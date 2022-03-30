@@ -119,7 +119,7 @@ func (t *TableOtoko) makeTable() *fyne.Container {
 			switch t.ColumnsType[i.Col] {
 			case "bool":
 				app_values[t.IDForm].Table[t.ID].wc[ic] = i
-				if t.Data[i.Row][i.Col] == "1" {
+				if t.Data[i.Row][i.Col] == "true" {
 					ic.Checked = true
 				} else {
 					ic.Checked = false
@@ -127,12 +127,16 @@ func (t *TableOtoko) makeTable() *fyne.Container {
 				ic.Refresh()
 				ic.Hidden = false
 			case "string":
-				entry.SetText(t.Data[i.Row][i.Col])
-				app_values[t.IDForm].Table[t.ID].we[entry] = i
-				entry.Hidden = false
+
+					entry.SetText(t.Data[i.Row][i.Col])
+					app_values[t.IDForm].Table[t.ID].we[entry] = i
+					entry.Hidden = false
+
 			default:
-				label.SetText(t.Data[i.Row][i.Col])
-				label.Hidden = false
+
+					label.SetText(t.Data[i.Row][i.Col])
+					label.Hidden = false
+				
 			}
 		})
 	for ic, v := range t.ColumnsWidth {
@@ -155,8 +159,6 @@ func (t *TableOtoko) makeTable() *fyne.Container {
 		},
 		),
 	)
-
-	
 
 	content := container.NewBorder(
 		container.NewVBox(

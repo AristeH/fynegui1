@@ -8,6 +8,7 @@ import (
 	"fynegui/ent/mdrekvizit"
 	"fynegui/ent/mdtabel"
 	"image/color"
+	"strconv"
 	"strings"
 
 	"fyne.io/fyne/v2"
@@ -104,49 +105,105 @@ func PutData(param []byte) []byte {
 	json.Unmarshal(param, &app)
 	if app.ID == "" {
 		client, _ := ent.Open("sqlite3", "C:/проект/fynegui/md.db?_fk=1")
-		parent, err := client.MDTabel.Query().Where(mdtabel.NameengEQ(app.Table)).All(context.Background())
+		tbl, err := client.MDTabel.Query().Where(mdtabel.NameengEQ(app.Table)).All(context.Background())
 
-		ps, err := client.MDRekvizit.Query().Where(mdrekvizit.OwnerID(parent[0].ID)).All(context.Background())
+		rec, err := client.MDRekvizit.Query().Order(ent.Asc(mdrekvizit.FieldPor)).Where(mdrekvizit.OwnerID(tbl[0].ID)).All(context.Background())
 		if err != nil {
 			WriteLog(fmt.Sprintf("tbl->Dial error:  (%s)", err))
 			return nil
 		}
 
-
-		ColumnsName := make([]string, len(app.Data[0]))
-		ColumnsType := make([]string, len(app.Data[0]))
-		ColumnsWidth := make([]float32, len(app.Data[0]))
-		//kolstrok := len(app.Data)/len(app.Data[0])
-		fd := app_values[app.Table]
-		for i := 1; i<len(app.Data);i++{
-			fd.Tree[app.Table].TextForTreeUID[app.Data[i][4]] = app.Data[i][3]
-			k:=fd.Tree[app.Table].TreeUIDMapping[app.Data[i][0]]
-			k = append(k, app.Data[i][4])
-			fd.Tree[app.Table].TreeUIDMapping[app.Data[i][0]] = k
-		}
-		//fd.Tree[app.Table].TreeUIDMapping = treeUIDMapping
-		//fd.Tree[app.Table].TextForTreeUID = textForTreeUID
-		fd.Tree[app.Table].Tree.Refresh()
-		for i := range app.Data[0] {
-			for _, field := range ps {
-				if app.Data[0][i] == field.Nameeng ||
-					app.Data[0][i] == field.Nameeng+"Name" {
-					app.Data[0][i] = field.Synonym
-					ColumnsWidth[i] = float32(field.WidthSpisok)
-					ColumnsType[i] = field.Type
-					ColumnsName[i] = field.Synonym
-				}
-				
+		kolstolb := 0
+		for _, field := range rec {
+			if field.Nameeng == "id" || field.WidthSpisok > 0 {
+				kolstolb++
 			}
 		}
+		kolstolb++
+		//kolstolb++
 
-		
-		fd.Table[app.Table].Data = app.Data
+		ColumnsName := make([]string, kolstolb)
+		ColumnsType := make([]string, kolstolb)
+		ColumnsWidth := make([]float32, kolstolb)
+		ColumnsNameRecive := make([]int, kolstolb)
+		ColumnsWidth[0] = 40
+		ColumnsType[0] = "string"
+		ColumnsName[0] = "N"
+		kolstolb = 1
+		for _, field := range rec {
+
+			if field.Nameeng != "id" && field.WidthSpisok == 0 {
+				continue
+			}
+			for i := 0; i < len(app.Data[0]); i++ {
+				if strings.ToUpper(app.Data[0][i]) == strings.ToUpper(field.Nameeng) {
+					ColumnsNameRecive[kolstolb] = i
+					break
+				}
+
+			}
+			if field.Nameeng == "id" {
+				ColumnsWidth[kolstolb] = 0
+				ColumnsType[kolstolb] = "string"
+
+			} else if strings.HasPrefix(field.Type, "string") {
+				ColumnsWidth[kolstolb] = float32(field.WidthSpisok)
+				ColumnsType[kolstolb] = "string"
+				ColumnsName[kolstolb] = field.Synonym
+			} else if strings.HasPrefix(field.Type, "bool") {
+				ColumnsWidth[kolstolb] = float32(field.WidthSpisok)
+				ColumnsType[kolstolb] = "bool"
+				ColumnsName[kolstolb] = field.Synonym
+			} else {
+				ColumnsWidth[kolstolb] = float32(field.WidthSpisok)
+				ColumnsType[kolstolb] = field.Type
+				ColumnsName[kolstolb] = field.Synonym
+			}
+			kolstolb++
+
+		}
+		fd := app_values[app.Table]
+		ParentID := 0
+		Name := 0
+		ID := 0
+		// name stolb
+		tabl := make([][]string, len(app.Data))
+		tabl[0] = make([]string, kolstolb)
+		for i := 0; i < len(ColumnsName); i++ {
+			tabl[0][i] = ColumnsName[i]
+		}
+		for i := 0; i < len(app.Data[0]); i++ {
+			if app.Data[0][i] == "ParentID" {
+				ParentID = i
+			} else if app.Data[0][i] == "Name" {
+				Name = i
+			} else if app.Data[0][i] == "ID" {
+				ID = i
+			}
+		}
+		//tree
+		for i := 1; i < len(app.Data); i++ {
+			fd.Tree[app.Table].TextForTreeUID[app.Data[i][ID]] = app.Data[i][Name]
+			k := fd.Tree[app.Table].TreeUIDMapping[app.Data[i][ParentID]]
+			k = append(k, app.Data[i][ID])
+			fd.Tree[app.Table].TreeUIDMapping[app.Data[i][0]] = k
+		}
+		fd.Tree[app.Table].Tree.Refresh()
+		//table
+		for i := 1; i < len(app.Data); i++ {
+			tabl[i] = make([]string, kolstolb)
+			tabl[i][0] = strconv.Itoa(i)
+
+			for j := 1; j < len(ColumnsName); j++ {
+				tabl[i][j] = app.Data[i][ColumnsNameRecive[j]]
+			}
+		}
+		fd.Table[app.Table].Data = tabl
 
 		fd.Table[app.Table].ColumnsType = ColumnsType
 		fd.Table[app.Table].ColumnsWidth = ColumnsWidth
 		fd.Table[app.Table].ColumnsName = ColumnsName
-
+		fd.Table[app.Table].Table.Refresh()
 		for ic, v := range ColumnsWidth {
 			fd.Table[app.Table].Table.SetColumnWidth(ic, v)
 		}
@@ -195,12 +252,11 @@ func GenFormTable(NameTable, IDForm string) (f *fyne.Container, t map[string]*Ta
 	return f, t
 }
 
-func GenFormTree(NameTree, IDForm string)  *widget.Tree {
+func GenFormTree(NameTree, IDForm string) *widget.Tree {
 
 	childUIDs := func(uid string) (c []string) {
 		return app_values[NameTree].Tree[NameTree].TreeUIDMapping[uid]
 	}
-	
 
 	createNode := func(branch bool) (o fyne.CanvasObject) {
 		return widget.NewLabel("")
@@ -220,12 +276,8 @@ func GenFormTree(NameTree, IDForm string)  *widget.Tree {
 		node.(*widget.Label).SetText(app_values[NameTree].Tree[NameTree].TextForTreeUID[uid])
 	}
 
-
-	return  widget.NewTree(childUIDs, isBranch, createNode, updateNode)
+	return widget.NewTree(childUIDs, isBranch, createNode, updateNode)
 }
-
-
-
 
 func makeCell() fyne.CanvasObject {
 	rect := canvas.NewRectangle(&color.RGBA{128, 128, 128, 255})
@@ -241,18 +293,16 @@ func GenForm(elemname, id string) {
 	top, entr := GenFormElem(elemname, id)
 	fd.Entry = entr
 
-	tabl, k := GenFormTable(elemname, id)
+	tabl, k := GenFormTable(elemname, elemname)
 	fd.Table = k
-	
 
-	fd.Tree =  make(map[string]*TreeOtoko)
-	f.Tree = GenFormTree(elemname, id)
+	fd.Tree = make(map[string]*TreeOtoko)
+	f.Tree = GenFormTree(elemname, elemname)
 	f.TextForTreeUID = make(map[string]string)
 	f.TreeUIDMapping = make(map[string][]string)
 	fd.Tree[elemname] = &f
 	//bottom := makeCell()
 	//left := makeCell()
-	
 
 	//right := makeCell()
 
@@ -260,18 +310,18 @@ func GenForm(elemname, id string) {
 	myWindow.Resize(fyne.NewSize(1200, 400))
 	fd.W = myWindow
 
-horizontalSplitter := container.NewHSplit( fd.Tree[elemname].Tree, tabl)
+	horizontalSplitter := container.NewHSplit(fd.Tree[elemname].Tree, tabl)
 	content := container.New(layout.NewBorderLayout(top, nil, nil, nil),
-		top,  horizontalSplitter)
-// 
+		top, horizontalSplitter)
+	//
 
 	// borderLayout := layout.NewBorderLayout(top, nil, left, right)
 	// content := fyne.newbNNewContainerWithLayout(border
 	// 	Layout, top, nil,left, left, horizontalSplitter)
-	
+
 	myWindow.SetContent(content)
 	myWindow.Show()
 	GenData(elemname, id)
 	GenData(elemname, "")
-	 fd.Tree[elemname].Tree.Refresh()
+	fd.Tree[elemname].Tree.Refresh()
 }
