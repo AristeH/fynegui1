@@ -2,15 +2,17 @@ package main
 
 import (
 	"fmt"
+	"image/color"
+	"log"
+	"sort"
+	"strconv"
+
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
-	"image/color"
-	"log"
-	"sort"
 )
 
 type TableOtoko struct {
@@ -50,6 +52,20 @@ func (t *TableOtoko) CreateHeader() {
 func (t *TableOtoko) LoadTable(mes []byte) {
 }
 
+func sortS(x [][]string, k int) {
+	var temp []string
+	n := len(x)
+	for i := 1; i < n; i++ {
+		for j := i; j < n; j++ {
+			if x[i][k] > x[j][k] {
+				temp = x[i]
+				x[i] = x[j]
+				x[j] = temp
+			}
+		}
+	}
+}
+
 func (t *TableOtoko) makeTable() *fyne.Container {
 	t.Table = widget.NewTable(
 		func() (int, int) {
@@ -61,14 +77,13 @@ func (t *TableOtoko) makeTable() *fyne.Container {
 			con := container.NewHBox()
 			con.Layout = layout.NewMaxLayout()
 			con.Add(widget.NewLabel(""))
-
 			check := widget.NewCheck("", nil)
 			check.OnChanged = func(b bool) {
 				i := app_values[t.IDForm].Table[t.ID].wc[check]
 				if check.Checked {
-					t.Data[i.Row][i.Col] = "1"
+					t.Data[i.Row][i.Col] = "true"
 				} else {
-					t.Data[i.Row][i.Col] = "0"
+					t.Data[i.Row][i.Col] = "false"
 				}
 				newTableCellID := widget.TableCellID{Col: i.Col, Row: i.Row + 1}
 				t.Table.ScrollTo(newTableCellID)
@@ -102,6 +117,11 @@ func (t *TableOtoko) makeTable() *fyne.Container {
 			} else {
 				rect.FillColor = t.RowColor
 			}
+			// определим цвет строки  изменена или нет
+			if i.Col == 0 {
+				rect.FillColor = color.Opaque
+			}
+
 			if i.Row == 0 {
 				rect.FillColor = t.HeaderColor
 			}
@@ -116,33 +136,46 @@ func (t *TableOtoko) makeTable() *fyne.Container {
 			label.Hidden = true
 			ic.Hidden = true
 			entry.Hidden = true
-			switch t.ColumnsType[i.Col] {
-			case "bool":
-				app_values[t.IDForm].Table[t.ID].wc[ic] = i
-				if t.Data[i.Row][i.Col] == "true" {
-					ic.Checked = true
-				} else {
-					ic.Checked = false
-				}
-				ic.Refresh()
-				ic.Hidden = false
-			case "string":
-
+			if i.Row == 0 {
+				label.SetText(t.Data[i.Row][i.Col])
+				label.Hidden = false
+			} else {
+				switch t.ColumnsType[i.Col] {
+				case "bool":
+					app_values[t.IDForm].Table[t.ID].wc[ic] = i
+					if t.Data[i.Row][i.Col] == "true" {
+						ic.Checked = true
+					} else {
+						ic.Checked = false
+					}
+					ic.Refresh()
+					ic.Hidden = false
+				case "string":
 					entry.SetText(t.Data[i.Row][i.Col])
 					app_values[t.IDForm].Table[t.ID].we[entry] = i
 					entry.Hidden = false
-
-			default:
+				case "ссылка":	
+				default:
 
 					label.SetText(t.Data[i.Row][i.Col])
 					label.Hidden = false
-				
+
+				}
 			}
 		})
 	for ic, v := range t.ColumnsWidth {
 		t.Table.SetColumnWidth(ic, v)
 	}
 	t.Table.OnSelected = func(id widget.TableCellID) {
+		if id.Row == 0 {
+			c := id.Col
+			sortS(t.Data, c)
+			n := len(t.Data)
+			for i := 1; i < n; i++ {
+				t.Data[i][0] = strconv.Itoa(i)
+			}
+		}
+		t.Table.Refresh()
 		fmt.Printf("i.Col: %v\n", id.Col)
 	}
 
@@ -164,6 +197,7 @@ func (t *TableOtoko) makeTable() *fyne.Container {
 		container.NewVBox(
 			t.Tool,
 			widget.NewSeparator(),
+			canvas.NewLine(color.Black),
 		),
 		nil, nil, nil, t.Table,
 	)

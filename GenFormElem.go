@@ -85,7 +85,8 @@ func GenFormLayout(fd map[string]entryForm, rek []*ent.MDRekvizit) *fyne.Contain
 			}
 		}
 	}
-	return grid
+
+	return container.NewVBox(grid,canvas.NewLine(color.Black))
 }
 
 func GenData(elemname string, id string) {
@@ -120,7 +121,6 @@ func PutData(param []byte) []byte {
 			}
 		}
 		kolstolb++
-		//kolstolb++
 
 		ColumnsName := make([]string, kolstolb)
 		ColumnsType := make([]string, kolstolb)
@@ -146,7 +146,7 @@ func PutData(param []byte) []byte {
 				ColumnsWidth[kolstolb] = 0
 				ColumnsType[kolstolb] = "string"
 
-			} else if strings.HasPrefix(field.Type, "string") {
+			} else if strings.HasPrefix( strings.ToUpper(field.Type), "STRING") {
 				ColumnsWidth[kolstolb] = float32(field.WidthSpisok)
 				ColumnsType[kolstolb] = "string"
 				ColumnsName[kolstolb] = field.Synonym
@@ -230,6 +230,7 @@ func PutData(param []byte) []byte {
 }
 
 func GenFormElem(elemname, id string) (f *fyne.Container, fEntry map[string]entryForm) {
+	Clientsqllite, _ := ent.Open("sqlite3", "C:/проект/fynegui/md.db?_fk=1")
 	ctx := context.Background()
 	ps, err := Clientsqllite.MDTabel.Query().WithMdrekvizits().Where(mdtabel.NameengEQ(elemname)).All(ctx)
 	if err != nil {
@@ -241,6 +242,7 @@ func GenFormElem(elemname, id string) (f *fyne.Container, fEntry map[string]entr
 }
 
 func GenFormTable(NameTable, IDForm string) (f *fyne.Container, t map[string]*TableOtoko) {
+	Clientsqllite, _ := ent.Open("sqlite3", "C:/проект/fynegui/md.db?_fk=1")
 	ctx := context.Background()
 	_, err := Clientsqllite.MDTabel.Query().WithMdrekvizits().Where(mdtabel.NameengEQ(NameTable)).All(ctx)
 	if err != nil {
