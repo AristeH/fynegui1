@@ -2,9 +2,11 @@ package main
 
 import (
 	"context"
+	"strings"
 
 	"fynegui/ent"
 	"fynegui/ent/mdsubsystems"
+
 	//"fynegui/ent/mdtabel"
 	"image/color"
 
@@ -15,7 +17,6 @@ import (
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/layout"
-
 
 	//"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
@@ -40,7 +41,7 @@ func toolMain() *fyne.Container {
 		but := widget.NewButton(b.Namerus, func() {
 			toolMain21(b.ID )
 		})
-		ch.AddObject(but)
+		ch.Add(but)
 	}
 	return ch
 }
@@ -56,15 +57,17 @@ func toolMain21(sub string) fyne.CanvasObject {
 	}
 	ch := widget.NewAccordion()
 
-cont := container.NewVBox()
+	cont := container.NewVBox()
 	for _, b := range tbl {
-		
-		but := widget.NewButton(b.Namerus, func() {
-			GenForm(b.Nameeng, "0046247f-bd7a-11e7-823e-1c98ec28debf")
-		})
-	cont.AddObject(but)
-
-	
+		d := widget.NewButton(b.Namerus, nil)
+		d.OnTapped = func() {
+			param, _ := findButton(d)
+			mp := strings.Split(param, ";")
+			GenForm(mp[0], mp[1])
+		}
+		p :=  b.Nameeng +";"+"0046247f-bd7a-11e7-823e-1c98ec28debf"
+		app_values["main"].Button[b.Namerus] = ButtonData{Fun: b.Nameeng +"GenForm", Parameters: p, Widget: d}
+		cont.Add(d)
 	}
 			ch.Append(&widget.AccordionItem{
 			Title:  "таблицы",
@@ -80,6 +83,10 @@ func main() {
 	go connectServer()
 
 	myWindow := myApp.NewWindow("TabContainer Widget")
+	myWindow.Resize(fyne.NewSize(1200, 400))
+	app_values["main"]= &FormData{}
+	app_values["main"].W = myWindow
+	app_values["main"].Button = make(map[string]ButtonData)
 	top := toolMain()
 
 	//top := canvas.NewText("top bar", color.White)
@@ -87,7 +94,7 @@ func main() {
 	middle := canvas.NewText("content", color.White)
 	content := container.New(layout.NewBorderLayout(top, nil, left, nil),
 		top, left, middle)
-	myWindow.Resize(fyne.NewSize(1200, 400))
+
 	myWindow.SetContent(content)
 	myWindow.ShowAndRun()
 }

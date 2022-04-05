@@ -106,7 +106,7 @@ func PutData(param []byte) []byte {
 	json.Unmarshal(param, &app)
 	if app.ID == "" {
 		client, _ := ent.Open("sqlite3", "C:/проект/fynegui/md.db?_fk=1")
-		tbl, err := client.MDTabel.Query().Where(mdtabel.NameengEQ(app.Table)).All(context.Background())
+		tbl, _ := client.MDTabel.Query().Where(mdtabel.NameengEQ(app.Table)).All(context.Background())
 
 		rec, err := client.MDRekvizit.Query().Order(ent.Asc(mdrekvizit.FieldPor)).Where(mdrekvizit.OwnerID(tbl[0].ID)).All(context.Background())
 		if err != nil {
