@@ -17,14 +17,13 @@ type fileUP struct{
 func GetFile(param []byte) []byte {
 	var p *fileUP
 	json.Unmarshal(param, &p)
-
 	file, err := os.Create(p.Name)
-    defer file.Close()
-    if err != nil {
+     if err != nil {
         log.Fatal(err)
     }
-
 	buffer := bufio.NewWriter(file)
 	buffer.Write(p.Content)
+	defer file.Close()
 	return nil
+
 }

@@ -7,10 +7,7 @@ import (
 	"fynegui/ent"
 	"fynegui/ent/mdsubsystems"
 
-	//"fynegui/ent/mdtabel"
 	"image/color"
-
-	"strconv"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
@@ -18,20 +15,21 @@ import (
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/layout"
 
-	//"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 	_ "github.com/mattn/go-sqlite3"
 )
 
-var left fyne.CanvasObject 
+var left fyne.CanvasObject
 
 // список форм
 var app_values = make(map[string]*FormData)
 var myApp = app.New()
 var Clientsqllite *ent.Client
 
+// toolMain функция отображающая подсистемы
 func toolMain() *fyne.Container {
 	client, _ := ent.Open("sqlite3", "C:/проект/fynegui/md.db?_fk=1")
+	defer client.Close()
 	tbl, err := client.MDSubSystems.Query().All(context.Background())
 	if err != nil {
 		println(err)
@@ -39,25 +37,26 @@ func toolMain() *fyne.Container {
 	ch := container.NewHBox()
 	for _, b := range tbl {
 		but := widget.NewButton(b.Namerus, func() {
-			toolMain21(b.ID )
+			toolMain21(b.ID)
 		})
 		ch.Add(but)
 	}
 	return ch
 }
 
-
-
+// toolMain функция отображающая таблицы подсистемы
 func toolMain21(sub string) fyne.CanvasObject {
 
 	client, _ := ent.Open("sqlite3", "C:/проект/fynegui/md.db?_fk=1")
+	defer client.Close()
 	tbl, err := client.MDSubSystems.Query().Where(mdsubsystems.IDEQ(sub)).QueryMdtables().All(context.Background())
 	if err != nil {
 		println(err)
 	}
 	ch := widget.NewAccordion()
+	contCatalog := container.NewVBox()
+	contDocument := container.NewVBox()
 
-	cont := container.NewVBox()
 	for _, b := range tbl {
 		d := widget.NewButton(b.Namerus, nil)
 		d.OnTapped = func() {
@@ -65,17 +64,24 @@ func toolMain21(sub string) fyne.CanvasObject {
 			mp := strings.Split(param, ";")
 			GenForm(mp[0], mp[1])
 		}
-		p :=  b.Nameeng +";"+"0046247f-bd7a-11e7-823e-1c98ec28debf"
-		app_values["main"].Button[b.Namerus] = ButtonData{Fun: b.Nameeng +"GenForm", Parameters: p, Widget: d}
-		cont.Add(d)
+		p := b.Nameeng + ";" + "0046247f-bd7a-11e7-823e-1c98ec28debf"
+		app_values["main"].Button[b.Namerus] = ButtonData{Fun: b.Nameeng + "GenForm", Parameters: p, Widget: d}
+		switch b.Type {
+		case "Справочник":
+		contCatalog.Add(d)
+
+		case "Документ":
+			contDocument.Add(d)
+
+		}
 	}
-			ch.Append(&widget.AccordionItem{
-			Title:  "таблицы",
-			Detail: cont,},
-		)
+
+	ch.Append(&widget.AccordionItem{Title:  "Документы",  Detail: contDocument},)
+	ch.Append(&widget.AccordionItem{Title:  "Справочники",Detail: contCatalog},)
+	
+
 	return ch
 }
-
 
 func main() {
 	RegFunc("GetFile", GetFile)
@@ -84,7 +90,7 @@ func main() {
 
 	myWindow := myApp.NewWindow("TabContainer Widget")
 	myWindow.Resize(fyne.NewSize(1200, 400))
-	app_values["main"]= &FormData{}
+	app_values["main"] = &FormData{}
 	app_values["main"].W = myWindow
 	app_values["main"].Button = make(map[string]ButtonData)
 	top := toolMain()
@@ -101,9 +107,6 @@ func main() {
 
 func makeTable(IDForm, IDTable string) *TableOtoko {
 	var t = make([][]string, 3)
-	for i := range t {
-		t[i] = []string{strconv.Itoa(i)}
-	}
 	var TO = TableOtoko{}
 	TO.ColumnsName = []string{"node_0"}
 	TO.ColumnsType = []string{"label"}
@@ -119,29 +122,4 @@ func makeTable(IDForm, IDTable string) *TableOtoko {
 	TO.wc = make(map[*widget.Check]widget.TableCellID)
 	TO.we = make(map[*enterEntry]widget.TableCellID)
 	return &TO
-}
-
-func Example_Todo() {
-	// client, err := ent.Open("sqlite3", "C:/проект/fynegui/md.db?_fk=1")
-	// if err != nil {
-	// 	WriteLog(fmt.Sprintf("failed opening connection to sqlite: %v", err))
-	// }
-	// defer client.Close()
-	// // Run the auto migration tool.
-	// if err := client.Schema.Create(context.Background()); err != nil {
-	// 	WriteLog(fmt.Sprintf("db ->failed creating schema resources: %v", err))
-	// }
-	// Clientsqllite = client
-	// ctx := context.Background()
-	// ps1, err := Clientsqllite.MDSubSystems.Query().All(ctx)
-	// fmt.Printf(ps1[0].Synonym)
-	// if err != nil {
-	// 	WriteLog(fmt.Sprintf("tbl->Dial error:  (%s)", err))
-	// 	return
-	// }
-	// if err != nil {
-	// 	WriteLog(fmt.Sprintf("Connect ent error:  (%s)", err))
-	// }
-	//GenFormElem("Phone", "eddcc74e-655d-11eb-9325-10f0058e0aed")
-	GenForm("Department", "0046247f-bd7a-11e7-823e-1c98ec28debf")
 }

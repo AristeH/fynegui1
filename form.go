@@ -60,18 +60,6 @@ type Form struct {
 	Table   []byte
 }
 
-// обновим форму
-func update_data(fd *FormData, res Message) {
-	var form_data Form
-	json.Unmarshal([]byte(res.Parameters), &form_data)
-	// обновим сведения о форме
-	// for key, value := range form_data {
-	// 	i, ok := app_values[key]
-	// 	if ok {
-	// 		fmt.Println("Key:", value, "Value:", i)
-	// 	}
-	// }
-}
 
 func create_form(res Message) {
 	var form_data Form

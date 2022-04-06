@@ -18,34 +18,6 @@ import (
 	"fyne.io/fyne/v2/widget"
 )
 
-var textForTreeUID = map[string]string{
-	"node_0":        "foo",
-	"node_1":        "bar",
-	"node_2":        "baz",
-	"node_3":        "floop",
-	"node_4":        "beep",
-	"node_5":        "flarb",
-	"subnode_0":     "subnode of foo",
-	"subnode_1":     "subnode of bar",
-	"subnode_2":     "subnode of baz",
-	"subnode_3":     "subnode of floop",
-	"subnode_4":     "subnode of beep",
-	"subnode_5_XXX": "flarb - because you're worth it",
-	"subnode_5_YYY": "flarb - oh my, this is tasty flarb",
-	"subnode_5_ZZZ": "flarb - enough is never enough",
-}
-
-var treeUIDMapping = map[string][]string{
-	"":              {"node_0", "node_1", "node_2", "node_3", "node_4", "node_5"},
-	"node_0":        {"subnode_0"},
-	"node_1":        {"subnode_1"},
-	"node_2":        {"subnode_2"},
-	"node_3":        {"subnode_3"},
-	"node_4":        {"subnode_4"},
-	"node_5":        {"subnode_5_XXX", "subnode_5_YYY"},
-	"subnode_5_XXX": {"subnode_5_ZZZ"},
-}
-
 type Message struct {
 	Action     []byte // имя  функции
 	Parameters []byte // параметры
@@ -71,10 +43,10 @@ func GenFormLayout(fd map[string]entryForm, rek []*ent.MDRekvizit) *fyne.Contain
 				input.SetPlaceHolder(v.Namerus)
 				fd[v.Nameeng] = entryForm{Value: "", Widget: input}
 				contentb := widget.NewButton("...", func() {
-					WriteLog(fmt.Sprintf("tapped"))
+					WriteLog("tapped")
 				})
 				contentb1 := widget.NewButton("?", func() {
-					WriteLog(fmt.Sprintf("tapped"))
+					WriteLog("tapped")
 				})
 				con := container.NewBorder(nil, nil,
 					nil, container.NewHBox(contentb, contentb1),
@@ -116,7 +88,11 @@ func PutData(param []byte) []byte {
 
 		kolstolb := 0
 		for _, field := range rec {
-			if field.Nameeng == "id" || field.WidthSpisok > 0 {
+			if field.Nameeng == "id"{
+				kolstolb++
+				continue
+			}
+			if field.WidthSpisok > 0 {
 				kolstolb++
 			}
 		}
@@ -132,11 +108,14 @@ func PutData(param []byte) []byte {
 		kolstolb = 1
 		for _, field := range rec {
 
-			if field.Nameeng != "id" && field.WidthSpisok == 0 {
+			// if field.Nameeng == "id" {
+			// 	continue
+			// }
+			if field.WidthSpisok == 0 {
 				continue
 			}
 			for i := 0; i < len(app.Data[0]); i++ {
-				if strings.ToUpper(app.Data[0][i]) == strings.ToUpper(field.Nameeng) {
+				if strings.EqualFold(app.Data[0][i], field.Nameeng) || strings.EqualFold(app.Data[0][i], field.Nameeng+"Name"){
 					ColumnsNameRecive[kolstolb] = i
 					break
 				}
@@ -145,13 +124,14 @@ func PutData(param []byte) []byte {
 			if field.Nameeng == "id" {
 				ColumnsWidth[kolstolb] = 0
 				ColumnsType[kolstolb] = "string"
+				ColumnsName[kolstolb] = field.Synonym
 
 			} else if strings.HasPrefix( strings.ToUpper(field.Type), "STRING") {
 				ColumnsWidth[kolstolb] = float32(field.WidthSpisok)
 				ColumnsType[kolstolb] = "string"
 				ColumnsName[kolstolb] = field.Synonym
 			} else if strings.HasPrefix(field.Type, "bool") {
-				ColumnsWidth[kolstolb] = float32(field.WidthSpisok)
+				ColumnsWidth[kolstolb] = float32(len(field.Synonym))
 				ColumnsType[kolstolb] = "bool"
 				ColumnsName[kolstolb] = field.Synonym
 			} else {
@@ -169,9 +149,7 @@ func PutData(param []byte) []byte {
 		// name stolb
 		tabl := make([][]string, len(app.Data))
 		tabl[0] = make([]string, kolstolb)
-		for i := 0; i < len(ColumnsName); i++ {
-			tabl[0][i] = ColumnsName[i]
-		}
+		copy(tabl[0],ColumnsName)
 		for i := 0; i < len(app.Data[0]); i++ {
 			if app.Data[0][i] == "ParentID" {
 				ParentID = i
@@ -195,9 +173,16 @@ func PutData(param []byte) []byte {
 			tabl[i][0] = strconv.Itoa(i)
 
 			for j := 1; j < len(ColumnsName); j++ {
-				tabl[i][j] = app.Data[i][ColumnsNameRecive[j]]
+				 
+				if ColumnsType[j] == "Time"{
+					tabl[i][j] = app.Data[i][ColumnsNameRecive[j]]
+				}else{
+					tabl[i][j] = app.Data[i][ColumnsNameRecive[j]]
+				}
+				ColumnsWidth[j] = float32( len(app.Data[i][ColumnsNameRecive[j]]))*9
 			}
 		}
+		ColumnsWidth[0] = float32( len(strconv.Itoa(len(app.Data))))*12
 		fd.Table[app.Table].Data = tabl
 
 		fd.Table[app.Table].ColumnsType = ColumnsType
@@ -206,6 +191,10 @@ func PutData(param []byte) []byte {
 		fd.Table[app.Table].Table.Refresh()
 		for ic, v := range ColumnsWidth {
 			fd.Table[app.Table].Table.SetColumnWidth(ic, v)
+			if ColumnsName[ic] == "Ссылка"{
+				fd.Table[app.Table].Table.SetColumnWidth(ic, 0)
+			}
+			
 		}
 		println(ColumnsType)
 	} else {
@@ -279,12 +268,6 @@ func GenFormTree(NameTree, IDForm string) *widget.Tree {
 	}
 
 	return widget.NewTree(childUIDs, isBranch, createNode, updateNode)
-}
-
-func makeCell() fyne.CanvasObject {
-	rect := canvas.NewRectangle(&color.RGBA{128, 128, 128, 255})
-	rect.SetMinSize(fyne.NewSize(30, 30))
-	return rect
 }
 
 func GenForm(elemname, id string) {
