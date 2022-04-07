@@ -7,12 +7,12 @@ import (
 	"fynegui/ent"
 	"fynegui/ent/mdrekvizit"
 	"fynegui/ent/mdtabel"
-	"image/color"
+	//"image/color"
 	"strconv"
 	"strings"
 
 	"fyne.io/fyne/v2"
-	"fyne.io/fyne/v2/canvas"
+	//"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/widget"
@@ -30,14 +30,28 @@ type Getdate struct {
 }
 
 func GenFormLayout(fd map[string]entryForm, rek []*ent.MDRekvizit) *fyne.Container {
-	grid := container.New(layout.NewFormLayout())
+	//var pages = make(map[string]string)
+	var columns = make(map[float64]*widget.Form)
+	// разделим вывод
+	form := widget.NewForm()
+	form.SubmitText = "jgyjhjg"
+	for _, v := range rek {
+		if _, ok := columns[v.WidthElem]; !ok {
+			form := widget.NewForm()
+			form.SubmitText = "jgyjhjg"
+			columns[v.WidthElem] = form
+		}
+	}
+	gri := container.New(layout.NewGridLayout(len(columns)))
+	for _, v := range columns {
+		gri.Add(v)
+	}
+
 	for _, v := range rek {
 		if v.Nameeng != "id" && v.Type != "String,0" {
-			label := widget.NewLabel(v.Synonym)
-			grid.Add(label)
 			if strings.HasPrefix(v.Type, "bool") {
-				input := widget.NewCheck("", nil)
-				grid.Add(input)
+				con := widget.NewCheck("", nil)
+			    columns[v.WidthElem].Items = append(columns[v.WidthElem].Items, widget.NewFormItem(v.Synonym,con))
 			} else {
 				input := widget.NewEntry()
 				input.SetPlaceHolder(v.Namerus)
@@ -53,12 +67,11 @@ func GenFormLayout(fd map[string]entryForm, rek []*ent.MDRekvizit) *fyne.Contain
 					// Middle
 					input,
 				)
-				grid.Add(con)
+				columns[v.WidthElem].Items = append(columns[v.WidthElem].Items, widget.NewFormItem(v.Synonym,con))
 			}
 		}
 	}
-
-	return container.NewVBox(grid,canvas.NewLine(color.Black))
+	return gri
 }
 
 func GenData(elemname string, id string) {
@@ -85,37 +98,35 @@ func PutData(param []byte) []byte {
 			WriteLog(fmt.Sprintf("tbl->Dial error:  (%s)", err))
 			return nil
 		}
-
+		// посчитаем сколько столбцов нужно отобразить
 		kolstolb := 0
 		for _, field := range rec {
-			if field.Nameeng == "id"{
-				kolstolb++
+			if field.Nameeng == "id" {
+				kolstolb++ // столбец для гуид
+
 				continue
 			}
 			if field.WidthSpisok > 0 {
-				kolstolb++
+				kolstolb++ // столбец с шириной > 0
 			}
 		}
-		kolstolb++
+		kolstolb++ // столбец для нумерации
 
 		ColumnsName := make([]string, kolstolb)
 		ColumnsType := make([]string, kolstolb)
 		ColumnsWidth := make([]float32, kolstolb)
 		ColumnsNameRecive := make([]int, kolstolb)
 		ColumnsWidth[0] = 40
-		ColumnsType[0] = "string"
+		ColumnsType[0] = "label"
 		ColumnsName[0] = "N"
 		kolstolb = 1
 		for _, field := range rec {
-
-			// if field.Nameeng == "id" {
-			// 	continue
-			// }
+			// пропустим столбец нулевой длины
 			if field.WidthSpisok == 0 {
 				continue
 			}
 			for i := 0; i < len(app.Data[0]); i++ {
-				if strings.EqualFold(app.Data[0][i], field.Nameeng) || strings.EqualFold(app.Data[0][i], field.Nameeng+"Name"){
+				if strings.EqualFold(app.Data[0][i], field.Nameeng) || strings.EqualFold(app.Data[0][i], field.Nameeng+"Name") {
 					ColumnsNameRecive[kolstolb] = i
 					break
 				}
@@ -123,10 +134,10 @@ func PutData(param []byte) []byte {
 			}
 			if field.Nameeng == "id" {
 				ColumnsWidth[kolstolb] = 0
-				ColumnsType[kolstolb] = "string"
+				ColumnsType[kolstolb] = "label"
 				ColumnsName[kolstolb] = field.Synonym
 
-			} else if strings.HasPrefix( strings.ToUpper(field.Type), "STRING") {
+			} else if strings.HasPrefix(strings.ToUpper(field.Type), "STRING") {
 				ColumnsWidth[kolstolb] = float32(field.WidthSpisok)
 				ColumnsType[kolstolb] = "string"
 				ColumnsName[kolstolb] = field.Synonym
@@ -149,7 +160,7 @@ func PutData(param []byte) []byte {
 		// name stolb
 		tabl := make([][]string, len(app.Data))
 		tabl[0] = make([]string, kolstolb)
-		copy(tabl[0],ColumnsName)
+		copy(tabl[0], ColumnsName)
 		for i := 0; i < len(app.Data[0]); i++ {
 			if app.Data[0][i] == "ParentID" {
 				ParentID = i
@@ -173,16 +184,16 @@ func PutData(param []byte) []byte {
 			tabl[i][0] = strconv.Itoa(i)
 
 			for j := 1; j < len(ColumnsName); j++ {
-				 
-				if ColumnsType[j] == "Time"{
+
+				if ColumnsType[j] == "Time" {
 					tabl[i][j] = app.Data[i][ColumnsNameRecive[j]]
-				}else{
+				} else {
 					tabl[i][j] = app.Data[i][ColumnsNameRecive[j]]
 				}
-				ColumnsWidth[j] = float32( len(app.Data[i][ColumnsNameRecive[j]]))*9
+				ColumnsWidth[j] = float32(len(app.Data[i][ColumnsNameRecive[j]])) * 9
 			}
 		}
-		ColumnsWidth[0] = float32( len(strconv.Itoa(len(app.Data))))*12
+		ColumnsWidth[0] = float32(len(strconv.Itoa(len(app.Data)))) * 12
 		fd.Table[app.Table].Data = tabl
 
 		fd.Table[app.Table].ColumnsType = ColumnsType
@@ -191,10 +202,10 @@ func PutData(param []byte) []byte {
 		fd.Table[app.Table].Table.Refresh()
 		for ic, v := range ColumnsWidth {
 			fd.Table[app.Table].Table.SetColumnWidth(ic, v)
-			if ColumnsName[ic] == "Ссылка"{
+			if ColumnsName[ic] == "Ссылка" {
 				fd.Table[app.Table].Table.SetColumnWidth(ic, 0)
 			}
-			
+
 		}
 		println(ColumnsType)
 	} else {
