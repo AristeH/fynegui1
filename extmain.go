@@ -126,8 +126,7 @@ func write() {
 	}()
 
 	for {
-		select {
-		case message, ok := <-Cl.Reci:
+		 message, ok := <-Cl.Reci
 			println("пишем в сокет")
 			if !ok {
 				err := Cl.socket.WriteMessage(websocket.CloseMessage, []byte{})
@@ -145,7 +144,6 @@ func write() {
 				fmt.Println("ошибка ping:", err)
 				return
 			}
-		}
 	}
 }
 
