@@ -3,18 +3,14 @@ package main
 import (
 	"context"
 	"strings"
-
 	"fynegui/ent"
 	"fynegui/ent/mdsubsystems"
-
 	"image/color"
-
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/layout"
-
 	"fyne.io/fyne/v2/widget"
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -118,8 +114,8 @@ func makeTable(IDForm, IDTable string) *TableOtoko {
 	TO.Edit = true
 	TO.ID = IDTable
 	TO.IDForm = IDForm
-	TO.wb = make(map[*widget.Button]int)
-	TO.wc = make(map[*widget.Check]widget.TableCellID)
-	TO.we = make(map[*enterEntry]widget.TableCellID)
+	//TO.wb = make(map[*widget.Button]int)
+	TO.wc = make(map[widget.TableCellID]*enterCheck)
+	TO.we = make(map[widget.TableCellID]*enterEntry)
 	return &TO
 }

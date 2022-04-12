@@ -33,13 +33,9 @@ func GenFormLayout(fd map[string]entryForm, rek []*ent.MDRekvizit) *fyne.Contain
 	//var pages = make(map[string]string)
 	var columns = make(map[float64]*widget.Form)
 	// разделим вывод
-	form := widget.NewForm()
-	form.SubmitText = "jgyjhjg"
 	for _, v := range rek {
 		if _, ok := columns[v.WidthElem]; !ok {
-			form := widget.NewForm()
-			form.SubmitText = "jgyjhjg"
-			columns[v.WidthElem] = form
+			columns[v.WidthElem] = widget.NewForm()
 		}
 	}
 	gri := container.New(layout.NewGridLayout(len(columns)))
@@ -51,7 +47,7 @@ func GenFormLayout(fd map[string]entryForm, rek []*ent.MDRekvizit) *fyne.Contain
 		if v.Nameeng != "id" && v.Type != "String,0" {
 			if strings.HasPrefix(v.Type, "bool") {
 				con := widget.NewCheck("", nil)
-			    columns[v.WidthElem].Items = append(columns[v.WidthElem].Items, widget.NewFormItem(v.Synonym,con))
+				columns[v.WidthElem].Items = append(columns[v.WidthElem].Items, widget.NewFormItem(v.Synonym, con))
 			} else {
 				input := widget.NewEntry()
 				input.SetPlaceHolder(v.Namerus)
@@ -67,7 +63,7 @@ func GenFormLayout(fd map[string]entryForm, rek []*ent.MDRekvizit) *fyne.Contain
 					// Middle
 					input,
 				)
-				columns[v.WidthElem].Items = append(columns[v.WidthElem].Items, widget.NewFormItem(v.Synonym,con))
+				columns[v.WidthElem].Items = append(columns[v.WidthElem].Items, widget.NewFormItem(v.Synonym, con))
 			}
 		}
 	}
@@ -92,7 +88,6 @@ func PutData(param []byte) []byte {
 	if app.ID == "" {
 		client, _ := ent.Open("sqlite3", "C:/проект/fynegui/md.db?_fk=1")
 		tbl, _ := client.MDTabel.Query().Where(mdtabel.NameengEQ(app.Table)).All(context.Background())
-
 		rec, err := client.MDRekvizit.Query().Order(ent.Asc(mdrekvizit.FieldPor)).Where(mdrekvizit.OwnerID(tbl[0].ID)).All(context.Background())
 		if err != nil {
 			WriteLog(fmt.Sprintf("tbl->Dial error:  (%s)", err))
@@ -103,7 +98,6 @@ func PutData(param []byte) []byte {
 		for _, field := range rec {
 			if field.Nameeng == "id" {
 				kolstolb++ // столбец для гуид
-
 				continue
 			}
 			if field.WidthSpisok > 0 {
@@ -116,10 +110,10 @@ func PutData(param []byte) []byte {
 		ColumnsType := make([]string, kolstolb)
 		ColumnsWidth := make([]float32, kolstolb)
 		ColumnsNameRecive := make([]int, kolstolb)
-		ColumnsWidth[0] = 40
-		ColumnsType[0] = "label"
-		ColumnsName[0] = "N"
-		kolstolb = 1
+		ColumnsWidth[1] = 40
+		ColumnsType[1] = "string"
+		ColumnsName[1] = "N"
+		kolstolb = 2
 		for _, field := range rec {
 			// пропустим столбец нулевой длины
 			if field.WidthSpisok == 0 {
@@ -127,30 +121,31 @@ func PutData(param []byte) []byte {
 			}
 			for i := 0; i < len(app.Data[0]); i++ {
 				if strings.EqualFold(app.Data[0][i], field.Nameeng) || strings.EqualFold(app.Data[0][i], field.Nameeng+"Name") {
-					ColumnsNameRecive[kolstolb] = i
-					break
+					if field.Nameeng == "id" {
+						ColumnsNameRecive[0] = i
+						ColumnsWidth[0] = 0
+						ColumnsType[0] = "string"
+						ColumnsName[0] = "id"
+					} else {
+						ColumnsNameRecive[kolstolb] = i
+						if strings.HasPrefix(strings.ToUpper(field.Type), "STRING") {
+							ColumnsWidth[kolstolb] = float32(field.WidthSpisok)
+							ColumnsType[kolstolb] = "string"
+							ColumnsName[kolstolb] = field.Synonym
+						} else if strings.HasPrefix(field.Type, "bool") {
+							ColumnsWidth[kolstolb] = float32(len(field.Synonym))
+							ColumnsType[kolstolb] = "bool"
+							ColumnsName[kolstolb] = field.Synonym
+						} else {
+							ColumnsWidth[kolstolb] = float32(field.WidthSpisok)
+							ColumnsType[kolstolb] = field.Type
+							ColumnsName[kolstolb] = field.Synonym
+						}
+						kolstolb++
+						break
+					}
 				}
-
 			}
-			if field.Nameeng == "id" {
-				ColumnsWidth[kolstolb] = 0
-				ColumnsType[kolstolb] = "label"
-				ColumnsName[kolstolb] = field.Synonym
-
-			} else if strings.HasPrefix(strings.ToUpper(field.Type), "STRING") {
-				ColumnsWidth[kolstolb] = float32(field.WidthSpisok)
-				ColumnsType[kolstolb] = "string"
-				ColumnsName[kolstolb] = field.Synonym
-			} else if strings.HasPrefix(field.Type, "bool") {
-				ColumnsWidth[kolstolb] = float32(len(field.Synonym))
-				ColumnsType[kolstolb] = "bool"
-				ColumnsName[kolstolb] = field.Synonym
-			} else {
-				ColumnsWidth[kolstolb] = float32(field.WidthSpisok)
-				ColumnsType[kolstolb] = field.Type
-				ColumnsName[kolstolb] = field.Synonym
-			}
-			kolstolb++
 
 		}
 		fd := app_values[app.Table]
@@ -161,29 +156,34 @@ func PutData(param []byte) []byte {
 		tabl := make([][]string, len(app.Data))
 		tabl[0] = make([]string, kolstolb)
 		copy(tabl[0], ColumnsName)
+		tree := false
 		for i := 0; i < len(app.Data[0]); i++ {
 			if app.Data[0][i] == "ParentID" {
 				ParentID = i
+				tree = true
 			} else if app.Data[0][i] == "Name" {
 				Name = i
 			} else if app.Data[0][i] == "ID" {
 				ID = i
 			}
 		}
-		//tree
-		for i := 1; i < len(app.Data); i++ {
-			fd.Tree[app.Table].TextForTreeUID[app.Data[i][ID]] = app.Data[i][Name]
-			k := fd.Tree[app.Table].TreeUIDMapping[app.Data[i][ParentID]]
-			k = append(k, app.Data[i][ID])
-			fd.Tree[app.Table].TreeUIDMapping[app.Data[i][0]] = k
+		if tree {
+			for i := 1; i < len(app.Data); i++ {
+				fd.Tree[app.Table].TextForTreeUID[app.Data[i][ID]] = app.Data[i][Name]
+				k := fd.Tree[app.Table].TreeUIDMapping[app.Data[i][ParentID]]
+				k = append(k, app.Data[i][ID])
+				fd.Tree[app.Table].TreeUIDMapping[app.Data[i][0]] = k
+			}
+			fd.Tree[app.Table].Tree.Refresh()
+		} else {
+			fd.Tree[app.Table].Tree.Hide()
 		}
-		fd.Tree[app.Table].Tree.Refresh()
 		//table
 		for i := 1; i < len(app.Data); i++ {
 			tabl[i] = make([]string, kolstolb)
-			tabl[i][0] = strconv.Itoa(i)
+			
 
-			for j := 1; j < len(ColumnsName); j++ {
+			for j := 0; j < len(ColumnsName); j++ {
 
 				if ColumnsType[j] == "Time" {
 					tabl[i][j] = app.Data[i][ColumnsNameRecive[j]]
@@ -192,32 +192,33 @@ func PutData(param []byte) []byte {
 				}
 				ColumnsWidth[j] = float32(len(app.Data[i][ColumnsNameRecive[j]])) * 9
 			}
+			tabl[i][1] = strconv.Itoa(i)
 		}
-		ColumnsWidth[0] = float32(len(strconv.Itoa(len(app.Data)))) * 12
+		ColumnsWidth[0] = 0
+		ColumnsWidth[1] = float32(len(strconv.Itoa(len(app.Data)))) * 12
 		fd.Table[app.Table].Data = tabl
 
 		fd.Table[app.Table].ColumnsType = ColumnsType
 		fd.Table[app.Table].ColumnsWidth = ColumnsWidth
 		fd.Table[app.Table].ColumnsName = ColumnsName
-		fd.Table[app.Table].Table.Refresh()
+
 		for ic, v := range ColumnsWidth {
 			fd.Table[app.Table].Table.SetColumnWidth(ic, v)
 			if ColumnsName[ic] == "Ссылка" {
 				fd.Table[app.Table].Table.SetColumnWidth(ic, 0)
 			}
-
 		}
-		println(ColumnsType)
+		fd.Table[app.Table].Table.Refresh()
+
 	} else {
-		// обхода двумерного массива
-		for i, f := range app.Data {
-			for j := range f {
-				if i > 0 {
+		for row, st := range app.Data { //получим строку
+			for col := range st { // колонку
+				if row > 0 {
 					for _, v3 := range app_values {
 						for k, v4 := range v3.Entry {
-							if k == app.Data[0][j] || k+"Name" == app.Data[0][j] {
-								v4.Value = app.Data[i][j]
-								v4.Widget.SetText(app.Data[i][j])
+							if k == app.Data[0][col] || k+"Name" == app.Data[0][col] {
+								v4.Value = app.Data[row][col]
+								v4.Widget.SetText(app.Data[row][col])
 							}
 						}
 					}

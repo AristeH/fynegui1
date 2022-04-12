@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"image/color"
 	"log"
-	"sort"
 	"strconv"
+	"strings"
 
+	//"sort"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
@@ -29,27 +30,8 @@ type TableOtoko struct {
 	Edit          bool
 	Tool          *widget.Toolbar
 	Table         *widget.Table
-	Header        *fyne.Container
-	we            map[*enterEntry]widget.TableCellID
-	wc            map[*widget.Check]widget.TableCellID
-	wb            map[*widget.Button]int
-}
-
-func (t *TableOtoko) CreateHeader() {
-	t.Header = container.New(&ToolButton{IDForm: t.IDForm, IDTable: t.ID})
-	for col, value := range t.ColumnsName {
-		d := widget.NewButtonWithIcon(value, nil, nil)
-		d.OnTapped = func() {
-			c := app_values[t.IDForm].Table[t.ID].wb[d]
-			sort.Slice(t.Data, func(i, j int) bool { return t.Data[i][c] < t.Data[j][c] })
-			t.Table.Refresh()
-		}
-		t.Header.Add(d)
-		app_values[t.IDForm].Table[t.ID].wb[d] = col
-	}
-}
-
-func (t *TableOtoko) LoadTable(mes []byte) {
+	we            map[widget.TableCellID]*enterEntry
+	wc            map[widget.TableCellID]*enterCheck
 }
 
 func sortS(x [][]string, k int) {
@@ -57,7 +39,21 @@ func sortS(x [][]string, k int) {
 	n := len(x)
 	for i := 1; i < n; i++ {
 		for j := i; j < n; j++ {
-			if x[i][k] > x[j][k] {
+			if strings.ToUpper( x[i][k]) > strings.ToUpper(x[j][k]) {
+				temp = x[i]
+				x[i] = x[j]
+				x[j] = temp
+			}
+		}
+	}
+}
+
+func sortDown(x [][]string, k int) {
+	var temp []string
+	n := len(x)
+	for i := 1; i < n; i++ {
+		for j := i; j < n; j++ {
+			if strings.ToUpper(x[i][k]) < strings.ToUpper(x[j][k]) {
 				temp = x[i]
 				x[i] = x[j]
 				x[j] = temp
@@ -76,111 +72,99 @@ func (t *TableOtoko) makeTable() *fyne.Container {
 		func() fyne.CanvasObject {
 			con := container.NewHBox()
 			con.Layout = layout.NewMaxLayout()
-			con.Add(widget.NewLabel(""))
-			check := widget.NewCheck("", nil)
+			check := newenterCheck()
+			// обработка нажатия на чек бокс
 			check.OnChanged = func(b bool) {
-				i := app_values[t.IDForm].Table[t.ID].wc[check]
-				if check.Checked {
-					t.Data[i.Row][i.Col] = "true"
-				} else {
-					t.Data[i.Row][i.Col] = "false"
-				}
-				newTableCellID := widget.TableCellID{Col: i.Col, Row: i.Row + 1}
-				t.Table.ScrollTo(newTableCellID)
-				println(i.Row)
-				for key, value := range app_values[t.IDForm].Table[t.ID].wc {
-					if value == newTableCellID {
-						app_values[t.IDForm].W.Canvas().Focus(key)
+				t := app_values[t.IDForm].Table[t.ID]
+				n := len(t.Data)
+				row := 0
+				for i := 1; i < n; i++ {
+					if t.Data[i][0] == check.ID {
+						row = i
 						break
 					}
 				}
+				if check.Checked {
+					t.Data[row][check.col] = "true"
+				} else {
+					t.Data[row][check.col] = "false"
+				}
+				// направление движения по столбцу вниз в дальнейшем условие
+				newTableCellID := widget.TableCellID{Col: check.col, Row: row + 1}
+				t.Table.ScrollTo(newTableCellID)
+
 			}
+			check.IDForm = t.IDForm
+			check.IDTable = t.ID
 			con.Add(check)
+
 			entry := newEnterEntry()
 			entry.IDForm = t.IDForm
 			entry.IDTable = t.ID
 			con.Add(entry)
+
 			return container.New(layout.NewMaxLayout(),
 				canvas.NewRectangle(color.Gray{250}),
 				con,
 			)
+
 		},
 		func(i widget.TableCellID, o fyne.CanvasObject) {
-			var label *widget.Label
-			var ic *widget.Check
+			var ic *enterCheck
 			var entry *enterEntry
 			box := o.(*fyne.Container)
 			rect := box.Objects[0].(*canvas.Rectangle)
-
-			if i.Row%2 == 0 {
+			if i.Row == 0 {
+				rect.FillColor = t.HeaderColor
+			} else if i.Row%2 == 0 {
 				rect.FillColor = t.AlterRowColor
 			} else {
 				rect.FillColor = t.RowColor
 			}
-			// определим цвет строки  изменена или нет
-			if i.Col == 0 {
-				rect.FillColor = color.Opaque
-			}
-
-			if i.Row == 0 {
-				rect.FillColor = t.HeaderColor
-			}
-
 			cont := box.Objects[1].(*fyne.Container)
+			ic = cont.Objects[0].(*enterCheck)
+			entry = cont.Objects[1].(*enterEntry)
 
-			label = cont.Objects[0].(*widget.Label)
-
-			ic = cont.Objects[1].(*widget.Check)
-
-			entry = cont.Objects[2].(*enterEntry)
-			label.Hidden = true
 			ic.Hidden = true
+
 			entry.Hidden = true
+
 			if i.Row == 0 {
-				label.SetText(t.Data[i.Row][i.Col])
-				label.Hidden = false
+				entry.SetText(t.Data[i.Row][i.Col])
+				entry.col = i.Col
+				entry.ID = t.Data[i.Row][0]
+				entry.Hidden = false
+
 			} else {
+
 				switch t.ColumnsType[i.Col] {
 				case "bool":
-					app_values[t.IDForm].Table[t.ID].wc[ic] = i
 					if t.Data[i.Row][i.Col] == "true" {
 						ic.Checked = true
 					} else {
 						ic.Checked = false
 					}
+					ic.ID = t.Data[i.Row][0]
+					ic.col = i.Col
 					ic.Refresh()
 					ic.Hidden = false
-				case "string":
-					entry.SetText(t.Data[i.Row][i.Col])
-					app_values[t.IDForm].Table[t.ID].we[entry] = i
-					entry.Hidden = false
-				case "ссылка":	
+					app_values[t.IDForm].Table[t.ID].wc[i] = ic
 				default:
-
-					label.SetText(t.Data[i.Row][i.Col])
-					label.Hidden = false
-
+					entry.SetText(t.Data[i.Row][i.Col])
+					app_values[t.IDForm].Table[t.ID].we[i] = entry
+					entry.col = i.Col
+					entry.ID = t.Data[i.Row][0]
+					entry.Hidden = false
 				}
 			}
 		})
 	for ic, v := range t.ColumnsWidth {
 		t.Table.SetColumnWidth(ic, v)
 	}
-	t.Table.OnSelected = func(id widget.TableCellID) {
-		if id.Row == 0 {
-			c := id.Col
-			sortS(t.Data, c)
-			n := len(t.Data)
-			for i := 1; i < n; i++ {
-				t.Data[i][0] = strconv.Itoa(i)
-			}
-		}
-		t.Table.Refresh()
-		fmt.Printf("i.Col: %v\n", id.Col)
-	}
 
 	t.Tool = widget.NewToolbar(
 		widget.NewToolbarAction(theme.DocumentCreateIcon(), func() {
+
 			log.Println("New document")
 		}),
 		widget.NewToolbarSeparator(),
@@ -189,70 +173,149 @@ func (t *TableOtoko) makeTable() *fyne.Container {
 		widget.NewToolbarSpacer(),
 		widget.NewToolbarAction(theme.SettingsIcon(), func() {
 			log.Println("Display help")
-		},
-		),
-	)
+		}))
 
 	content := container.NewBorder(
 		container.NewVBox(
 			t.Tool,
 			widget.NewSeparator(),
-			canvas.NewLine(color.Black),
 		),
-		nil, nil, nil, t.Table,
-	)
+		nil,
+		nil,
+		nil,
 
+		t.Table,
+	)
 	return content
+
 }
 
-//////////////////////////////////////////////
+/// поле ввода
 type enterEntry struct {
 	IDForm  string
 	IDTable string
+	ID      string
+	col     int
 	widget.Entry
+}
+
+func (e *enterEntry) Tapped(ev *fyne.PointEvent) {
+	t := app_values[e.IDForm].Table[e.IDTable]
+	n := len(t.Data)
+	row := 0
+	for i := 1; i < n; i++ {
+		if t.Data[i][0] == e.ID {
+			row = i
+			break
+		}
+	}
+
+	if row == 0 {
+		sortS(t.Data, e.col)
+		for i := 1; i < n; i++ {
+			t.Data[i][1] = strconv.Itoa(i)
+		}
+		t.Table.Refresh()
+	}
+}
+func (e *enterEntry) DoubleTapped(ev *fyne.PointEvent) {
+	t := app_values[e.IDForm].Table[e.IDTable]
+	n := len(t.Data)
+	row := 0
+	for i := 1; i < n; i++ {
+		if t.Data[i][0] == e.ID {
+			row = i
+			break
+		}
+	}
+
+	if row == 0 {
+		sortDown(t.Data, e.col)
+		n := len(t.Data)
+		for i := 1; i < n; i++ {
+			t.Data[i][1] = strconv.Itoa(i)
+		}
+		t.Table.Refresh()
+	}
+}
+
+func (e *enterEntry) TappedSecondary(ev *fyne.PointEvent) {
+	fmt.Println(e.Entry.Text)
 }
 
 func (e *enterEntry) onEnter() {
 	fmt.Println(e.Entry.Text)
-	i := app_values[e.IDForm].Table[e.IDTable].we[e]
-	app_values[e.IDForm].Table[e.IDTable].Data[i.Row][i.Col] = e.Entry.Text
+
 }
 
 func newEnterEntry() *enterEntry {
 	entry := &enterEntry{}
+
 	entry.ExtendBaseWidget(entry)
 	return entry
 }
 
+func scrolltable(row int, col int, t *TableOtoko) {
+	switch t.ColumnsType[col] {
+	case "bool":
+		newTableCellID := widget.TableCellID{Col: col, Row: row}
+		t.Table.ScrollTo(newTableCellID)
+		key := t.wc[newTableCellID]
+		app_values[t.IDForm].W.Canvas().Focus(key)
+
+	default:
+		newTableCellID := widget.TableCellID{Col: col, Row: row}
+		t.Table.ScrollTo(newTableCellID)
+		key := t.we[newTableCellID]
+		app_values[t.IDForm].W.Canvas().Focus(key)
+
+	}
+
+}
+
 func (e *enterEntry) KeyDown(key *fyne.KeyEvent) {
 	t := app_values[e.IDForm].Table[e.IDTable]
+	n := len(t.Data)
+	row := 0
+	for i := 1; i < n; i++ {
+		if t.Data[i][0] == e.ID {
+			row = i
+			break
+		}
+	}
 	switch key.Name {
 	case fyne.KeyReturn:
 		e.onEnter()
 	case "KP_Enter":
 		e.onEnter()
 	case "Down":
-		i := t.we[e]
-		newTableCellID := widget.TableCellID{Col: i.Col, Row: i.Row + 1}
-		t.Table.ScrollTo(newTableCellID)
-		for key, value := range app_values[e.IDForm].Table[e.IDTable].we {
-			if value == newTableCellID {
-				app_values[e.IDForm].W.Canvas().Focus(key)
-				break
-			}
+		if n == row+1 {
+			scrolltable(row, e.col, t)
+		} else {
+			scrolltable(row+1, e.col, t)
 		}
+	case "Left":
+		if e.col == 0 {
+			scrolltable(row, e.col, t)
+		} else {
+			scrolltable(row, e.col-1, t)
+		}
+	case "Right":
+
+		if len(t.ColumnsType) == e.col+1 {
+			scrolltable(row, e.col, t)
+		} else {
+			scrolltable(row, e.col+1, t)
+		}
+
 	case "Up":
-		i := t.we[e]
-		newTableCellID := widget.TableCellID{Col: i.Col, Row: i.Row - 1}
-		t.Table.ScrollTo(newTableCellID)
-		for key, value := range t.we {
-			if value == newTableCellID {
-				app_values[e.IDForm].W.Canvas().Focus(key)
-				break
-			}
+		if row == 0 {
+			scrolltable(row, e.col, t)
+		} else {
+			scrolltable(row-1, e.col, t)
 		}
 	default:
-		e.Entry.KeyDown(key)
+		//e.Entry.KeyDown(key)
 		fmt.Printf("Key %v pressed\n", key.Name)
 	}
 }
@@ -261,31 +324,73 @@ func (e *enterEntry) KeyUp(key *fyne.KeyEvent) {
 	fmt.Printf("Key %v released\n", key.Name)
 }
 
-/////////////////////////////
-type ToolButton struct {
+/// чек бокс
+type enterCheck struct {
 	IDForm  string
 	IDTable string
+	ID      string
+	col     int
+	widget.Check
 }
 
-func (d *ToolButton) MinSize(objects []fyne.CanvasObject) fyne.Size {
-	TO := app_values[d.IDForm].Table[d.IDTable]
-	w, h := float32(0), float32(0)
-	for i, o := range objects {
-		childSize := o.MinSize()
-		o.Resize(fyne.NewSize(TO.ColumnsWidth[i], childSize.Height))
-		w += TO.ColumnsWidth[i]
-		h = childSize.Height
-	}
-	return fyne.NewSize(w, h)
+func (e *enterCheck) onEnter() {
+	fmt.Println(e.Check.Text)
+
 }
 
-func (d *ToolButton) Layout(objects []fyne.CanvasObject, containerSize fyne.Size) {
-	pos := fyne.NewPos(0, 0)
-	TO := app_values[d.IDForm].Table[d.IDTable]
-	for i, o := range objects {
-		size := o.MinSize()
-		o.Resize(size)
-		o.Move(pos)
-		pos = pos.Add(fyne.NewPos(TO.ColumnsWidth[i], 0))
+func newenterCheck() *enterCheck {
+	entry := &enterCheck{}
+	entry.ExtendBaseWidget(entry)
+	return entry
+}
+
+func (e *enterCheck) KeyDown(key *fyne.KeyEvent) {
+	t := app_values[e.IDForm].Table[e.IDTable]
+	n := len(t.Data)
+	row := 0
+	for i := 1; i < n; i++ {
+		if t.Data[i][0] == e.ID {
+			row = i
+			break
+		}
 	}
+	switch key.Name {
+	case fyne.KeyReturn:
+		e.onEnter()
+	case "KP_Enter":
+		e.onEnter()
+case "Down":
+		if n == row+1 {
+			scrolltable(row, e.col, t)
+		} else {
+			scrolltable(row+1, e.col, t)
+		}
+	case "Left":
+		if e.col == 0 {
+			scrolltable(row, e.col, t)
+		} else {
+			scrolltable(row, e.col-1, t)
+		}
+	case "Right":
+
+		if len(t.ColumnsType) == e.col+1 {
+			scrolltable(row, e.col, t)
+		} else {
+			scrolltable(row, e.col+1, t)
+		}
+
+	case "Up":
+		if row == 0 {
+			scrolltable(row, e.col, t)
+		} else {
+			scrolltable(row-1, e.col, t)
+		}
+	default:
+
+		fmt.Printf("Key %v pressed\n", key.Name)
+	}
+}
+
+func (e *enterCheck) KeyUp(key *fyne.KeyEvent) {
+	fmt.Printf("Key %v released\n", key.Name)
 }
