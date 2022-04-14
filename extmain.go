@@ -1,8 +1,9 @@
 package main
 
 import (
-
-	"encoding/json"
+	"bytes"
+	"encoding/gob"
+	//"encoding/json"
 	"fmt"
 
 	"os"
@@ -44,13 +45,13 @@ func connectServer() string {
 	Cl = Client{id: "", socket: conn, Send: make(chan []byte), Reci: make(chan []byte)}
 	go readC()
 	go write()
-	Action,_ := json.Marshal("login")
-	mes := Message{
-		Action: Action,
-	}
+	// Action,_ := json.Marshal("login")
+	// mes := Message{
+	// 	Action: Action,
+	// }
 
-	jsonMessage, _ := json.Marshal(&mes)
-	Cl.Reci <- jsonMessage
+	// jsonMessage, _ := json.Marshal(&mes)
+	// Cl.Reci <- jsonMessage
 
 	// mes = Message{
 	// 	Action: "GetFile",
@@ -61,6 +62,8 @@ func connectServer() string {
 	// Cl.Reci <- jsonMessage
 	return ""
 }
+
+
 
 func readC() {
 	defer func() {
@@ -75,15 +78,11 @@ func readC() {
 			}
 			break
 		}
-
-		var res Message
-		json.Unmarshal(message, &res)
-
-		if err != nil {
-			fmt.Println("read:", err)
-		}
-
-		go Runproc(&res)
+ 		z:=bytes.NewBuffer(message)
+		out := MessageGob{}
+		dec := gob.NewDecoder(z)
+		dec.Decode(&out)
+		go Runproc(&out)
 
 	}
 }
@@ -97,15 +96,12 @@ func RegFunc(sName string, fu func([]byte) []byte) {
 }
 
 // Runproc выполним процедуру
-func Runproc(c *Message) {
-	f:= ""
-	json.Unmarshal(c.Action, &f)
-	if fnc, bExist := mfu[f]; bExist {
+func Runproc(c *MessageGob) {
+	if fnc, bExist := mfu[c.Action]; bExist {
 		var ap []byte
 		if len(c.Parameters) > 1 {
 			ap =[]byte( c.Parameters)
 		}
-		WriteLog(fmt.Sprintf("pgo> (%s) len:%d\r\n", c.Parameters, len(ap)))
 		fnc(ap)
 	}
 }

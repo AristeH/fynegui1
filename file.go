@@ -2,9 +2,13 @@ package main
 
 import (
 	"bufio"
+	"bytes"
+	"encoding/gob"
 	"encoding/json"
 	"log"
 	"os"
+
+//	"github.com/gorilla/websocket"
 
 )
 
@@ -26,4 +30,33 @@ func GetFile(param []byte) []byte {
 	defer file.Close()
 	return nil
 
+}
+type MessageGob struct{
+	Action string
+	Parameters []byte
+}
+
+func GetMetaData(param []byte) []byte {
+	var buff bytes.Buffer
+	enc := gob.NewEncoder(&buff)
+	jsonMessage, _ := json.Marshal([]string {"Table: MDSubSystems"})
+	mes := MessageGob{
+		Action:     "MDSubSystemsGob",
+		Parameters: jsonMessage,
+	}
+	enc.Encode(mes)
+	k:=buff.Bytes()
+	println(k)
+	//c:=[]byte("vbh")
+//Cl.socket.WriteMessage(websocket.TextMessage, c)
+
+// Action,_ := json.Marshal("login")
+// 	mes1 := Message{
+// 		Action: Action,
+// 	}
+
+// 	jsonMessage, _ := json.Marshal(&mes1)
+// 	Cl.Reci <- jsonMessage
+//	Cl.Reci <-k
+return nil
 }

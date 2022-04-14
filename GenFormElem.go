@@ -1,12 +1,15 @@
 package main
 
 import (
+	"bytes"
 	"context"
+	"encoding/gob"
 	"encoding/json"
 	"fmt"
 	"fynegui/ent"
 	"fynegui/ent/mdrekvizit"
 	"fynegui/ent/mdtabel"
+
 	//"image/color"
 	"strconv"
 	"strings"
@@ -71,15 +74,30 @@ func GenFormLayout(fd map[string]entryForm, rek []*ent.MDRekvizit) *fyne.Contain
 }
 
 func GenData(elemname string, id string) {
-	req := Getdate{Table: elemname, ID: id}
-	jsonMessage, _ := json.Marshal(&req)
-	Action, _ := json.Marshal(elemname + "GetData")
-	mes := Message{
-		Action:     Action,
-		Parameters: jsonMessage,
+	var buff bytes.Buffer
+	enc := gob.NewEncoder(&buff)
+	jsonMessage, _ := json.Marshal( []string {"ID: "+id})
+	mes := MessageGob{
+		Action:     elemname+"GetData",
+		Parameters:jsonMessage,
 	}
-	jsonMessage, _ = json.Marshal(&mes)
-	Cl.Reci <- jsonMessage
+	enc.Encode(mes)
+	k:=buff.Bytes()
+	println(k)
+
+	Cl.Reci <-k
+
+
+
+	// req := Getdate{Table: elemname, ID: id}
+	// jsonMessage, _ := json.Marshal(&req)
+	// Action, _ := json.Marshal(elemname + "GetData")
+	// mes := Message{
+	// 	Action:     Action,
+	// 	Parameters: jsonMessage,
+	// }
+	// jsonMessage, _ = json.Marshal(&mes)
+	// Cl.Reci <- jsonMessage
 }
 
 func PutData(param []byte) []byte {
@@ -181,10 +199,7 @@ func PutData(param []byte) []byte {
 		//table
 		for i := 1; i < len(app.Data); i++ {
 			tabl[i] = make([]string, kolstolb)
-			
-
 			for j := 0; j < len(ColumnsName); j++ {
-
 				if ColumnsType[j] == "Time" {
 					tabl[i][j] = app.Data[i][ColumnsNameRecive[j]]
 				} else {
@@ -250,8 +265,7 @@ func GenFormTable(NameTable, IDForm string) (f *fyne.Container, t map[string]*Ta
 		WriteLog(fmt.Sprintf("tbl->Dial error:  (%s)", err))
 	}
 	t = make(map[string]*TableOtoko)
-	t[NameTable] = makeTable(NameTable, IDForm)
-	f = t[NameTable].makeTable()
+	f = t[NameTable].newTableOtoko(NameTable, IDForm)
 	return f, t
 }
 

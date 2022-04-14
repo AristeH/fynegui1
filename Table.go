@@ -62,7 +62,23 @@ func sortDown(x [][]string, k int) {
 	}
 }
 
-func (t *TableOtoko) makeTable() *fyne.Container {
+func (t *TableOtoko) newTableOtoko(IDForm, IDTable string) *fyne.Container {
+	var t1 = make([][]string, 3)
+	t = &TableOtoko{}
+	t.ColumnsName = []string{"node_0"}
+	t.ColumnsType = []string{"label"}
+	t.ColumnsWidth = []float32{40}
+	t.AlterRowColor = color.Gray{250}
+	t.HeaderColor = color.Gray{80}
+	t.RowColor = color.Gray{200}
+	t.Data = t1
+	t.Edit = true
+	t.ID = IDTable
+	t.IDForm = IDForm
+	//TO.wb = make(map[*widget.Button]int)
+	t.wc = make(map[widget.TableCellID]*enterCheck)
+	t.we = make(map[widget.TableCellID]*enterEntry)
+
 	t.Table = widget.NewTable(
 		func() (int, int) {
 			rows := len(t.Data)
@@ -158,9 +174,9 @@ func (t *TableOtoko) makeTable() *fyne.Container {
 				}
 			}
 		})
-	for ic, v := range t.ColumnsWidth {
-		t.Table.SetColumnWidth(ic, v)
-	}
+	// for ic, v := range t.ColumnsWidth {
+	// 	t.Table.SetColumnWidth(ic, v)
+	// }
 
 	t.Tool = widget.NewToolbar(
 		widget.NewToolbarAction(theme.DocumentCreateIcon(), func() {

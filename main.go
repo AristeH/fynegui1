@@ -82,7 +82,9 @@ func toolMain21(sub string) fyne.CanvasObject {
 func main() {
 	RegFunc("GetFile", GetFile)
 	RegFunc("PutData", PutData)
+	RegFunc("GetMetaData", GetMetaData)
 	go connectServer()
+	
 
 	myWindow := myApp.NewWindow("TabContainer Widget")
 	myWindow.Resize(fyne.NewSize(1200, 400))
@@ -101,21 +103,4 @@ func main() {
 	myWindow.ShowAndRun()
 }
 
-func makeTable(IDForm, IDTable string) *TableOtoko {
-	var t = make([][]string, 3)
-	var TO = TableOtoko{}
-	TO.ColumnsName = []string{"node_0"}
-	TO.ColumnsType = []string{"label"}
-	TO.ColumnsWidth = []float32{40}
-	TO.AlterRowColor = color.Gray{250}
-	TO.HeaderColor = color.Gray{80}
-	TO.RowColor = color.Gray{200}
-	TO.Data = t
-	TO.Edit = true
-	TO.ID = IDTable
-	TO.IDForm = IDForm
-	//TO.wb = make(map[*widget.Button]int)
-	TO.wc = make(map[widget.TableCellID]*enterCheck)
-	TO.we = make(map[widget.TableCellID]*enterEntry)
-	return &TO
-}
+
