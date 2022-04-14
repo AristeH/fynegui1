@@ -62,9 +62,11 @@ func sortDown(x [][]string, k int) {
 	}
 }
 
-func (t *TableOtoko) newTableOtoko(IDForm, IDTable string) *fyne.Container {
+func  newTableOtoko(IDForm, IDTable string) (*fyne.Container,*TableOtoko) {
 	var t1 = make([][]string, 3)
-	t = &TableOtoko{}
+
+	t := &TableOtoko{}
+
 	t.ColumnsName = []string{"node_0"}
 	t.ColumnsType = []string{"label"}
 	t.ColumnsWidth = []float32{40}
@@ -75,6 +77,7 @@ func (t *TableOtoko) newTableOtoko(IDForm, IDTable string) *fyne.Container {
 	t.Edit = true
 	t.ID = IDTable
 	t.IDForm = IDForm
+
 	//TO.wb = make(map[*widget.Button]int)
 	t.wc = make(map[widget.TableCellID]*enterCheck)
 	t.we = make(map[widget.TableCellID]*enterEntry)
@@ -202,7 +205,7 @@ func (t *TableOtoko) newTableOtoko(IDForm, IDTable string) *fyne.Container {
 
 		t.Table,
 	)
-	return content
+	return content,t
 
 }
 

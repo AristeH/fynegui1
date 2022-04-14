@@ -12,15 +12,10 @@ import (
 
 )
 
-type fileUP struct{
-	Name string
-	Dir string
-	Content []byte
-} 
 
-func GetFile(param []byte) []byte {
-	var p *fileUP
-	json.Unmarshal(param, &p)
+
+func GetFile(c *MessageGob) []byte {
+	p := &c.File
 	file, err := os.Create(p.Name)
      if err != nil {
         log.Fatal(err)
@@ -31,12 +26,8 @@ func GetFile(param []byte) []byte {
 	return nil
 
 }
-type MessageGob struct{
-	Action string
-	Parameters []byte
-}
 
-func GetMetaData(param []byte) []byte {
+func GetMetaData(c *MessageGob) []byte {
 	var buff bytes.Buffer
 	enc := gob.NewEncoder(&buff)
 	jsonMessage, _ := json.Marshal([]string {"Table: MDSubSystems"})

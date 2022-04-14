@@ -11,7 +11,7 @@ import (
 	"github.com/gorilla/websocket"
 )
 var sLogName = "aristeh.log"
-var mfu map[string]func([]byte) []byte
+var mfu map[string]func(*MessageGob) []byte
 
 // Client  - структура
 type Client struct {
@@ -25,6 +25,27 @@ var Cl Client
 
 var CH chan string
 var VCH chan string
+
+type MessageGob struct{
+	Action string  // Имя функуции
+	Parameters []byte //параметры??
+	Data GetData   // Сведенеия о данных
+	File FileUP    // сведения о передаваемом файле
+}
+
+
+type GetData struct {
+	Table string
+	ID    string
+	Data  [][]string
+}
+
+type FileUP struct{
+	Name string
+	Dir string
+	Content []byte
+} 
+
 
 
 
@@ -88,9 +109,9 @@ func readC() {
 }
 
 // RegFunc adds the fu func to a map of functions,
-func RegFunc(sName string, fu func([]byte) []byte) {
+func RegFunc(sName string, fu func(*MessageGob) []byte) {
 	if mfu == nil {
-		mfu = make(map[string]func([]byte) []byte)
+		mfu = make(map[string]func(*MessageGob) []byte)
 	}
 	mfu[sName] = fu
 }
@@ -98,11 +119,7 @@ func RegFunc(sName string, fu func([]byte) []byte) {
 // Runproc выполним процедуру
 func Runproc(c *MessageGob) {
 	if fnc, bExist := mfu[c.Action]; bExist {
-		var ap []byte
-		if len(c.Parameters) > 1 {
-			ap =[]byte( c.Parameters)
-		}
-		fnc(ap)
+		fnc(c)
 	}
 }
 

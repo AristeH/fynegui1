@@ -60,7 +60,7 @@ func toolMain21(sub string) fyne.CanvasObject {
 			mp := strings.Split(param, ";")
 			GenForm(mp[0], mp[1])
 		}
-		p := b.Nameeng + ";" + "0046247f-bd7a-11e7-823e-1c98ec28debf"
+		p := b.Nameeng + ";" + "0005bfbd-e65c-11e8-8828-3440b5b05858"
 		app_values["main"].Button[b.Namerus] = ButtonData{Fun: b.Nameeng + "GenForm", Parameters: p, Widget: d}
 		switch b.Type {
 		case "Справочник":

@@ -26,12 +26,6 @@ type Message struct {
 	Parameters []byte // параметры
 }
 
-type Getdate struct {
-	Table string
-	ID    string
-	Data  [][]string
-}
-
 func GenFormLayout(fd map[string]entryForm, rek []*ent.MDRekvizit) *fyne.Container {
 	//var pages = make(map[string]string)
 	var columns = make(map[float64]*widget.Form)
@@ -76,18 +70,18 @@ func GenFormLayout(fd map[string]entryForm, rek []*ent.MDRekvizit) *fyne.Contain
 func GenData(elemname string, id string) {
 	var buff bytes.Buffer
 	enc := gob.NewEncoder(&buff)
-	jsonMessage, _ := json.Marshal( []string {"ID: "+id})
+	jsonMessage, _ := json.Marshal([]string{"ID: " + id})
+	d := GetData{Table: elemname, ID: id}
 	mes := MessageGob{
-		Action:     elemname+"GetData",
-		Parameters:jsonMessage,
+		Action:     elemname + "GetData",
+		Parameters: jsonMessage,
+		Data:       d,
 	}
 	enc.Encode(mes)
-	k:=buff.Bytes()
+	k := buff.Bytes()
 	println(k)
 
-	Cl.Reci <-k
-
-
+	Cl.Reci <- k
 
 	// req := Getdate{Table: elemname, ID: id}
 	// jsonMessage, _ := json.Marshal(&req)
@@ -100,9 +94,8 @@ func GenData(elemname string, id string) {
 	// Cl.Reci <- jsonMessage
 }
 
-func PutData(param []byte) []byte {
-	app := Getdate{}
-	json.Unmarshal(param, &app)
+func PutData(c *MessageGob) []byte {
+	app := c.Data
 	if app.ID == "" {
 		client, _ := ent.Open("sqlite3", "C:/проект/fynegui/md.db?_fk=1")
 		tbl, _ := client.MDTabel.Query().Where(mdtabel.NameengEQ(app.Table)).All(context.Background())
@@ -211,7 +204,8 @@ func PutData(param []byte) []byte {
 		}
 		ColumnsWidth[0] = 0
 		ColumnsWidth[1] = float32(len(strconv.Itoa(len(app.Data)))) * 12
-		fd.Table[app.Table].Data = tabl
+
+	
 
 		fd.Table[app.Table].ColumnsType = ColumnsType
 		fd.Table[app.Table].ColumnsWidth = ColumnsWidth
@@ -257,15 +251,16 @@ func GenFormElem(elemname, id string) (f *fyne.Container, fEntry map[string]entr
 	return f, fEntry
 }
 
-func GenFormTable(NameTable, IDForm string) (f *fyne.Container, t map[string]*TableOtoko) {
+func GenFormTable(NameTable, IDForm string) (f *fyne.Container, t *TableOtoko) {
 	Clientsqllite, _ := ent.Open("sqlite3", "C:/проект/fynegui/md.db?_fk=1")
 	ctx := context.Background()
 	_, err := Clientsqllite.MDTabel.Query().WithMdrekvizits().Where(mdtabel.NameengEQ(NameTable)).All(ctx)
 	if err != nil {
 		WriteLog(fmt.Sprintf("tbl->Dial error:  (%s)", err))
 	}
-	t = make(map[string]*TableOtoko)
-	f = t[NameTable].newTableOtoko(NameTable, IDForm)
+
+	f, t = newTableOtoko(NameTable, IDForm)
+
 	return f, t
 }
 
@@ -296,34 +291,60 @@ func GenFormTree(NameTree, IDForm string) *widget.Tree {
 	return widget.NewTree(childUIDs, isBranch, createNode, updateNode)
 }
 
-func GenForm(elemname, id string) {
+// Функция для генерации формы таблицы БД
+// если id = "" генерится форма списка
+// иначе форма элемента
+func GenForm(NameTable, id string) {
 	var fd FormData = FormData{}
-	var f TreeOtoko
-	app_values[elemname] = &fd
 
-	top, entr := GenFormElem(elemname, id)
-	fd.Entry = entr
+	var top, tabl *fyne.Container
+	var tree *widget.Tree
 
-	tabl, k := GenFormTable(elemname, elemname)
-	fd.Table = k
+	var entr map[string]entryForm
+	// форма элемента
+	id =""
+	if id != "" {
+		app_values[id] = &fd
+		top, entr = GenFormElem(NameTable, id)
+		fd.Entry = entr
+		println(top)
+	} else {
+		// форма списка
+		app_values[NameTable] = &fd
+		tree = GenFormTree(NameTable, NameTable)
+		if tree != nil {
+			var f TreeOtoko
+			fd.Tree = make(map[string]*TreeOtoko)
+			f.Tree = tree
+			f.TextForTreeUID = make(map[string]string)
+			f.TreeUIDMapping = make(map[string][]string)
+			fd.Tree[NameTable] = &f
+		}
+		var ta *TableOtoko
+		tabl, ta = GenFormTable(NameTable, NameTable)
+		if ta != nil {
+			fd.Table = make(map[string]*TableOtoko)
+			fd.Table[NameTable] = ta
+		}
 
-	fd.Tree = make(map[string]*TreeOtoko)
-	f.Tree = GenFormTree(elemname, elemname)
-	f.TextForTreeUID = make(map[string]string)
-	f.TreeUIDMapping = make(map[string][]string)
-	fd.Tree[elemname] = &f
-	//bottom := makeCell()
-	//left := makeCell()
-
-	//right := makeCell()
+	}
 
 	myWindow := myApp.NewWindow("TabContainer Widget")
 	myWindow.Resize(fyne.NewSize(1200, 400))
 	fd.W = myWindow
+	var horizontalSplitter *container.Split
+	var content *fyne.Container
 
-	horizontalSplitter := container.NewHSplit(fd.Tree[elemname].Tree, tabl)
-	content := container.New(layout.NewBorderLayout(top, nil, nil, nil),
-		top, horizontalSplitter)
+
+//if tree!=nil{
+	horizontalSplitter = container.NewHSplit(tree, tabl)
+	content = container.New(layout.NewBorderLayout(nil, nil, nil, nil),
+		 horizontalSplitter)
+// }else{
+// 	content = container.New(layout.NewBorderLayout(top, nil, nil, nil),
+// 		top)
+// }
+	
 	//
 
 	// borderLayout := layout.NewBorderLayout(top, nil, left, right)
@@ -332,7 +353,7 @@ func GenForm(elemname, id string) {
 
 	myWindow.SetContent(content)
 	myWindow.Show()
-	GenData(elemname, id)
-	GenData(elemname, "")
-	fd.Tree[elemname].Tree.Refresh()
+	//	GenData(NameTable, id)
+	GenData(NameTable, "")
+	//fd.Tree[eleNameTablemname].Tree.Refresh()
 }

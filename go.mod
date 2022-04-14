@@ -1,6 +1,6 @@
 module fynegui
 
-go 1.17
+go 1.18
 
 require (
 	entgo.io/ent v0.10.1
