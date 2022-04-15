@@ -11,6 +11,8 @@ import (
 	//"fyne.io/fyne/v2/widget"
 )
 
+cons
+
 func create_form_md(res Message) {
 	var form_data map[string]string
 	var w fyne.Window

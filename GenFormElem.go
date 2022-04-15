@@ -39,7 +39,6 @@ func GenFormLayout(fd map[string]entryForm, rek []*ent.MDRekvizit) *fyne.Contain
 	for _, v := range columns {
 		gri.Add(v)
 	}
-
 	for _, v := range rek {
 		if v.Nameeng != "id" && v.Type != "String,0" {
 			if strings.HasPrefix(v.Type, "bool") {
@@ -83,15 +82,6 @@ func GenData(elemname string, id string) {
 
 	Cl.Reci <- k
 
-	// req := Getdate{Table: elemname, ID: id}
-	// jsonMessage, _ := json.Marshal(&req)
-	// Action, _ := json.Marshal(elemname + "GetData")
-	// mes := Message{
-	// 	Action:     Action,
-	// 	Parameters: jsonMessage,
-	// }
-	// jsonMessage, _ = json.Marshal(&mes)
-	// Cl.Reci <- jsonMessage
 }
 
 func PutData(c *MessageGob) []byte {

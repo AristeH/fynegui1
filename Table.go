@@ -177,9 +177,6 @@ func  newTableOtoko(IDForm, IDTable string) (*fyne.Container,*TableOtoko) {
 				}
 			}
 		})
-	// for ic, v := range t.ColumnsWidth {
-	// 	t.Table.SetColumnWidth(ic, v)
-	// }
 
 	t.Tool = widget.NewToolbar(
 		widget.NewToolbarAction(theme.DocumentCreateIcon(), func() {

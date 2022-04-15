@@ -2,16 +2,14 @@ package main
 
 import (
 	"context"
-	"strings"
 	"fynegui/ent"
 	"fynegui/ent/mdsubsystems"
-	"image/color"
+	"strings"
+
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
-	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/layout"
-	"fyne.io/fyne/v2/widget"
+	"fyne.io/fyne/widget"
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -84,22 +82,7 @@ func main() {
 	RegFunc("PutData", PutData)
 	RegFunc("GetMetaData", GetMetaData)
 	go connectServer()
-	
-
-	myWindow := myApp.NewWindow("TabContainer Widget")
-	myWindow.Resize(fyne.NewSize(1200, 400))
-	app_values["main"] = &FormData{}
-	app_values["main"].W = myWindow
-	app_values["main"].Button = make(map[string]ButtonData)
-	top := toolMain()
-
-	//top := canvas.NewText("top bar", color.White)
-	left = toolMain21("316bec67-1cce-43a2-ae92-b841da8bf090")
-	middle := canvas.NewText("content", color.White)
-	content := container.New(layout.NewBorderLayout(top, nil, left, nil),
-		top, left, middle)
-
-	myWindow.SetContent(content)
+	myWindow := mainform()
 	myWindow.ShowAndRun()
 }
 

@@ -38,16 +38,5 @@ func GetMetaData(c *MessageGob) []byte {
 	enc.Encode(mes)
 	k:=buff.Bytes()
 	println(k)
-	//c:=[]byte("vbh")
-//Cl.socket.WriteMessage(websocket.TextMessage, c)
-
-// Action,_ := json.Marshal("login")
-// 	mes1 := Message{
-// 		Action: Action,
-// 	}
-
-// 	jsonMessage, _ := json.Marshal(&mes1)
-// 	Cl.Reci <- jsonMessage
-//	Cl.Reci <-k
-return nil
+    return nil
 }
