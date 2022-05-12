@@ -6,6 +6,7 @@ require (
 	entgo.io/ent v0.10.1
 	fyne.io/fyne/v2 v2.1.4
 	github.com/mattn/go-sqlite3 v1.14.12
+	github.com/recoilme/pudge v1.0.3
 )
 
 require (

@@ -7,7 +7,7 @@ import (
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
-	"strconv"
+	// "strconv"
 	"strings"
 )
 
@@ -61,89 +61,89 @@ type Form struct {
 }
 
 
-func create_form(res Message) {
-	var form_data Form
-	var Title UserForm
-	var w fyne.Window
-	var ID string
-	var fd *FormData = &FormData{}
-	var toolbar *fyne.Container
-	var fields *fyne.Container
-	var tab *fyne.Container
-	var content1 *fyne.Container
-	var FieldS []FieldSection
+// func create_form(res Message) {
+// 	var form_data Form
+// 	var Title UserForm
+// 	var w fyne.Window
+// 	var ID string
+// 	var fd *FormData = &FormData{}
+// 	var toolbar *fyne.Container
+// 	var fields *fyne.Container
+// 	var tab *fyne.Container
+// 	var content1 *fyne.Container
+// 	var FieldS []FieldSection
 
-	json.Unmarshal([]byte(res.Parameters), &form_data)
-	json.Unmarshal(form_data.Title, &Title)
-	json.Unmarshal(form_data.Fields, &FieldS)
-	// обновим сведения о форме
-	ID = Title.ID
-	app_values[ID] = fd
-	w = myApp.NewWindow(Title.Title)
-	fd.W = w
-	words := strings.Split(Title.Size, ",")
-	wf, err := strconv.ParseFloat(words[0], 32)
-	if err != nil {
-		wf = 300
-	}
-	hf, err := strconv.ParseFloat(words[0], 32)
-	if err != nil {
-		hf = 400
-	}
-	w.Resize(fyne.NewSize(float32(wf), float32(hf)))
+// 	json.Unmarshal([]byte(res.Parameters), &form_data)
+// 	json.Unmarshal(form_data.Title, &Title)
+// 	json.Unmarshal(form_data.Fields, &FieldS)
+// 	// обновим сведения о форме
+// 	ID = Title.ID
+// 	app_values[ID] = fd
+// 	w = myApp.NewWindow(Title.Title)
+// 	fd.W = w
+// 	words := strings.Split(Title.Size, ",")
+// 	wf, err := strconv.ParseFloat(words[0], 32)
+// 	if err != nil {
+// 		wf = 300
+// 	}
+// 	hf, err := strconv.ParseFloat(words[0], 32)
+// 	if err != nil {
+// 		hf = 400
+// 	}
+// 	w.Resize(fyne.NewSize(float32(wf), float32(hf)))
 
-	fd.Table = make(map[string]*TableOtoko)
-	//var fa [][]entryForm
-	// for _, value := range res.Child {
-	// 	//fmt.Println("Key:", key, "Value:", value)
-	// 	switch value.Name {
-	// 	case "fields":
-	// 		var bt []entryForm
-	// 		json.Unmarshal([]byte(value.Body), &bt)
-	// 		fa = append(fa, bt)
-	// 	case "toolbar":
-	// 		toolbar = ToolBarCreate(ID, value.Body)
-	// 	case "table":
-	// 		var bt = TableOtoko{}
-	// 		json.Unmarshal([]byte(value.Body), &bt)
-	// 		bt.wb = make(map[*widget.Button]int)
-	// 		bt.wc = make(map[*widget.Check]widget.TableCellID)
-	// 		bt.we = make(map[*enterEntry]widget.TableCellID)
-	// 		fd.Table[bt.ID] = &bt
-	// 		tab = bt.makeTable()
-	// 		//ntent.Add(fd.Table[bt.ID].Table)
-	// 	}
-	// }
-	fields = FieldsCreate(ID, FieldS)
-	vb := container.NewVBox()
+// 	fd.Table = make(map[string]*TableOtoko)
+// 	//var fa [][]entryForm
+// 	// for _, value := range res.Child {
+// 	// 	//fmt.Println("Key:", key, "Value:", value)
+// 	// 	switch value.Name {
+// 	// 	case "fields":
+// 	// 		var bt []entryForm
+// 	// 		json.Unmarshal([]byte(value.Body), &bt)
+// 	// 		fa = append(fa, bt)
+// 	// 	case "toolbar":
+// 	// 		toolbar = ToolBarCreate(ID, value.Body)
+// 	// 	case "table":
+// 	// 		var bt = TableOtoko{}
+// 	// 		json.Unmarshal([]byte(value.Body), &bt)
+// 	// 		bt.wb = make(map[*widget.Button]int)
+// 	// 		bt.wc = make(map[*widget.Check]widget.TableCellID)
+// 	// 		bt.we = make(map[*enterEntry]widget.TableCellID)
+// 	// 		fd.Table[bt.ID] = &bt
+// 	// 		tab = bt.makeTable()
+// 	// 		//ntent.Add(fd.Table[bt.ID].Table)
+// 	// 	}
+// 	// }
+// 	fields = FieldsCreate(ID, FieldS)
+// 	vb := container.NewVBox()
 
-	if toolbar != nil {
-		vb.Add(toolbar)
-		vb.Add(widget.NewSeparator())
-	}
+// 	if toolbar != nil {
+// 		vb.Add(toolbar)
+// 		vb.Add(widget.NewSeparator())
+// 	}
 
-	if fields != nil {
-		vb.Add(fields)
-		vb.Add(widget.NewSeparator())
-	}
+// 	if fields != nil {
+// 		vb.Add(fields)
+// 		vb.Add(widget.NewSeparator())
+// 	}
 
-	content1 = container.NewBorder(
-		vb,
-		nil,
-		nil,
-		nil,
-	)
+// 	content1 = container.NewBorder(
+// 		vb,
+// 		nil,
+// 		nil,
+// 		nil,
+// 	)
 
-	if tab != nil {
-		content1.Add(tab)
+// 	if tab != nil {
+// 		content1.Add(tab)
 
-	}
+// 	}
 
-	w.SetContent(content1)
+// 	w.SetContent(content1)
 
-	w.Show()
+// 	w.Show()
 
-}
+// }
 
 func FieldsCreate(id string, f []FieldSection) *fyne.Container {
 	// var vb []*fyne.Container
@@ -193,13 +193,15 @@ func FieldsCreate(id string, f []FieldSection) *fyne.Container {
 	return nil
 }
 
-func findButton(d *widget.Button) (string, *FormData) {
+func findButton(d *widget.Button) (*ButtonData, *FormData) {
 	for _, f := range app_values {
-		if f.Button[d.Text].Widget == d {
-			return f.Button[d.Text].Parameters, f
+		for _, b := range f.Button {
+		if b.Widget == d {
+			return &b, f
 		}
 	}
-	return "", &FormData{}
+	}
+	return &ButtonData{}, &FormData{}
 }
 
 // func findEntry(f *FormData, name string)string{
@@ -208,19 +210,18 @@ func findButton(d *widget.Button) (string, *FormData) {
 
 // }
 
-func ToolBarCreate(id string, but []byte) *fyne.Container {
-	var bt []Button
+func ToolBarCreate(id string, but [][]string) *fyne.Container {
+	
 	fd := app_values[id]
 	fd.Button = make(map[string]ButtonData)
 	toolbar := container.New(layout.NewHBoxLayout())
-	json.Unmarshal([]byte(but), &bt)
 
-	for _, value := range bt {
+	for _, value := range but {
 		//	fmt.Println("Key:", key, "Value:", value)
-		d := widget.NewButtonWithIcon(value.Name, GetIcon(value.Image), nil)
+		d := widget.NewButtonWithIcon(value[Namerus], GetIcon(value[Namerus]), nil)
 		d.OnTapped = func() {
 			param, f := findButton(d)
-			mp := strings.Split(param, ",")
+			mp := strings.Split(param.Parameters, ",")
 			p := ""
 			for _, r := range mp {
 				if _, ok := f.Entry[r]; ok {
@@ -228,22 +229,19 @@ func ToolBarCreate(id string, but []byte) *fyne.Container {
 				} else {
 					p = p + r + ";"
 				}
-
 			}
 			mes := map[string]string{
-				"Action":     d.Text,
+				"Action":     param.Fun,
 				"Parameters": p,
 			}
 			send(mes)
-
 		}
-		fd.Button[value.Name] = ButtonData{Fun: value.Name, Parameters: value.Param, Widget: d}
+		fd.Button[value[Nameeng]] = ButtonData{Fun: "GetTable", Parameters: value[ID], Widget: d}
 		toolbar.Add(d)
 	}
 	beans := app_values[id]
 	beans.Button = fd.Button
 	app_values[id] = beans
-
 	return toolbar
 }
 

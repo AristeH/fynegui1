@@ -87,6 +87,9 @@ func GenData(elemname string, id string) {
 func PutData(c *MessageGob) []byte {
 	app := c.Data
 	if app.ID == "" {
+		if app.Table == "md_sub_systems"{
+			println("jhjhjhjhjhjhjhjhjhjhjhjh")
+		}
 		client, _ := ent.Open("sqlite3", "C:/проект/fynegui/md.db?_fk=1")
 		tbl, _ := client.MDTabel.Query().Where(mdtabel.NameengEQ(app.Table)).All(context.Background())
 		rec, err := client.MDRekvizit.Query().Order(ent.Asc(mdrekvizit.FieldPor)).Where(mdrekvizit.OwnerID(tbl[0].ID)).All(context.Background())
@@ -292,7 +295,7 @@ func GenForm(NameTable, id string) {
 
 	var entr map[string]entryForm
 	// форма элемента
-	id =""
+	
 	if id != "" {
 		app_values[id] = &fd
 		top, entr = GenFormElem(NameTable, id)

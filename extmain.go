@@ -33,10 +33,10 @@ type MessageGob struct{
 	File FileUP    // сведения о передаваемом файле
 }
 
-
 type GetData struct {
 	Table string
 	ID    string
+	Type  string
 	Data  [][]string
 }
 
@@ -46,15 +46,11 @@ type FileUP struct{
 	Content []byte
 } 
 
-
-
-
 func Init(sOpt string, constr string, quit chan string) int {
 	VCH = make(chan string)
 	CH = quit
 	connectServer()
 	return 0
-
 }
 
 func connectServer() string {
@@ -66,25 +62,8 @@ func connectServer() string {
 	Cl = Client{id: "", socket: conn, Send: make(chan []byte), Reci: make(chan []byte)}
 	go readC()
 	go write()
-	// Action,_ := json.Marshal("login")
-	// mes := Message{
-	// 	Action: Action,
-	// }
-
-	// jsonMessage, _ := json.Marshal(&mes)
-	// Cl.Reci <- jsonMessage
-
-	// mes = Message{
-	// 	Action: "GetFile",
-	// 	Parameters:[]byte("Name:md.db"),
-	// }
-
-	// jsonMessage, _ = json.Marshal(&mes)
-	// Cl.Reci <- jsonMessage
 	return ""
 }
-
-
 
 func readC() {
 	defer func() {
