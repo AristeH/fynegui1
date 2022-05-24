@@ -7,28 +7,61 @@ import (
 )
 
 // MDTabel holds the schema definition for the MDTabel entity.
+type MDTypeTabel struct {
+	ent.Schema
+}
+
+// Fields of the MDTypeTabel .
+func (MDTypeTabel) Fields() []ent.Field {
+	return []ent.Field{
+		field.String("id").MaxLen(36).NotEmpty().Unique().Immutable().StructTag(`json:"ссылка,omitempty"`).StorageKey("ID"),
+		field.String("nameeng").MaxLen(300).StructTag(`json:"ИмяАнгл,omitempty"`).StorageKey("Nameeng"),
+		field.String("synonym").MaxLen(300).StructTag(`json:"ИмяРус,omitempty"`).StorageKey("Synonym"),
+		field.String("por").StructTag(`json:"Порядок,omitempty"`).StorageKey("Por"),
+		field.String("parent").Optional().StructTag(`json:"Родитель,omitempty"`).StorageKey("Parent"),
+	}
+}
+
+// Edges of the ДанныеФормыЭлементКоллекции.
+func (MDTypeTabel) Edges() []ent.Edge {
+	return []ent.Edge{
+		edge.To("child_mdtypetabels", MDTypeTabel.Type),
+		edge.From("parent_mdtypetabels", MDTypeTabel.Type).Ref("child_mdtypetabels").Unique().Field("parent").StructTag(`json:"родитель,omitempty"`),
+
+		edge.To("mdtypetabels", MDTabel.Type),	
+	}
+}
+
+// MDTabel holds the schema definition for the MDTabel entity.
 type MDTabel struct {
 	ent.Schema
 }
 
+
 // Fields of the MDTabel .
 func (MDTabel) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("namerus").MaxLen(300).StructTag(`json:"ИмяРус,omitempty"`).StorageKey("Namerus"),
+		field.String("id").MaxLen(36).NotEmpty().Unique().Immutable().StructTag(`json:"ссылка,omitempty"`).StorageKey("ID"),
 		field.String("nameeng").MaxLen(300).StructTag(`json:"ИмяАнгл,omitempty"`).StorageKey("Nameeng"),
 		field.String("synonym").MaxLen(300).StructTag(`json:"Синоним,omitempty"`).StorageKey("Synonym"),
+		field.String("por").StructTag(`json:"Порядок,omitempty"`).StorageKey("Por"),
+		field.String("parent").Optional().StructTag(`json:"Родитель,omitempty"`).StorageKey("Parent"),
+		field.String("types_id").MaxLen(36).Optional(),
+
 		field.String("file").MaxLen(300).StructTag(`json:"ИмяФайла,omitempty"`).StorageKey("File"),
-		field.String("type").MaxLen(300).StructTag(`json:"Тип,omitempty"`).StorageKey("Type"),
-		field.String("id").MaxLen(36).NotEmpty().Unique().Immutable().StructTag(`json:"ссылка,omitempty"`).StorageKey("ID"),
+
 	}
 }
 
 // Edges of the ДанныеФормыЭлементКоллекции.
 func (MDTabel) Edges() []ent.Edge {
 	return []ent.Edge{
+		edge.To("child_mdtabel", MDTabel.Type),
+		edge.From("parent_mdtabel", MDTabel.Type).Ref("child_mdtabel").Unique().Field("parent").StructTag(`json:"родитель,omitempty"`),
+
 		edge.From("mdsubsystems", MDSubSystems.Type).Ref("mdtables"),
 		edge.To("mdrekvizits", MDRekvizit.Type),
-		
+		edge.From("mdtypetabel", MDTypeTabel.Type).Unique().Ref("mdtypetabels").Field("types_id"),
 	}
 }
 
@@ -41,14 +74,13 @@ type MDRekvizit struct {
 func (MDRekvizit) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("id").MaxLen(36).NotEmpty().Unique().Immutable().StructTag(`json:"ссылка,omitempty"`).StorageKey("ID"),
-		field.String("namerus").MaxLen(300).StructTag(`json:"ИмяРус,omitempty"`).StorageKey("Namerus"),
 		field.String("nameeng").MaxLen(300).StructTag(`json:"ИмяАнгл,omitempty"`).StorageKey("Nameeng"),
 		field.String("synonym").MaxLen(300).StructTag(`json:"Синоним,omitempty"`).StorageKey("Synonym"),
 		field.String("por").MaxLen(300).StructTag(`json:"ПорядокВывода,omitempty"`).StorageKey("por"),
-		field.Float("widthElem").StructTag(`json:"ШиринаЭлемента,omitempty"`),
-		field.Float("widthSpisok").StructTag(`json:"ШиринаКолонки,omitempty"`),
 		field.String("type").MaxLen(300).StructTag(`json:"Тип,omitempty"`).StorageKey("Type"),
 		field.String("owner_id").MaxLen(36).NotEmpty().Optional(),
+
+		field.Float("widthSpisok").StructTag(`json:"ШиринаКолонки,omitempty"`),
 	}
 }
 
@@ -67,10 +99,10 @@ type MDSubSystems struct {
 // Fields of the MDSubSystems .
 func (MDSubSystems) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("namerus").MaxLen(300).StructTag(`json:"ИмяРус,omitempty"`).StorageKey("Namerus"),
+		field.String("id").MaxLen(36).NotEmpty().Unique().Immutable().StructTag(`json:"ссылка,omitempty"`).StorageKey("ID"),
 		field.String("nameeng").MaxLen(300).StructTag(`json:"ИмяАнгл,omitempty"`).StorageKey("Nameeng"),
 		field.String("synonym").MaxLen(150).StructTag(`json:"Синоним,omitempty"`).StorageKey("Synonym"),
-		field.String("id").MaxLen(36).NotEmpty().Unique().Immutable().StructTag(`json:"ссылка,omitempty"`).StorageKey("ID"),
+		field.String("por").StructTag(`json:"Порядок,omitempty"`).StorageKey("Por"),		
 		field.String("parent").Optional().StructTag(`json:"Родитель,omitempty"`).StorageKey("Parent"),
 	}
 }

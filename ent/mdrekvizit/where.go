@@ -92,13 +92,6 @@ func IDLTE(id string) predicate.MDRekvizit {
 	})
 }
 
-// Namerus applies equality check predicate on the "namerus" field. It's identical to NamerusEQ.
-func Namerus(v string) predicate.MDRekvizit {
-	return predicate.MDRekvizit(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldNamerus), v))
-	})
-}
-
 // Nameeng applies equality check predicate on the "nameeng" field. It's identical to NameengEQ.
 func Nameeng(v string) predicate.MDRekvizit {
 	return predicate.MDRekvizit(func(s *sql.Selector) {
@@ -120,20 +113,6 @@ func Por(v string) predicate.MDRekvizit {
 	})
 }
 
-// WidthElem applies equality check predicate on the "widthElem" field. It's identical to WidthElemEQ.
-func WidthElem(v float64) predicate.MDRekvizit {
-	return predicate.MDRekvizit(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldWidthElem), v))
-	})
-}
-
-// WidthSpisok applies equality check predicate on the "widthSpisok" field. It's identical to WidthSpisokEQ.
-func WidthSpisok(v float64) predicate.MDRekvizit {
-	return predicate.MDRekvizit(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldWidthSpisok), v))
-	})
-}
-
 // Type applies equality check predicate on the "type" field. It's identical to TypeEQ.
 func Type(v string) predicate.MDRekvizit {
 	return predicate.MDRekvizit(func(s *sql.Selector) {
@@ -148,114 +127,10 @@ func OwnerID(v string) predicate.MDRekvizit {
 	})
 }
 
-// NamerusEQ applies the EQ predicate on the "namerus" field.
-func NamerusEQ(v string) predicate.MDRekvizit {
+// WidthSpisok applies equality check predicate on the "widthSpisok" field. It's identical to WidthSpisokEQ.
+func WidthSpisok(v float64) predicate.MDRekvizit {
 	return predicate.MDRekvizit(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldNamerus), v))
-	})
-}
-
-// NamerusNEQ applies the NEQ predicate on the "namerus" field.
-func NamerusNEQ(v string) predicate.MDRekvizit {
-	return predicate.MDRekvizit(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldNamerus), v))
-	})
-}
-
-// NamerusIn applies the In predicate on the "namerus" field.
-func NamerusIn(vs ...string) predicate.MDRekvizit {
-	v := make([]interface{}, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.MDRekvizit(func(s *sql.Selector) {
-		// if not arguments were provided, append the FALSE constants,
-		// since we can't apply "IN ()". This will make this predicate falsy.
-		if len(v) == 0 {
-			s.Where(sql.False())
-			return
-		}
-		s.Where(sql.In(s.C(FieldNamerus), v...))
-	})
-}
-
-// NamerusNotIn applies the NotIn predicate on the "namerus" field.
-func NamerusNotIn(vs ...string) predicate.MDRekvizit {
-	v := make([]interface{}, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.MDRekvizit(func(s *sql.Selector) {
-		// if not arguments were provided, append the FALSE constants,
-		// since we can't apply "IN ()". This will make this predicate falsy.
-		if len(v) == 0 {
-			s.Where(sql.False())
-			return
-		}
-		s.Where(sql.NotIn(s.C(FieldNamerus), v...))
-	})
-}
-
-// NamerusGT applies the GT predicate on the "namerus" field.
-func NamerusGT(v string) predicate.MDRekvizit {
-	return predicate.MDRekvizit(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldNamerus), v))
-	})
-}
-
-// NamerusGTE applies the GTE predicate on the "namerus" field.
-func NamerusGTE(v string) predicate.MDRekvizit {
-	return predicate.MDRekvizit(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldNamerus), v))
-	})
-}
-
-// NamerusLT applies the LT predicate on the "namerus" field.
-func NamerusLT(v string) predicate.MDRekvizit {
-	return predicate.MDRekvizit(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldNamerus), v))
-	})
-}
-
-// NamerusLTE applies the LTE predicate on the "namerus" field.
-func NamerusLTE(v string) predicate.MDRekvizit {
-	return predicate.MDRekvizit(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldNamerus), v))
-	})
-}
-
-// NamerusContains applies the Contains predicate on the "namerus" field.
-func NamerusContains(v string) predicate.MDRekvizit {
-	return predicate.MDRekvizit(func(s *sql.Selector) {
-		s.Where(sql.Contains(s.C(FieldNamerus), v))
-	})
-}
-
-// NamerusHasPrefix applies the HasPrefix predicate on the "namerus" field.
-func NamerusHasPrefix(v string) predicate.MDRekvizit {
-	return predicate.MDRekvizit(func(s *sql.Selector) {
-		s.Where(sql.HasPrefix(s.C(FieldNamerus), v))
-	})
-}
-
-// NamerusHasSuffix applies the HasSuffix predicate on the "namerus" field.
-func NamerusHasSuffix(v string) predicate.MDRekvizit {
-	return predicate.MDRekvizit(func(s *sql.Selector) {
-		s.Where(sql.HasSuffix(s.C(FieldNamerus), v))
-	})
-}
-
-// NamerusEqualFold applies the EqualFold predicate on the "namerus" field.
-func NamerusEqualFold(v string) predicate.MDRekvizit {
-	return predicate.MDRekvizit(func(s *sql.Selector) {
-		s.Where(sql.EqualFold(s.C(FieldNamerus), v))
-	})
-}
-
-// NamerusContainsFold applies the ContainsFold predicate on the "namerus" field.
-func NamerusContainsFold(v string) predicate.MDRekvizit {
-	return predicate.MDRekvizit(func(s *sql.Selector) {
-		s.Where(sql.ContainsFold(s.C(FieldNamerus), v))
+		s.Where(sql.EQ(s.C(FieldWidthSpisok), v))
 	})
 }
 
@@ -592,158 +467,6 @@ func PorContainsFold(v string) predicate.MDRekvizit {
 	})
 }
 
-// WidthElemEQ applies the EQ predicate on the "widthElem" field.
-func WidthElemEQ(v float64) predicate.MDRekvizit {
-	return predicate.MDRekvizit(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldWidthElem), v))
-	})
-}
-
-// WidthElemNEQ applies the NEQ predicate on the "widthElem" field.
-func WidthElemNEQ(v float64) predicate.MDRekvizit {
-	return predicate.MDRekvizit(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldWidthElem), v))
-	})
-}
-
-// WidthElemIn applies the In predicate on the "widthElem" field.
-func WidthElemIn(vs ...float64) predicate.MDRekvizit {
-	v := make([]interface{}, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.MDRekvizit(func(s *sql.Selector) {
-		// if not arguments were provided, append the FALSE constants,
-		// since we can't apply "IN ()". This will make this predicate falsy.
-		if len(v) == 0 {
-			s.Where(sql.False())
-			return
-		}
-		s.Where(sql.In(s.C(FieldWidthElem), v...))
-	})
-}
-
-// WidthElemNotIn applies the NotIn predicate on the "widthElem" field.
-func WidthElemNotIn(vs ...float64) predicate.MDRekvizit {
-	v := make([]interface{}, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.MDRekvizit(func(s *sql.Selector) {
-		// if not arguments were provided, append the FALSE constants,
-		// since we can't apply "IN ()". This will make this predicate falsy.
-		if len(v) == 0 {
-			s.Where(sql.False())
-			return
-		}
-		s.Where(sql.NotIn(s.C(FieldWidthElem), v...))
-	})
-}
-
-// WidthElemGT applies the GT predicate on the "widthElem" field.
-func WidthElemGT(v float64) predicate.MDRekvizit {
-	return predicate.MDRekvizit(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldWidthElem), v))
-	})
-}
-
-// WidthElemGTE applies the GTE predicate on the "widthElem" field.
-func WidthElemGTE(v float64) predicate.MDRekvizit {
-	return predicate.MDRekvizit(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldWidthElem), v))
-	})
-}
-
-// WidthElemLT applies the LT predicate on the "widthElem" field.
-func WidthElemLT(v float64) predicate.MDRekvizit {
-	return predicate.MDRekvizit(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldWidthElem), v))
-	})
-}
-
-// WidthElemLTE applies the LTE predicate on the "widthElem" field.
-func WidthElemLTE(v float64) predicate.MDRekvizit {
-	return predicate.MDRekvizit(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldWidthElem), v))
-	})
-}
-
-// WidthSpisokEQ applies the EQ predicate on the "widthSpisok" field.
-func WidthSpisokEQ(v float64) predicate.MDRekvizit {
-	return predicate.MDRekvizit(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldWidthSpisok), v))
-	})
-}
-
-// WidthSpisokNEQ applies the NEQ predicate on the "widthSpisok" field.
-func WidthSpisokNEQ(v float64) predicate.MDRekvizit {
-	return predicate.MDRekvizit(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldWidthSpisok), v))
-	})
-}
-
-// WidthSpisokIn applies the In predicate on the "widthSpisok" field.
-func WidthSpisokIn(vs ...float64) predicate.MDRekvizit {
-	v := make([]interface{}, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.MDRekvizit(func(s *sql.Selector) {
-		// if not arguments were provided, append the FALSE constants,
-		// since we can't apply "IN ()". This will make this predicate falsy.
-		if len(v) == 0 {
-			s.Where(sql.False())
-			return
-		}
-		s.Where(sql.In(s.C(FieldWidthSpisok), v...))
-	})
-}
-
-// WidthSpisokNotIn applies the NotIn predicate on the "widthSpisok" field.
-func WidthSpisokNotIn(vs ...float64) predicate.MDRekvizit {
-	v := make([]interface{}, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.MDRekvizit(func(s *sql.Selector) {
-		// if not arguments were provided, append the FALSE constants,
-		// since we can't apply "IN ()". This will make this predicate falsy.
-		if len(v) == 0 {
-			s.Where(sql.False())
-			return
-		}
-		s.Where(sql.NotIn(s.C(FieldWidthSpisok), v...))
-	})
-}
-
-// WidthSpisokGT applies the GT predicate on the "widthSpisok" field.
-func WidthSpisokGT(v float64) predicate.MDRekvizit {
-	return predicate.MDRekvizit(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldWidthSpisok), v))
-	})
-}
-
-// WidthSpisokGTE applies the GTE predicate on the "widthSpisok" field.
-func WidthSpisokGTE(v float64) predicate.MDRekvizit {
-	return predicate.MDRekvizit(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldWidthSpisok), v))
-	})
-}
-
-// WidthSpisokLT applies the LT predicate on the "widthSpisok" field.
-func WidthSpisokLT(v float64) predicate.MDRekvizit {
-	return predicate.MDRekvizit(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldWidthSpisok), v))
-	})
-}
-
-// WidthSpisokLTE applies the LTE predicate on the "widthSpisok" field.
-func WidthSpisokLTE(v float64) predicate.MDRekvizit {
-	return predicate.MDRekvizit(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldWidthSpisok), v))
-	})
-}
-
 // TypeEQ applies the EQ predicate on the "type" field.
 func TypeEQ(v string) predicate.MDRekvizit {
 	return predicate.MDRekvizit(func(s *sql.Selector) {
@@ -977,6 +700,82 @@ func OwnerIDEqualFold(v string) predicate.MDRekvizit {
 func OwnerIDContainsFold(v string) predicate.MDRekvizit {
 	return predicate.MDRekvizit(func(s *sql.Selector) {
 		s.Where(sql.ContainsFold(s.C(FieldOwnerID), v))
+	})
+}
+
+// WidthSpisokEQ applies the EQ predicate on the "widthSpisok" field.
+func WidthSpisokEQ(v float64) predicate.MDRekvizit {
+	return predicate.MDRekvizit(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldWidthSpisok), v))
+	})
+}
+
+// WidthSpisokNEQ applies the NEQ predicate on the "widthSpisok" field.
+func WidthSpisokNEQ(v float64) predicate.MDRekvizit {
+	return predicate.MDRekvizit(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldWidthSpisok), v))
+	})
+}
+
+// WidthSpisokIn applies the In predicate on the "widthSpisok" field.
+func WidthSpisokIn(vs ...float64) predicate.MDRekvizit {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.MDRekvizit(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.In(s.C(FieldWidthSpisok), v...))
+	})
+}
+
+// WidthSpisokNotIn applies the NotIn predicate on the "widthSpisok" field.
+func WidthSpisokNotIn(vs ...float64) predicate.MDRekvizit {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.MDRekvizit(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.NotIn(s.C(FieldWidthSpisok), v...))
+	})
+}
+
+// WidthSpisokGT applies the GT predicate on the "widthSpisok" field.
+func WidthSpisokGT(v float64) predicate.MDRekvizit {
+	return predicate.MDRekvizit(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldWidthSpisok), v))
+	})
+}
+
+// WidthSpisokGTE applies the GTE predicate on the "widthSpisok" field.
+func WidthSpisokGTE(v float64) predicate.MDRekvizit {
+	return predicate.MDRekvizit(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldWidthSpisok), v))
+	})
+}
+
+// WidthSpisokLT applies the LT predicate on the "widthSpisok" field.
+func WidthSpisokLT(v float64) predicate.MDRekvizit {
+	return predicate.MDRekvizit(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldWidthSpisok), v))
+	})
+}
+
+// WidthSpisokLTE applies the LTE predicate on the "widthSpisok" field.
+func WidthSpisokLTE(v float64) predicate.MDRekvizit {
+	return predicate.MDRekvizit(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldWidthSpisok), v))
 	})
 }
 

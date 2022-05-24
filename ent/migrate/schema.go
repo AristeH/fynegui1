@@ -11,13 +11,11 @@ var (
 	// MdRekvizitsColumns holds the columns for the "md_rekvizits" table.
 	MdRekvizitsColumns = []*schema.Column{
 		{Name: "ID", Type: field.TypeString, Unique: true, Size: 36},
-		{Name: "Namerus", Type: field.TypeString, Size: 300},
 		{Name: "Nameeng", Type: field.TypeString, Size: 300},
 		{Name: "Synonym", Type: field.TypeString, Size: 300},
 		{Name: "por", Type: field.TypeString, Size: 300},
-		{Name: "width_elem", Type: field.TypeFloat64},
-		{Name: "width_spisok", Type: field.TypeFloat64},
 		{Name: "Type", Type: field.TypeString, Size: 300},
+		{Name: "width_spisok", Type: field.TypeFloat64},
 		{Name: "owner_id", Type: field.TypeString, Nullable: true, Size: 36},
 	}
 	// MdRekvizitsTable holds the schema information for the "md_rekvizits" table.
@@ -28,7 +26,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "md_rekvizits_md_tabels_mdrekvizits",
-				Columns:    []*schema.Column{MdRekvizitsColumns[8]},
+				Columns:    []*schema.Column{MdRekvizitsColumns[6]},
 				RefColumns: []*schema.Column{MdTabelsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -37,9 +35,9 @@ var (
 	// MdSubSystemsColumns holds the columns for the "md_sub_systems" table.
 	MdSubSystemsColumns = []*schema.Column{
 		{Name: "ID", Type: field.TypeString, Unique: true, Size: 36},
-		{Name: "Namerus", Type: field.TypeString, Size: 300},
 		{Name: "Nameeng", Type: field.TypeString, Size: 300},
 		{Name: "Synonym", Type: field.TypeString, Size: 150},
+		{Name: "Por", Type: field.TypeString},
 		{Name: "Parent", Type: field.TypeString, Nullable: true, Size: 36},
 	}
 	// MdSubSystemsTable holds the schema information for the "md_sub_systems" table.
@@ -59,17 +57,54 @@ var (
 	// MdTabelsColumns holds the columns for the "md_tabels" table.
 	MdTabelsColumns = []*schema.Column{
 		{Name: "ID", Type: field.TypeString, Unique: true, Size: 36},
-		{Name: "Namerus", Type: field.TypeString, Size: 300},
 		{Name: "Nameeng", Type: field.TypeString, Size: 300},
 		{Name: "Synonym", Type: field.TypeString, Size: 300},
+		{Name: "Por", Type: field.TypeString},
 		{Name: "File", Type: field.TypeString, Size: 300},
-		{Name: "Type", Type: field.TypeString, Size: 300},
+		{Name: "Parent", Type: field.TypeString, Nullable: true, Size: 36},
+		{Name: "types_id", Type: field.TypeString, Nullable: true, Size: 36},
 	}
 	// MdTabelsTable holds the schema information for the "md_tabels" table.
 	MdTabelsTable = &schema.Table{
 		Name:       "md_tabels",
 		Columns:    MdTabelsColumns,
 		PrimaryKey: []*schema.Column{MdTabelsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "md_tabels_md_tabels_child_mdtabel",
+				Columns:    []*schema.Column{MdTabelsColumns[5]},
+				RefColumns: []*schema.Column{MdTabelsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "md_tabels_md_type_tabels_mdtypetabels",
+				Columns:    []*schema.Column{MdTabelsColumns[6]},
+				RefColumns: []*schema.Column{MdTypeTabelsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
+	// MdTypeTabelsColumns holds the columns for the "md_type_tabels" table.
+	MdTypeTabelsColumns = []*schema.Column{
+		{Name: "ID", Type: field.TypeString, Unique: true, Size: 36},
+		{Name: "Nameeng", Type: field.TypeString, Size: 300},
+		{Name: "Synonym", Type: field.TypeString, Size: 300},
+		{Name: "Por", Type: field.TypeString},
+		{Name: "Parent", Type: field.TypeString, Nullable: true, Size: 36},
+	}
+	// MdTypeTabelsTable holds the schema information for the "md_type_tabels" table.
+	MdTypeTabelsTable = &schema.Table{
+		Name:       "md_type_tabels",
+		Columns:    MdTypeTabelsColumns,
+		PrimaryKey: []*schema.Column{MdTypeTabelsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "md_type_tabels_md_type_tabels_child_mdtypetabels",
+				Columns:    []*schema.Column{MdTypeTabelsColumns[4]},
+				RefColumns: []*schema.Column{MdTypeTabelsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
 	}
 	// MdSubSystemsMdtablesColumns holds the columns for the "md_sub_systems_mdtables" table.
 	MdSubSystemsMdtablesColumns = []*schema.Column{
@@ -101,6 +136,7 @@ var (
 		MdRekvizitsTable,
 		MdSubSystemsTable,
 		MdTabelsTable,
+		MdTypeTabelsTable,
 		MdSubSystemsMdtablesTable,
 	}
 )
@@ -108,6 +144,9 @@ var (
 func init() {
 	MdRekvizitsTable.ForeignKeys[0].RefTable = MdTabelsTable
 	MdSubSystemsTable.ForeignKeys[0].RefTable = MdSubSystemsTable
+	MdTabelsTable.ForeignKeys[0].RefTable = MdTabelsTable
+	MdTabelsTable.ForeignKeys[1].RefTable = MdTypeTabelsTable
+	MdTypeTabelsTable.ForeignKeys[0].RefTable = MdTypeTabelsTable
 	MdSubSystemsMdtablesTable.ForeignKeys[0].RefTable = MdSubSystemsTable
 	MdSubSystemsMdtablesTable.ForeignKeys[1].RefTable = MdTabelsTable
 }

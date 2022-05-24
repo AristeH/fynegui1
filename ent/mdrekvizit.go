@@ -16,22 +16,18 @@ type MDRekvizit struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID string `json:"ссылка,omitempty"`
-	// Namerus holds the value of the "namerus" field.
-	Namerus string `json:"ИмяРус,omitempty"`
 	// Nameeng holds the value of the "nameeng" field.
 	Nameeng string `json:"ИмяАнгл,omitempty"`
 	// Synonym holds the value of the "synonym" field.
 	Synonym string `json:"Синоним,omitempty"`
 	// Por holds the value of the "por" field.
 	Por string `json:"ПорядокВывода,omitempty"`
-	// WidthElem holds the value of the "widthElem" field.
-	WidthElem float64 `json:"ШиринаЭлемента,omitempty"`
-	// WidthSpisok holds the value of the "widthSpisok" field.
-	WidthSpisok float64 `json:"ШиринаКолонки,omitempty"`
 	// Type holds the value of the "type" field.
 	Type string `json:"Тип,omitempty"`
 	// OwnerID holds the value of the "owner_id" field.
 	OwnerID string `json:"owner_id,omitempty"`
+	// WidthSpisok holds the value of the "widthSpisok" field.
+	WidthSpisok float64 `json:"ШиринаКолонки,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the MDRekvizitQuery when eager-loading is set.
 	Edges MDRekvizitEdges `json:"edges"`
@@ -65,9 +61,9 @@ func (*MDRekvizit) scanValues(columns []string) ([]interface{}, error) {
 	values := make([]interface{}, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case mdrekvizit.FieldWidthElem, mdrekvizit.FieldWidthSpisok:
+		case mdrekvizit.FieldWidthSpisok:
 			values[i] = new(sql.NullFloat64)
-		case mdrekvizit.FieldID, mdrekvizit.FieldNamerus, mdrekvizit.FieldNameeng, mdrekvizit.FieldSynonym, mdrekvizit.FieldPor, mdrekvizit.FieldType, mdrekvizit.FieldOwnerID:
+		case mdrekvizit.FieldID, mdrekvizit.FieldNameeng, mdrekvizit.FieldSynonym, mdrekvizit.FieldPor, mdrekvizit.FieldType, mdrekvizit.FieldOwnerID:
 			values[i] = new(sql.NullString)
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type MDRekvizit", columns[i])
@@ -90,12 +86,6 @@ func (mr *MDRekvizit) assignValues(columns []string, values []interface{}) error
 			} else if value.Valid {
 				mr.ID = value.String
 			}
-		case mdrekvizit.FieldNamerus:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field namerus", values[i])
-			} else if value.Valid {
-				mr.Namerus = value.String
-			}
 		case mdrekvizit.FieldNameeng:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field nameeng", values[i])
@@ -114,18 +104,6 @@ func (mr *MDRekvizit) assignValues(columns []string, values []interface{}) error
 			} else if value.Valid {
 				mr.Por = value.String
 			}
-		case mdrekvizit.FieldWidthElem:
-			if value, ok := values[i].(*sql.NullFloat64); !ok {
-				return fmt.Errorf("unexpected type %T for field widthElem", values[i])
-			} else if value.Valid {
-				mr.WidthElem = value.Float64
-			}
-		case mdrekvizit.FieldWidthSpisok:
-			if value, ok := values[i].(*sql.NullFloat64); !ok {
-				return fmt.Errorf("unexpected type %T for field widthSpisok", values[i])
-			} else if value.Valid {
-				mr.WidthSpisok = value.Float64
-			}
 		case mdrekvizit.FieldType:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field type", values[i])
@@ -137,6 +115,12 @@ func (mr *MDRekvizit) assignValues(columns []string, values []interface{}) error
 				return fmt.Errorf("unexpected type %T for field owner_id", values[i])
 			} else if value.Valid {
 				mr.OwnerID = value.String
+			}
+		case mdrekvizit.FieldWidthSpisok:
+			if value, ok := values[i].(*sql.NullFloat64); !ok {
+				return fmt.Errorf("unexpected type %T for field widthSpisok", values[i])
+			} else if value.Valid {
+				mr.WidthSpisok = value.Float64
 			}
 		}
 	}
@@ -171,22 +155,18 @@ func (mr *MDRekvizit) String() string {
 	var builder strings.Builder
 	builder.WriteString("MDRekvizit(")
 	builder.WriteString(fmt.Sprintf("id=%v", mr.ID))
-	builder.WriteString(", namerus=")
-	builder.WriteString(mr.Namerus)
 	builder.WriteString(", nameeng=")
 	builder.WriteString(mr.Nameeng)
 	builder.WriteString(", synonym=")
 	builder.WriteString(mr.Synonym)
 	builder.WriteString(", por=")
 	builder.WriteString(mr.Por)
-	builder.WriteString(", widthElem=")
-	builder.WriteString(fmt.Sprintf("%v", mr.WidthElem))
-	builder.WriteString(", widthSpisok=")
-	builder.WriteString(fmt.Sprintf("%v", mr.WidthSpisok))
 	builder.WriteString(", type=")
 	builder.WriteString(mr.Type)
 	builder.WriteString(", owner_id=")
 	builder.WriteString(mr.OwnerID)
+	builder.WriteString(", widthSpisok=")
+	builder.WriteString(fmt.Sprintf("%v", mr.WidthSpisok))
 	builder.WriteByte(')')
 	return builder.String()
 }

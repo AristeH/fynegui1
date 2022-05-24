@@ -9,6 +9,7 @@ import (
 	"fynegui/ent/mdrekvizit"
 	"fynegui/ent/mdsubsystems"
 	"fynegui/ent/mdtabel"
+	"fynegui/ent/mdtypetabel"
 	"fynegui/ent/predicate"
 	"sync"
 
@@ -27,6 +28,7 @@ const (
 	TypeMDRekvizit   = "MDRekvizit"
 	TypeMDSubSystems = "MDSubSystems"
 	TypeMDTabel      = "MDTabel"
+	TypeMDTypeTabel  = "MDTypeTabel"
 )
 
 // MDRekvizitMutation represents an operation that mutates the MDRekvizit nodes in the graph.
@@ -35,15 +37,12 @@ type MDRekvizitMutation struct {
 	op             Op
 	typ            string
 	id             *string
-	namerus        *string
 	nameeng        *string
 	synonym        *string
 	por            *string
-	widthElem      *float64
-	addwidthElem   *float64
+	_type          *string
 	widthSpisok    *float64
 	addwidthSpisok *float64
-	_type          *string
 	clearedFields  map[string]struct{}
 	owner          *string
 	clearedowner   bool
@@ -156,42 +155,6 @@ func (m *MDRekvizitMutation) IDs(ctx context.Context) ([]string, error) {
 	}
 }
 
-// SetNamerus sets the "namerus" field.
-func (m *MDRekvizitMutation) SetNamerus(s string) {
-	m.namerus = &s
-}
-
-// Namerus returns the value of the "namerus" field in the mutation.
-func (m *MDRekvizitMutation) Namerus() (r string, exists bool) {
-	v := m.namerus
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldNamerus returns the old "namerus" field's value of the MDRekvizit entity.
-// If the MDRekvizit object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *MDRekvizitMutation) OldNamerus(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldNamerus is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldNamerus requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldNamerus: %w", err)
-	}
-	return oldValue.Namerus, nil
-}
-
-// ResetNamerus resets all changes to the "namerus" field.
-func (m *MDRekvizitMutation) ResetNamerus() {
-	m.namerus = nil
-}
-
 // SetNameeng sets the "nameeng" field.
 func (m *MDRekvizitMutation) SetNameeng(s string) {
 	m.nameeng = &s
@@ -300,118 +263,6 @@ func (m *MDRekvizitMutation) ResetPor() {
 	m.por = nil
 }
 
-// SetWidthElem sets the "widthElem" field.
-func (m *MDRekvizitMutation) SetWidthElem(f float64) {
-	m.widthElem = &f
-	m.addwidthElem = nil
-}
-
-// WidthElem returns the value of the "widthElem" field in the mutation.
-func (m *MDRekvizitMutation) WidthElem() (r float64, exists bool) {
-	v := m.widthElem
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldWidthElem returns the old "widthElem" field's value of the MDRekvizit entity.
-// If the MDRekvizit object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *MDRekvizitMutation) OldWidthElem(ctx context.Context) (v float64, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldWidthElem is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldWidthElem requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldWidthElem: %w", err)
-	}
-	return oldValue.WidthElem, nil
-}
-
-// AddWidthElem adds f to the "widthElem" field.
-func (m *MDRekvizitMutation) AddWidthElem(f float64) {
-	if m.addwidthElem != nil {
-		*m.addwidthElem += f
-	} else {
-		m.addwidthElem = &f
-	}
-}
-
-// AddedWidthElem returns the value that was added to the "widthElem" field in this mutation.
-func (m *MDRekvizitMutation) AddedWidthElem() (r float64, exists bool) {
-	v := m.addwidthElem
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetWidthElem resets all changes to the "widthElem" field.
-func (m *MDRekvizitMutation) ResetWidthElem() {
-	m.widthElem = nil
-	m.addwidthElem = nil
-}
-
-// SetWidthSpisok sets the "widthSpisok" field.
-func (m *MDRekvizitMutation) SetWidthSpisok(f float64) {
-	m.widthSpisok = &f
-	m.addwidthSpisok = nil
-}
-
-// WidthSpisok returns the value of the "widthSpisok" field in the mutation.
-func (m *MDRekvizitMutation) WidthSpisok() (r float64, exists bool) {
-	v := m.widthSpisok
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldWidthSpisok returns the old "widthSpisok" field's value of the MDRekvizit entity.
-// If the MDRekvizit object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *MDRekvizitMutation) OldWidthSpisok(ctx context.Context) (v float64, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldWidthSpisok is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldWidthSpisok requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldWidthSpisok: %w", err)
-	}
-	return oldValue.WidthSpisok, nil
-}
-
-// AddWidthSpisok adds f to the "widthSpisok" field.
-func (m *MDRekvizitMutation) AddWidthSpisok(f float64) {
-	if m.addwidthSpisok != nil {
-		*m.addwidthSpisok += f
-	} else {
-		m.addwidthSpisok = &f
-	}
-}
-
-// AddedWidthSpisok returns the value that was added to the "widthSpisok" field in this mutation.
-func (m *MDRekvizitMutation) AddedWidthSpisok() (r float64, exists bool) {
-	v := m.addwidthSpisok
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetWidthSpisok resets all changes to the "widthSpisok" field.
-func (m *MDRekvizitMutation) ResetWidthSpisok() {
-	m.widthSpisok = nil
-	m.addwidthSpisok = nil
-}
-
 // SetType sets the "type" field.
 func (m *MDRekvizitMutation) SetType(s string) {
 	m._type = &s
@@ -497,6 +348,62 @@ func (m *MDRekvizitMutation) ResetOwnerID() {
 	delete(m.clearedFields, mdrekvizit.FieldOwnerID)
 }
 
+// SetWidthSpisok sets the "widthSpisok" field.
+func (m *MDRekvizitMutation) SetWidthSpisok(f float64) {
+	m.widthSpisok = &f
+	m.addwidthSpisok = nil
+}
+
+// WidthSpisok returns the value of the "widthSpisok" field in the mutation.
+func (m *MDRekvizitMutation) WidthSpisok() (r float64, exists bool) {
+	v := m.widthSpisok
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldWidthSpisok returns the old "widthSpisok" field's value of the MDRekvizit entity.
+// If the MDRekvizit object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MDRekvizitMutation) OldWidthSpisok(ctx context.Context) (v float64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldWidthSpisok is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldWidthSpisok requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldWidthSpisok: %w", err)
+	}
+	return oldValue.WidthSpisok, nil
+}
+
+// AddWidthSpisok adds f to the "widthSpisok" field.
+func (m *MDRekvizitMutation) AddWidthSpisok(f float64) {
+	if m.addwidthSpisok != nil {
+		*m.addwidthSpisok += f
+	} else {
+		m.addwidthSpisok = &f
+	}
+}
+
+// AddedWidthSpisok returns the value that was added to the "widthSpisok" field in this mutation.
+func (m *MDRekvizitMutation) AddedWidthSpisok() (r float64, exists bool) {
+	v := m.addwidthSpisok
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetWidthSpisok resets all changes to the "widthSpisok" field.
+func (m *MDRekvizitMutation) ResetWidthSpisok() {
+	m.widthSpisok = nil
+	m.addwidthSpisok = nil
+}
+
 // ClearOwner clears the "owner" edge to the MDTabel entity.
 func (m *MDRekvizitMutation) ClearOwner() {
 	m.clearedowner = true
@@ -542,10 +449,7 @@ func (m *MDRekvizitMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *MDRekvizitMutation) Fields() []string {
-	fields := make([]string, 0, 8)
-	if m.namerus != nil {
-		fields = append(fields, mdrekvizit.FieldNamerus)
-	}
+	fields := make([]string, 0, 6)
 	if m.nameeng != nil {
 		fields = append(fields, mdrekvizit.FieldNameeng)
 	}
@@ -555,17 +459,14 @@ func (m *MDRekvizitMutation) Fields() []string {
 	if m.por != nil {
 		fields = append(fields, mdrekvizit.FieldPor)
 	}
-	if m.widthElem != nil {
-		fields = append(fields, mdrekvizit.FieldWidthElem)
-	}
-	if m.widthSpisok != nil {
-		fields = append(fields, mdrekvizit.FieldWidthSpisok)
-	}
 	if m._type != nil {
 		fields = append(fields, mdrekvizit.FieldType)
 	}
 	if m.owner != nil {
 		fields = append(fields, mdrekvizit.FieldOwnerID)
+	}
+	if m.widthSpisok != nil {
+		fields = append(fields, mdrekvizit.FieldWidthSpisok)
 	}
 	return fields
 }
@@ -575,22 +476,18 @@ func (m *MDRekvizitMutation) Fields() []string {
 // schema.
 func (m *MDRekvizitMutation) Field(name string) (ent.Value, bool) {
 	switch name {
-	case mdrekvizit.FieldNamerus:
-		return m.Namerus()
 	case mdrekvizit.FieldNameeng:
 		return m.Nameeng()
 	case mdrekvizit.FieldSynonym:
 		return m.Synonym()
 	case mdrekvizit.FieldPor:
 		return m.Por()
-	case mdrekvizit.FieldWidthElem:
-		return m.WidthElem()
-	case mdrekvizit.FieldWidthSpisok:
-		return m.WidthSpisok()
 	case mdrekvizit.FieldType:
 		return m.GetType()
 	case mdrekvizit.FieldOwnerID:
 		return m.OwnerID()
+	case mdrekvizit.FieldWidthSpisok:
+		return m.WidthSpisok()
 	}
 	return nil, false
 }
@@ -600,22 +497,18 @@ func (m *MDRekvizitMutation) Field(name string) (ent.Value, bool) {
 // database failed.
 func (m *MDRekvizitMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
-	case mdrekvizit.FieldNamerus:
-		return m.OldNamerus(ctx)
 	case mdrekvizit.FieldNameeng:
 		return m.OldNameeng(ctx)
 	case mdrekvizit.FieldSynonym:
 		return m.OldSynonym(ctx)
 	case mdrekvizit.FieldPor:
 		return m.OldPor(ctx)
-	case mdrekvizit.FieldWidthElem:
-		return m.OldWidthElem(ctx)
-	case mdrekvizit.FieldWidthSpisok:
-		return m.OldWidthSpisok(ctx)
 	case mdrekvizit.FieldType:
 		return m.OldType(ctx)
 	case mdrekvizit.FieldOwnerID:
 		return m.OldOwnerID(ctx)
+	case mdrekvizit.FieldWidthSpisok:
+		return m.OldWidthSpisok(ctx)
 	}
 	return nil, fmt.Errorf("unknown MDRekvizit field %s", name)
 }
@@ -625,13 +518,6 @@ func (m *MDRekvizitMutation) OldField(ctx context.Context, name string) (ent.Val
 // type.
 func (m *MDRekvizitMutation) SetField(name string, value ent.Value) error {
 	switch name {
-	case mdrekvizit.FieldNamerus:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetNamerus(v)
-		return nil
 	case mdrekvizit.FieldNameeng:
 		v, ok := value.(string)
 		if !ok {
@@ -653,20 +539,6 @@ func (m *MDRekvizitMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetPor(v)
 		return nil
-	case mdrekvizit.FieldWidthElem:
-		v, ok := value.(float64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetWidthElem(v)
-		return nil
-	case mdrekvizit.FieldWidthSpisok:
-		v, ok := value.(float64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetWidthSpisok(v)
-		return nil
 	case mdrekvizit.FieldType:
 		v, ok := value.(string)
 		if !ok {
@@ -681,6 +553,13 @@ func (m *MDRekvizitMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetOwnerID(v)
 		return nil
+	case mdrekvizit.FieldWidthSpisok:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetWidthSpisok(v)
+		return nil
 	}
 	return fmt.Errorf("unknown MDRekvizit field %s", name)
 }
@@ -689,9 +568,6 @@ func (m *MDRekvizitMutation) SetField(name string, value ent.Value) error {
 // this mutation.
 func (m *MDRekvizitMutation) AddedFields() []string {
 	var fields []string
-	if m.addwidthElem != nil {
-		fields = append(fields, mdrekvizit.FieldWidthElem)
-	}
 	if m.addwidthSpisok != nil {
 		fields = append(fields, mdrekvizit.FieldWidthSpisok)
 	}
@@ -703,8 +579,6 @@ func (m *MDRekvizitMutation) AddedFields() []string {
 // was not set, or was not defined in the schema.
 func (m *MDRekvizitMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
-	case mdrekvizit.FieldWidthElem:
-		return m.AddedWidthElem()
 	case mdrekvizit.FieldWidthSpisok:
 		return m.AddedWidthSpisok()
 	}
@@ -716,13 +590,6 @@ func (m *MDRekvizitMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *MDRekvizitMutation) AddField(name string, value ent.Value) error {
 	switch name {
-	case mdrekvizit.FieldWidthElem:
-		v, ok := value.(float64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddWidthElem(v)
-		return nil
 	case mdrekvizit.FieldWidthSpisok:
 		v, ok := value.(float64)
 		if !ok {
@@ -766,9 +633,6 @@ func (m *MDRekvizitMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *MDRekvizitMutation) ResetField(name string) error {
 	switch name {
-	case mdrekvizit.FieldNamerus:
-		m.ResetNamerus()
-		return nil
 	case mdrekvizit.FieldNameeng:
 		m.ResetNameeng()
 		return nil
@@ -778,17 +642,14 @@ func (m *MDRekvizitMutation) ResetField(name string) error {
 	case mdrekvizit.FieldPor:
 		m.ResetPor()
 		return nil
-	case mdrekvizit.FieldWidthElem:
-		m.ResetWidthElem()
-		return nil
-	case mdrekvizit.FieldWidthSpisok:
-		m.ResetWidthSpisok()
-		return nil
 	case mdrekvizit.FieldType:
 		m.ResetType()
 		return nil
 	case mdrekvizit.FieldOwnerID:
 		m.ResetOwnerID()
+		return nil
+	case mdrekvizit.FieldWidthSpisok:
+		m.ResetWidthSpisok()
 		return nil
 	}
 	return fmt.Errorf("unknown MDRekvizit field %s", name)
@@ -876,9 +737,9 @@ type MDSubSystemsMutation struct {
 	op                         Op
 	typ                        string
 	id                         *string
-	namerus                    *string
 	nameeng                    *string
 	synonym                    *string
+	por                        *string
 	clearedFields              map[string]struct{}
 	child_mdsubsystems         map[string]struct{}
 	removedchild_mdsubsystems  map[string]struct{}
@@ -997,42 +858,6 @@ func (m *MDSubSystemsMutation) IDs(ctx context.Context) ([]string, error) {
 	}
 }
 
-// SetNamerus sets the "namerus" field.
-func (m *MDSubSystemsMutation) SetNamerus(s string) {
-	m.namerus = &s
-}
-
-// Namerus returns the value of the "namerus" field in the mutation.
-func (m *MDSubSystemsMutation) Namerus() (r string, exists bool) {
-	v := m.namerus
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldNamerus returns the old "namerus" field's value of the MDSubSystems entity.
-// If the MDSubSystems object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *MDSubSystemsMutation) OldNamerus(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldNamerus is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldNamerus requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldNamerus: %w", err)
-	}
-	return oldValue.Namerus, nil
-}
-
-// ResetNamerus resets all changes to the "namerus" field.
-func (m *MDSubSystemsMutation) ResetNamerus() {
-	m.namerus = nil
-}
-
 // SetNameeng sets the "nameeng" field.
 func (m *MDSubSystemsMutation) SetNameeng(s string) {
 	m.nameeng = &s
@@ -1103,6 +928,42 @@ func (m *MDSubSystemsMutation) OldSynonym(ctx context.Context) (v string, err er
 // ResetSynonym resets all changes to the "synonym" field.
 func (m *MDSubSystemsMutation) ResetSynonym() {
 	m.synonym = nil
+}
+
+// SetPor sets the "por" field.
+func (m *MDSubSystemsMutation) SetPor(s string) {
+	m.por = &s
+}
+
+// Por returns the value of the "por" field in the mutation.
+func (m *MDSubSystemsMutation) Por() (r string, exists bool) {
+	v := m.por
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPor returns the old "por" field's value of the MDSubSystems entity.
+// If the MDSubSystems object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MDSubSystemsMutation) OldPor(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPor is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPor requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPor: %w", err)
+	}
+	return oldValue.Por, nil
+}
+
+// ResetPor resets all changes to the "por" field.
+func (m *MDSubSystemsMutation) ResetPor() {
+	m.por = nil
 }
 
 // SetParent sets the "parent" field.
@@ -1321,14 +1182,14 @@ func (m *MDSubSystemsMutation) Type() string {
 // AddedFields().
 func (m *MDSubSystemsMutation) Fields() []string {
 	fields := make([]string, 0, 4)
-	if m.namerus != nil {
-		fields = append(fields, mdsubsystems.FieldNamerus)
-	}
 	if m.nameeng != nil {
 		fields = append(fields, mdsubsystems.FieldNameeng)
 	}
 	if m.synonym != nil {
 		fields = append(fields, mdsubsystems.FieldSynonym)
+	}
+	if m.por != nil {
+		fields = append(fields, mdsubsystems.FieldPor)
 	}
 	if m.parent_mdsubsystems != nil {
 		fields = append(fields, mdsubsystems.FieldParent)
@@ -1341,12 +1202,12 @@ func (m *MDSubSystemsMutation) Fields() []string {
 // schema.
 func (m *MDSubSystemsMutation) Field(name string) (ent.Value, bool) {
 	switch name {
-	case mdsubsystems.FieldNamerus:
-		return m.Namerus()
 	case mdsubsystems.FieldNameeng:
 		return m.Nameeng()
 	case mdsubsystems.FieldSynonym:
 		return m.Synonym()
+	case mdsubsystems.FieldPor:
+		return m.Por()
 	case mdsubsystems.FieldParent:
 		return m.Parent()
 	}
@@ -1358,12 +1219,12 @@ func (m *MDSubSystemsMutation) Field(name string) (ent.Value, bool) {
 // database failed.
 func (m *MDSubSystemsMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
-	case mdsubsystems.FieldNamerus:
-		return m.OldNamerus(ctx)
 	case mdsubsystems.FieldNameeng:
 		return m.OldNameeng(ctx)
 	case mdsubsystems.FieldSynonym:
 		return m.OldSynonym(ctx)
+	case mdsubsystems.FieldPor:
+		return m.OldPor(ctx)
 	case mdsubsystems.FieldParent:
 		return m.OldParent(ctx)
 	}
@@ -1375,13 +1236,6 @@ func (m *MDSubSystemsMutation) OldField(ctx context.Context, name string) (ent.V
 // type.
 func (m *MDSubSystemsMutation) SetField(name string, value ent.Value) error {
 	switch name {
-	case mdsubsystems.FieldNamerus:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetNamerus(v)
-		return nil
 	case mdsubsystems.FieldNameeng:
 		v, ok := value.(string)
 		if !ok {
@@ -1395,6 +1249,13 @@ func (m *MDSubSystemsMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetSynonym(v)
+		return nil
+	case mdsubsystems.FieldPor:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPor(v)
 		return nil
 	case mdsubsystems.FieldParent:
 		v, ok := value.(string)
@@ -1461,14 +1322,14 @@ func (m *MDSubSystemsMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *MDSubSystemsMutation) ResetField(name string) error {
 	switch name {
-	case mdsubsystems.FieldNamerus:
-		m.ResetNamerus()
-		return nil
 	case mdsubsystems.FieldNameeng:
 		m.ResetNameeng()
 		return nil
 	case mdsubsystems.FieldSynonym:
 		m.ResetSynonym()
+		return nil
+	case mdsubsystems.FieldPor:
+		m.ResetPor()
 		return nil
 	case mdsubsystems.FieldParent:
 		m.ResetParent()
@@ -1608,24 +1469,30 @@ func (m *MDSubSystemsMutation) ResetEdge(name string) error {
 // MDTabelMutation represents an operation that mutates the MDTabel nodes in the graph.
 type MDTabelMutation struct {
 	config
-	op                  Op
-	typ                 string
-	id                  *string
-	namerus             *string
-	nameeng             *string
-	synonym             *string
-	file                *string
-	_type               *string
-	clearedFields       map[string]struct{}
-	mdsubsystems        map[string]struct{}
-	removedmdsubsystems map[string]struct{}
-	clearedmdsubsystems bool
-	mdrekvizits         map[string]struct{}
-	removedmdrekvizits  map[string]struct{}
-	clearedmdrekvizits  bool
-	done                bool
-	oldValue            func(context.Context) (*MDTabel, error)
-	predicates          []predicate.MDTabel
+	op                    Op
+	typ                   string
+	id                    *string
+	nameeng               *string
+	synonym               *string
+	por                   *string
+	file                  *string
+	clearedFields         map[string]struct{}
+	child_mdtabel         map[string]struct{}
+	removedchild_mdtabel  map[string]struct{}
+	clearedchild_mdtabel  bool
+	parent_mdtabel        *string
+	clearedparent_mdtabel bool
+	mdsubsystems          map[string]struct{}
+	removedmdsubsystems   map[string]struct{}
+	clearedmdsubsystems   bool
+	mdrekvizits           map[string]struct{}
+	removedmdrekvizits    map[string]struct{}
+	clearedmdrekvizits    bool
+	mdtypetabel           *string
+	clearedmdtypetabel    bool
+	done                  bool
+	oldValue              func(context.Context) (*MDTabel, error)
+	predicates            []predicate.MDTabel
 }
 
 var _ ent.Mutation = (*MDTabelMutation)(nil)
@@ -1732,42 +1599,6 @@ func (m *MDTabelMutation) IDs(ctx context.Context) ([]string, error) {
 	}
 }
 
-// SetNamerus sets the "namerus" field.
-func (m *MDTabelMutation) SetNamerus(s string) {
-	m.namerus = &s
-}
-
-// Namerus returns the value of the "namerus" field in the mutation.
-func (m *MDTabelMutation) Namerus() (r string, exists bool) {
-	v := m.namerus
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldNamerus returns the old "namerus" field's value of the MDTabel entity.
-// If the MDTabel object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *MDTabelMutation) OldNamerus(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldNamerus is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldNamerus requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldNamerus: %w", err)
-	}
-	return oldValue.Namerus, nil
-}
-
-// ResetNamerus resets all changes to the "namerus" field.
-func (m *MDTabelMutation) ResetNamerus() {
-	m.namerus = nil
-}
-
 // SetNameeng sets the "nameeng" field.
 func (m *MDTabelMutation) SetNameeng(s string) {
 	m.nameeng = &s
@@ -1840,6 +1671,140 @@ func (m *MDTabelMutation) ResetSynonym() {
 	m.synonym = nil
 }
 
+// SetPor sets the "por" field.
+func (m *MDTabelMutation) SetPor(s string) {
+	m.por = &s
+}
+
+// Por returns the value of the "por" field in the mutation.
+func (m *MDTabelMutation) Por() (r string, exists bool) {
+	v := m.por
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPor returns the old "por" field's value of the MDTabel entity.
+// If the MDTabel object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MDTabelMutation) OldPor(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPor is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPor requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPor: %w", err)
+	}
+	return oldValue.Por, nil
+}
+
+// ResetPor resets all changes to the "por" field.
+func (m *MDTabelMutation) ResetPor() {
+	m.por = nil
+}
+
+// SetParent sets the "parent" field.
+func (m *MDTabelMutation) SetParent(s string) {
+	m.parent_mdtabel = &s
+}
+
+// Parent returns the value of the "parent" field in the mutation.
+func (m *MDTabelMutation) Parent() (r string, exists bool) {
+	v := m.parent_mdtabel
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldParent returns the old "parent" field's value of the MDTabel entity.
+// If the MDTabel object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MDTabelMutation) OldParent(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldParent is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldParent requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldParent: %w", err)
+	}
+	return oldValue.Parent, nil
+}
+
+// ClearParent clears the value of the "parent" field.
+func (m *MDTabelMutation) ClearParent() {
+	m.parent_mdtabel = nil
+	m.clearedFields[mdtabel.FieldParent] = struct{}{}
+}
+
+// ParentCleared returns if the "parent" field was cleared in this mutation.
+func (m *MDTabelMutation) ParentCleared() bool {
+	_, ok := m.clearedFields[mdtabel.FieldParent]
+	return ok
+}
+
+// ResetParent resets all changes to the "parent" field.
+func (m *MDTabelMutation) ResetParent() {
+	m.parent_mdtabel = nil
+	delete(m.clearedFields, mdtabel.FieldParent)
+}
+
+// SetTypesID sets the "types_id" field.
+func (m *MDTabelMutation) SetTypesID(s string) {
+	m.mdtypetabel = &s
+}
+
+// TypesID returns the value of the "types_id" field in the mutation.
+func (m *MDTabelMutation) TypesID() (r string, exists bool) {
+	v := m.mdtypetabel
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTypesID returns the old "types_id" field's value of the MDTabel entity.
+// If the MDTabel object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MDTabelMutation) OldTypesID(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTypesID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTypesID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTypesID: %w", err)
+	}
+	return oldValue.TypesID, nil
+}
+
+// ClearTypesID clears the value of the "types_id" field.
+func (m *MDTabelMutation) ClearTypesID() {
+	m.mdtypetabel = nil
+	m.clearedFields[mdtabel.FieldTypesID] = struct{}{}
+}
+
+// TypesIDCleared returns if the "types_id" field was cleared in this mutation.
+func (m *MDTabelMutation) TypesIDCleared() bool {
+	_, ok := m.clearedFields[mdtabel.FieldTypesID]
+	return ok
+}
+
+// ResetTypesID resets all changes to the "types_id" field.
+func (m *MDTabelMutation) ResetTypesID() {
+	m.mdtypetabel = nil
+	delete(m.clearedFields, mdtabel.FieldTypesID)
+}
+
 // SetFile sets the "file" field.
 func (m *MDTabelMutation) SetFile(s string) {
 	m.file = &s
@@ -1876,40 +1841,97 @@ func (m *MDTabelMutation) ResetFile() {
 	m.file = nil
 }
 
-// SetType sets the "type" field.
-func (m *MDTabelMutation) SetType(s string) {
-	m._type = &s
+// AddChildMdtabelIDs adds the "child_mdtabel" edge to the MDTabel entity by ids.
+func (m *MDTabelMutation) AddChildMdtabelIDs(ids ...string) {
+	if m.child_mdtabel == nil {
+		m.child_mdtabel = make(map[string]struct{})
+	}
+	for i := range ids {
+		m.child_mdtabel[ids[i]] = struct{}{}
+	}
 }
 
-// GetType returns the value of the "type" field in the mutation.
-func (m *MDTabelMutation) GetType() (r string, exists bool) {
-	v := m._type
-	if v == nil {
-		return
-	}
-	return *v, true
+// ClearChildMdtabel clears the "child_mdtabel" edge to the MDTabel entity.
+func (m *MDTabelMutation) ClearChildMdtabel() {
+	m.clearedchild_mdtabel = true
 }
 
-// OldType returns the old "type" field's value of the MDTabel entity.
-// If the MDTabel object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *MDTabelMutation) OldType(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldType is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldType requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldType: %w", err)
-	}
-	return oldValue.Type, nil
+// ChildMdtabelCleared reports if the "child_mdtabel" edge to the MDTabel entity was cleared.
+func (m *MDTabelMutation) ChildMdtabelCleared() bool {
+	return m.clearedchild_mdtabel
 }
 
-// ResetType resets all changes to the "type" field.
-func (m *MDTabelMutation) ResetType() {
-	m._type = nil
+// RemoveChildMdtabelIDs removes the "child_mdtabel" edge to the MDTabel entity by IDs.
+func (m *MDTabelMutation) RemoveChildMdtabelIDs(ids ...string) {
+	if m.removedchild_mdtabel == nil {
+		m.removedchild_mdtabel = make(map[string]struct{})
+	}
+	for i := range ids {
+		delete(m.child_mdtabel, ids[i])
+		m.removedchild_mdtabel[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedChildMdtabel returns the removed IDs of the "child_mdtabel" edge to the MDTabel entity.
+func (m *MDTabelMutation) RemovedChildMdtabelIDs() (ids []string) {
+	for id := range m.removedchild_mdtabel {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ChildMdtabelIDs returns the "child_mdtabel" edge IDs in the mutation.
+func (m *MDTabelMutation) ChildMdtabelIDs() (ids []string) {
+	for id := range m.child_mdtabel {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetChildMdtabel resets all changes to the "child_mdtabel" edge.
+func (m *MDTabelMutation) ResetChildMdtabel() {
+	m.child_mdtabel = nil
+	m.clearedchild_mdtabel = false
+	m.removedchild_mdtabel = nil
+}
+
+// SetParentMdtabelID sets the "parent_mdtabel" edge to the MDTabel entity by id.
+func (m *MDTabelMutation) SetParentMdtabelID(id string) {
+	m.parent_mdtabel = &id
+}
+
+// ClearParentMdtabel clears the "parent_mdtabel" edge to the MDTabel entity.
+func (m *MDTabelMutation) ClearParentMdtabel() {
+	m.clearedparent_mdtabel = true
+}
+
+// ParentMdtabelCleared reports if the "parent_mdtabel" edge to the MDTabel entity was cleared.
+func (m *MDTabelMutation) ParentMdtabelCleared() bool {
+	return m.ParentCleared() || m.clearedparent_mdtabel
+}
+
+// ParentMdtabelID returns the "parent_mdtabel" edge ID in the mutation.
+func (m *MDTabelMutation) ParentMdtabelID() (id string, exists bool) {
+	if m.parent_mdtabel != nil {
+		return *m.parent_mdtabel, true
+	}
+	return
+}
+
+// ParentMdtabelIDs returns the "parent_mdtabel" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// ParentMdtabelID instead. It exists only for internal usage by the builders.
+func (m *MDTabelMutation) ParentMdtabelIDs() (ids []string) {
+	if id := m.parent_mdtabel; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetParentMdtabel resets all changes to the "parent_mdtabel" edge.
+func (m *MDTabelMutation) ResetParentMdtabel() {
+	m.parent_mdtabel = nil
+	m.clearedparent_mdtabel = false
 }
 
 // AddMdsubsystemIDs adds the "mdsubsystems" edge to the MDSubSystems entity by ids.
@@ -2020,6 +2042,45 @@ func (m *MDTabelMutation) ResetMdrekvizits() {
 	m.removedmdrekvizits = nil
 }
 
+// SetMdtypetabelID sets the "mdtypetabel" edge to the MDTypeTabel entity by id.
+func (m *MDTabelMutation) SetMdtypetabelID(id string) {
+	m.mdtypetabel = &id
+}
+
+// ClearMdtypetabel clears the "mdtypetabel" edge to the MDTypeTabel entity.
+func (m *MDTabelMutation) ClearMdtypetabel() {
+	m.clearedmdtypetabel = true
+}
+
+// MdtypetabelCleared reports if the "mdtypetabel" edge to the MDTypeTabel entity was cleared.
+func (m *MDTabelMutation) MdtypetabelCleared() bool {
+	return m.TypesIDCleared() || m.clearedmdtypetabel
+}
+
+// MdtypetabelID returns the "mdtypetabel" edge ID in the mutation.
+func (m *MDTabelMutation) MdtypetabelID() (id string, exists bool) {
+	if m.mdtypetabel != nil {
+		return *m.mdtypetabel, true
+	}
+	return
+}
+
+// MdtypetabelIDs returns the "mdtypetabel" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// MdtypetabelID instead. It exists only for internal usage by the builders.
+func (m *MDTabelMutation) MdtypetabelIDs() (ids []string) {
+	if id := m.mdtypetabel; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetMdtypetabel resets all changes to the "mdtypetabel" edge.
+func (m *MDTabelMutation) ResetMdtypetabel() {
+	m.mdtypetabel = nil
+	m.clearedmdtypetabel = false
+}
+
 // Where appends a list predicates to the MDTabelMutation builder.
 func (m *MDTabelMutation) Where(ps ...predicate.MDTabel) {
 	m.predicates = append(m.predicates, ps...)
@@ -2039,21 +2100,24 @@ func (m *MDTabelMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *MDTabelMutation) Fields() []string {
-	fields := make([]string, 0, 5)
-	if m.namerus != nil {
-		fields = append(fields, mdtabel.FieldNamerus)
-	}
+	fields := make([]string, 0, 6)
 	if m.nameeng != nil {
 		fields = append(fields, mdtabel.FieldNameeng)
 	}
 	if m.synonym != nil {
 		fields = append(fields, mdtabel.FieldSynonym)
 	}
+	if m.por != nil {
+		fields = append(fields, mdtabel.FieldPor)
+	}
+	if m.parent_mdtabel != nil {
+		fields = append(fields, mdtabel.FieldParent)
+	}
+	if m.mdtypetabel != nil {
+		fields = append(fields, mdtabel.FieldTypesID)
+	}
 	if m.file != nil {
 		fields = append(fields, mdtabel.FieldFile)
-	}
-	if m._type != nil {
-		fields = append(fields, mdtabel.FieldType)
 	}
 	return fields
 }
@@ -2063,16 +2127,18 @@ func (m *MDTabelMutation) Fields() []string {
 // schema.
 func (m *MDTabelMutation) Field(name string) (ent.Value, bool) {
 	switch name {
-	case mdtabel.FieldNamerus:
-		return m.Namerus()
 	case mdtabel.FieldNameeng:
 		return m.Nameeng()
 	case mdtabel.FieldSynonym:
 		return m.Synonym()
+	case mdtabel.FieldPor:
+		return m.Por()
+	case mdtabel.FieldParent:
+		return m.Parent()
+	case mdtabel.FieldTypesID:
+		return m.TypesID()
 	case mdtabel.FieldFile:
 		return m.File()
-	case mdtabel.FieldType:
-		return m.GetType()
 	}
 	return nil, false
 }
@@ -2082,16 +2148,18 @@ func (m *MDTabelMutation) Field(name string) (ent.Value, bool) {
 // database failed.
 func (m *MDTabelMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
-	case mdtabel.FieldNamerus:
-		return m.OldNamerus(ctx)
 	case mdtabel.FieldNameeng:
 		return m.OldNameeng(ctx)
 	case mdtabel.FieldSynonym:
 		return m.OldSynonym(ctx)
+	case mdtabel.FieldPor:
+		return m.OldPor(ctx)
+	case mdtabel.FieldParent:
+		return m.OldParent(ctx)
+	case mdtabel.FieldTypesID:
+		return m.OldTypesID(ctx)
 	case mdtabel.FieldFile:
 		return m.OldFile(ctx)
-	case mdtabel.FieldType:
-		return m.OldType(ctx)
 	}
 	return nil, fmt.Errorf("unknown MDTabel field %s", name)
 }
@@ -2101,13 +2169,6 @@ func (m *MDTabelMutation) OldField(ctx context.Context, name string) (ent.Value,
 // type.
 func (m *MDTabelMutation) SetField(name string, value ent.Value) error {
 	switch name {
-	case mdtabel.FieldNamerus:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetNamerus(v)
-		return nil
 	case mdtabel.FieldNameeng:
 		v, ok := value.(string)
 		if !ok {
@@ -2122,19 +2183,33 @@ func (m *MDTabelMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetSynonym(v)
 		return nil
+	case mdtabel.FieldPor:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPor(v)
+		return nil
+	case mdtabel.FieldParent:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetParent(v)
+		return nil
+	case mdtabel.FieldTypesID:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTypesID(v)
+		return nil
 	case mdtabel.FieldFile:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetFile(v)
-		return nil
-	case mdtabel.FieldType:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetType(v)
 		return nil
 	}
 	return fmt.Errorf("unknown MDTabel field %s", name)
@@ -2165,7 +2240,14 @@ func (m *MDTabelMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *MDTabelMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(mdtabel.FieldParent) {
+		fields = append(fields, mdtabel.FieldParent)
+	}
+	if m.FieldCleared(mdtabel.FieldTypesID) {
+		fields = append(fields, mdtabel.FieldTypesID)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -2178,6 +2260,14 @@ func (m *MDTabelMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *MDTabelMutation) ClearField(name string) error {
+	switch name {
+	case mdtabel.FieldParent:
+		m.ClearParent()
+		return nil
+	case mdtabel.FieldTypesID:
+		m.ClearTypesID()
+		return nil
+	}
 	return fmt.Errorf("unknown MDTabel nullable field %s", name)
 }
 
@@ -2185,20 +2275,23 @@ func (m *MDTabelMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *MDTabelMutation) ResetField(name string) error {
 	switch name {
-	case mdtabel.FieldNamerus:
-		m.ResetNamerus()
-		return nil
 	case mdtabel.FieldNameeng:
 		m.ResetNameeng()
 		return nil
 	case mdtabel.FieldSynonym:
 		m.ResetSynonym()
 		return nil
+	case mdtabel.FieldPor:
+		m.ResetPor()
+		return nil
+	case mdtabel.FieldParent:
+		m.ResetParent()
+		return nil
+	case mdtabel.FieldTypesID:
+		m.ResetTypesID()
+		return nil
 	case mdtabel.FieldFile:
 		m.ResetFile()
-		return nil
-	case mdtabel.FieldType:
-		m.ResetType()
 		return nil
 	}
 	return fmt.Errorf("unknown MDTabel field %s", name)
@@ -2206,12 +2299,21 @@ func (m *MDTabelMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *MDTabelMutation) AddedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 5)
+	if m.child_mdtabel != nil {
+		edges = append(edges, mdtabel.EdgeChildMdtabel)
+	}
+	if m.parent_mdtabel != nil {
+		edges = append(edges, mdtabel.EdgeParentMdtabel)
+	}
 	if m.mdsubsystems != nil {
 		edges = append(edges, mdtabel.EdgeMdsubsystems)
 	}
 	if m.mdrekvizits != nil {
 		edges = append(edges, mdtabel.EdgeMdrekvizits)
+	}
+	if m.mdtypetabel != nil {
+		edges = append(edges, mdtabel.EdgeMdtypetabel)
 	}
 	return edges
 }
@@ -2220,6 +2322,16 @@ func (m *MDTabelMutation) AddedEdges() []string {
 // name in this mutation.
 func (m *MDTabelMutation) AddedIDs(name string) []ent.Value {
 	switch name {
+	case mdtabel.EdgeChildMdtabel:
+		ids := make([]ent.Value, 0, len(m.child_mdtabel))
+		for id := range m.child_mdtabel {
+			ids = append(ids, id)
+		}
+		return ids
+	case mdtabel.EdgeParentMdtabel:
+		if id := m.parent_mdtabel; id != nil {
+			return []ent.Value{*id}
+		}
 	case mdtabel.EdgeMdsubsystems:
 		ids := make([]ent.Value, 0, len(m.mdsubsystems))
 		for id := range m.mdsubsystems {
@@ -2232,13 +2344,20 @@ func (m *MDTabelMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case mdtabel.EdgeMdtypetabel:
+		if id := m.mdtypetabel; id != nil {
+			return []ent.Value{*id}
+		}
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *MDTabelMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 5)
+	if m.removedchild_mdtabel != nil {
+		edges = append(edges, mdtabel.EdgeChildMdtabel)
+	}
 	if m.removedmdsubsystems != nil {
 		edges = append(edges, mdtabel.EdgeMdsubsystems)
 	}
@@ -2252,6 +2371,12 @@ func (m *MDTabelMutation) RemovedEdges() []string {
 // the given name in this mutation.
 func (m *MDTabelMutation) RemovedIDs(name string) []ent.Value {
 	switch name {
+	case mdtabel.EdgeChildMdtabel:
+		ids := make([]ent.Value, 0, len(m.removedchild_mdtabel))
+		for id := range m.removedchild_mdtabel {
+			ids = append(ids, id)
+		}
+		return ids
 	case mdtabel.EdgeMdsubsystems:
 		ids := make([]ent.Value, 0, len(m.removedmdsubsystems))
 		for id := range m.removedmdsubsystems {
@@ -2270,12 +2395,21 @@ func (m *MDTabelMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *MDTabelMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 5)
+	if m.clearedchild_mdtabel {
+		edges = append(edges, mdtabel.EdgeChildMdtabel)
+	}
+	if m.clearedparent_mdtabel {
+		edges = append(edges, mdtabel.EdgeParentMdtabel)
+	}
 	if m.clearedmdsubsystems {
 		edges = append(edges, mdtabel.EdgeMdsubsystems)
 	}
 	if m.clearedmdrekvizits {
 		edges = append(edges, mdtabel.EdgeMdrekvizits)
+	}
+	if m.clearedmdtypetabel {
+		edges = append(edges, mdtabel.EdgeMdtypetabel)
 	}
 	return edges
 }
@@ -2284,10 +2418,16 @@ func (m *MDTabelMutation) ClearedEdges() []string {
 // was cleared in this mutation.
 func (m *MDTabelMutation) EdgeCleared(name string) bool {
 	switch name {
+	case mdtabel.EdgeChildMdtabel:
+		return m.clearedchild_mdtabel
+	case mdtabel.EdgeParentMdtabel:
+		return m.clearedparent_mdtabel
 	case mdtabel.EdgeMdsubsystems:
 		return m.clearedmdsubsystems
 	case mdtabel.EdgeMdrekvizits:
 		return m.clearedmdrekvizits
+	case mdtabel.EdgeMdtypetabel:
+		return m.clearedmdtypetabel
 	}
 	return false
 }
@@ -2296,6 +2436,12 @@ func (m *MDTabelMutation) EdgeCleared(name string) bool {
 // if that edge is not defined in the schema.
 func (m *MDTabelMutation) ClearEdge(name string) error {
 	switch name {
+	case mdtabel.EdgeParentMdtabel:
+		m.ClearParentMdtabel()
+		return nil
+	case mdtabel.EdgeMdtypetabel:
+		m.ClearMdtypetabel()
+		return nil
 	}
 	return fmt.Errorf("unknown MDTabel unique edge %s", name)
 }
@@ -2304,12 +2450,756 @@ func (m *MDTabelMutation) ClearEdge(name string) error {
 // It returns an error if the edge is not defined in the schema.
 func (m *MDTabelMutation) ResetEdge(name string) error {
 	switch name {
+	case mdtabel.EdgeChildMdtabel:
+		m.ResetChildMdtabel()
+		return nil
+	case mdtabel.EdgeParentMdtabel:
+		m.ResetParentMdtabel()
+		return nil
 	case mdtabel.EdgeMdsubsystems:
 		m.ResetMdsubsystems()
 		return nil
 	case mdtabel.EdgeMdrekvizits:
 		m.ResetMdrekvizits()
 		return nil
+	case mdtabel.EdgeMdtypetabel:
+		m.ResetMdtypetabel()
+		return nil
 	}
 	return fmt.Errorf("unknown MDTabel edge %s", name)
+}
+
+// MDTypeTabelMutation represents an operation that mutates the MDTypeTabel nodes in the graph.
+type MDTypeTabelMutation struct {
+	config
+	op                         Op
+	typ                        string
+	id                         *string
+	nameeng                    *string
+	synonym                    *string
+	por                        *string
+	clearedFields              map[string]struct{}
+	child_mdtypetabels         map[string]struct{}
+	removedchild_mdtypetabels  map[string]struct{}
+	clearedchild_mdtypetabels  bool
+	parent_mdtypetabels        *string
+	clearedparent_mdtypetabels bool
+	mdtypetabels               map[string]struct{}
+	removedmdtypetabels        map[string]struct{}
+	clearedmdtypetabels        bool
+	done                       bool
+	oldValue                   func(context.Context) (*MDTypeTabel, error)
+	predicates                 []predicate.MDTypeTabel
+}
+
+var _ ent.Mutation = (*MDTypeTabelMutation)(nil)
+
+// mdtypetabelOption allows management of the mutation configuration using functional options.
+type mdtypetabelOption func(*MDTypeTabelMutation)
+
+// newMDTypeTabelMutation creates new mutation for the MDTypeTabel entity.
+func newMDTypeTabelMutation(c config, op Op, opts ...mdtypetabelOption) *MDTypeTabelMutation {
+	m := &MDTypeTabelMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeMDTypeTabel,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withMDTypeTabelID sets the ID field of the mutation.
+func withMDTypeTabelID(id string) mdtypetabelOption {
+	return func(m *MDTypeTabelMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *MDTypeTabel
+		)
+		m.oldValue = func(ctx context.Context) (*MDTypeTabel, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().MDTypeTabel.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withMDTypeTabel sets the old MDTypeTabel of the mutation.
+func withMDTypeTabel(node *MDTypeTabel) mdtypetabelOption {
+	return func(m *MDTypeTabelMutation) {
+		m.oldValue = func(context.Context) (*MDTypeTabel, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m MDTypeTabelMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m MDTypeTabelMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of MDTypeTabel entities.
+func (m *MDTypeTabelMutation) SetID(id string) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *MDTypeTabelMutation) ID() (id string, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *MDTypeTabelMutation) IDs(ctx context.Context) ([]string, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []string{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().MDTypeTabel.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetNameeng sets the "nameeng" field.
+func (m *MDTypeTabelMutation) SetNameeng(s string) {
+	m.nameeng = &s
+}
+
+// Nameeng returns the value of the "nameeng" field in the mutation.
+func (m *MDTypeTabelMutation) Nameeng() (r string, exists bool) {
+	v := m.nameeng
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldNameeng returns the old "nameeng" field's value of the MDTypeTabel entity.
+// If the MDTypeTabel object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MDTypeTabelMutation) OldNameeng(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldNameeng is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldNameeng requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldNameeng: %w", err)
+	}
+	return oldValue.Nameeng, nil
+}
+
+// ResetNameeng resets all changes to the "nameeng" field.
+func (m *MDTypeTabelMutation) ResetNameeng() {
+	m.nameeng = nil
+}
+
+// SetSynonym sets the "synonym" field.
+func (m *MDTypeTabelMutation) SetSynonym(s string) {
+	m.synonym = &s
+}
+
+// Synonym returns the value of the "synonym" field in the mutation.
+func (m *MDTypeTabelMutation) Synonym() (r string, exists bool) {
+	v := m.synonym
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSynonym returns the old "synonym" field's value of the MDTypeTabel entity.
+// If the MDTypeTabel object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MDTypeTabelMutation) OldSynonym(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSynonym is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSynonym requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSynonym: %w", err)
+	}
+	return oldValue.Synonym, nil
+}
+
+// ResetSynonym resets all changes to the "synonym" field.
+func (m *MDTypeTabelMutation) ResetSynonym() {
+	m.synonym = nil
+}
+
+// SetPor sets the "por" field.
+func (m *MDTypeTabelMutation) SetPor(s string) {
+	m.por = &s
+}
+
+// Por returns the value of the "por" field in the mutation.
+func (m *MDTypeTabelMutation) Por() (r string, exists bool) {
+	v := m.por
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPor returns the old "por" field's value of the MDTypeTabel entity.
+// If the MDTypeTabel object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MDTypeTabelMutation) OldPor(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPor is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPor requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPor: %w", err)
+	}
+	return oldValue.Por, nil
+}
+
+// ResetPor resets all changes to the "por" field.
+func (m *MDTypeTabelMutation) ResetPor() {
+	m.por = nil
+}
+
+// SetParent sets the "parent" field.
+func (m *MDTypeTabelMutation) SetParent(s string) {
+	m.parent_mdtypetabels = &s
+}
+
+// Parent returns the value of the "parent" field in the mutation.
+func (m *MDTypeTabelMutation) Parent() (r string, exists bool) {
+	v := m.parent_mdtypetabels
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldParent returns the old "parent" field's value of the MDTypeTabel entity.
+// If the MDTypeTabel object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MDTypeTabelMutation) OldParent(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldParent is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldParent requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldParent: %w", err)
+	}
+	return oldValue.Parent, nil
+}
+
+// ClearParent clears the value of the "parent" field.
+func (m *MDTypeTabelMutation) ClearParent() {
+	m.parent_mdtypetabels = nil
+	m.clearedFields[mdtypetabel.FieldParent] = struct{}{}
+}
+
+// ParentCleared returns if the "parent" field was cleared in this mutation.
+func (m *MDTypeTabelMutation) ParentCleared() bool {
+	_, ok := m.clearedFields[mdtypetabel.FieldParent]
+	return ok
+}
+
+// ResetParent resets all changes to the "parent" field.
+func (m *MDTypeTabelMutation) ResetParent() {
+	m.parent_mdtypetabels = nil
+	delete(m.clearedFields, mdtypetabel.FieldParent)
+}
+
+// AddChildMdtypetabelIDs adds the "child_mdtypetabels" edge to the MDTypeTabel entity by ids.
+func (m *MDTypeTabelMutation) AddChildMdtypetabelIDs(ids ...string) {
+	if m.child_mdtypetabels == nil {
+		m.child_mdtypetabels = make(map[string]struct{})
+	}
+	for i := range ids {
+		m.child_mdtypetabels[ids[i]] = struct{}{}
+	}
+}
+
+// ClearChildMdtypetabels clears the "child_mdtypetabels" edge to the MDTypeTabel entity.
+func (m *MDTypeTabelMutation) ClearChildMdtypetabels() {
+	m.clearedchild_mdtypetabels = true
+}
+
+// ChildMdtypetabelsCleared reports if the "child_mdtypetabels" edge to the MDTypeTabel entity was cleared.
+func (m *MDTypeTabelMutation) ChildMdtypetabelsCleared() bool {
+	return m.clearedchild_mdtypetabels
+}
+
+// RemoveChildMdtypetabelIDs removes the "child_mdtypetabels" edge to the MDTypeTabel entity by IDs.
+func (m *MDTypeTabelMutation) RemoveChildMdtypetabelIDs(ids ...string) {
+	if m.removedchild_mdtypetabels == nil {
+		m.removedchild_mdtypetabels = make(map[string]struct{})
+	}
+	for i := range ids {
+		delete(m.child_mdtypetabels, ids[i])
+		m.removedchild_mdtypetabels[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedChildMdtypetabels returns the removed IDs of the "child_mdtypetabels" edge to the MDTypeTabel entity.
+func (m *MDTypeTabelMutation) RemovedChildMdtypetabelsIDs() (ids []string) {
+	for id := range m.removedchild_mdtypetabels {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ChildMdtypetabelsIDs returns the "child_mdtypetabels" edge IDs in the mutation.
+func (m *MDTypeTabelMutation) ChildMdtypetabelsIDs() (ids []string) {
+	for id := range m.child_mdtypetabels {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetChildMdtypetabels resets all changes to the "child_mdtypetabels" edge.
+func (m *MDTypeTabelMutation) ResetChildMdtypetabels() {
+	m.child_mdtypetabels = nil
+	m.clearedchild_mdtypetabels = false
+	m.removedchild_mdtypetabels = nil
+}
+
+// SetParentMdtypetabelsID sets the "parent_mdtypetabels" edge to the MDTypeTabel entity by id.
+func (m *MDTypeTabelMutation) SetParentMdtypetabelsID(id string) {
+	m.parent_mdtypetabels = &id
+}
+
+// ClearParentMdtypetabels clears the "parent_mdtypetabels" edge to the MDTypeTabel entity.
+func (m *MDTypeTabelMutation) ClearParentMdtypetabels() {
+	m.clearedparent_mdtypetabels = true
+}
+
+// ParentMdtypetabelsCleared reports if the "parent_mdtypetabels" edge to the MDTypeTabel entity was cleared.
+func (m *MDTypeTabelMutation) ParentMdtypetabelsCleared() bool {
+	return m.ParentCleared() || m.clearedparent_mdtypetabels
+}
+
+// ParentMdtypetabelsID returns the "parent_mdtypetabels" edge ID in the mutation.
+func (m *MDTypeTabelMutation) ParentMdtypetabelsID() (id string, exists bool) {
+	if m.parent_mdtypetabels != nil {
+		return *m.parent_mdtypetabels, true
+	}
+	return
+}
+
+// ParentMdtypetabelsIDs returns the "parent_mdtypetabels" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// ParentMdtypetabelsID instead. It exists only for internal usage by the builders.
+func (m *MDTypeTabelMutation) ParentMdtypetabelsIDs() (ids []string) {
+	if id := m.parent_mdtypetabels; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetParentMdtypetabels resets all changes to the "parent_mdtypetabels" edge.
+func (m *MDTypeTabelMutation) ResetParentMdtypetabels() {
+	m.parent_mdtypetabels = nil
+	m.clearedparent_mdtypetabels = false
+}
+
+// AddMdtypetabelIDs adds the "mdtypetabels" edge to the MDTabel entity by ids.
+func (m *MDTypeTabelMutation) AddMdtypetabelIDs(ids ...string) {
+	if m.mdtypetabels == nil {
+		m.mdtypetabels = make(map[string]struct{})
+	}
+	for i := range ids {
+		m.mdtypetabels[ids[i]] = struct{}{}
+	}
+}
+
+// ClearMdtypetabels clears the "mdtypetabels" edge to the MDTabel entity.
+func (m *MDTypeTabelMutation) ClearMdtypetabels() {
+	m.clearedmdtypetabels = true
+}
+
+// MdtypetabelsCleared reports if the "mdtypetabels" edge to the MDTabel entity was cleared.
+func (m *MDTypeTabelMutation) MdtypetabelsCleared() bool {
+	return m.clearedmdtypetabels
+}
+
+// RemoveMdtypetabelIDs removes the "mdtypetabels" edge to the MDTabel entity by IDs.
+func (m *MDTypeTabelMutation) RemoveMdtypetabelIDs(ids ...string) {
+	if m.removedmdtypetabels == nil {
+		m.removedmdtypetabels = make(map[string]struct{})
+	}
+	for i := range ids {
+		delete(m.mdtypetabels, ids[i])
+		m.removedmdtypetabels[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedMdtypetabels returns the removed IDs of the "mdtypetabels" edge to the MDTabel entity.
+func (m *MDTypeTabelMutation) RemovedMdtypetabelsIDs() (ids []string) {
+	for id := range m.removedmdtypetabels {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// MdtypetabelsIDs returns the "mdtypetabels" edge IDs in the mutation.
+func (m *MDTypeTabelMutation) MdtypetabelsIDs() (ids []string) {
+	for id := range m.mdtypetabels {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetMdtypetabels resets all changes to the "mdtypetabels" edge.
+func (m *MDTypeTabelMutation) ResetMdtypetabels() {
+	m.mdtypetabels = nil
+	m.clearedmdtypetabels = false
+	m.removedmdtypetabels = nil
+}
+
+// Where appends a list predicates to the MDTypeTabelMutation builder.
+func (m *MDTypeTabelMutation) Where(ps ...predicate.MDTypeTabel) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// Op returns the operation name.
+func (m *MDTypeTabelMutation) Op() Op {
+	return m.op
+}
+
+// Type returns the node type of this mutation (MDTypeTabel).
+func (m *MDTypeTabelMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *MDTypeTabelMutation) Fields() []string {
+	fields := make([]string, 0, 4)
+	if m.nameeng != nil {
+		fields = append(fields, mdtypetabel.FieldNameeng)
+	}
+	if m.synonym != nil {
+		fields = append(fields, mdtypetabel.FieldSynonym)
+	}
+	if m.por != nil {
+		fields = append(fields, mdtypetabel.FieldPor)
+	}
+	if m.parent_mdtypetabels != nil {
+		fields = append(fields, mdtypetabel.FieldParent)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *MDTypeTabelMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case mdtypetabel.FieldNameeng:
+		return m.Nameeng()
+	case mdtypetabel.FieldSynonym:
+		return m.Synonym()
+	case mdtypetabel.FieldPor:
+		return m.Por()
+	case mdtypetabel.FieldParent:
+		return m.Parent()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *MDTypeTabelMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case mdtypetabel.FieldNameeng:
+		return m.OldNameeng(ctx)
+	case mdtypetabel.FieldSynonym:
+		return m.OldSynonym(ctx)
+	case mdtypetabel.FieldPor:
+		return m.OldPor(ctx)
+	case mdtypetabel.FieldParent:
+		return m.OldParent(ctx)
+	}
+	return nil, fmt.Errorf("unknown MDTypeTabel field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *MDTypeTabelMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case mdtypetabel.FieldNameeng:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetNameeng(v)
+		return nil
+	case mdtypetabel.FieldSynonym:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSynonym(v)
+		return nil
+	case mdtypetabel.FieldPor:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPor(v)
+		return nil
+	case mdtypetabel.FieldParent:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetParent(v)
+		return nil
+	}
+	return fmt.Errorf("unknown MDTypeTabel field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *MDTypeTabelMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *MDTypeTabelMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *MDTypeTabelMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown MDTypeTabel numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *MDTypeTabelMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(mdtypetabel.FieldParent) {
+		fields = append(fields, mdtypetabel.FieldParent)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *MDTypeTabelMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *MDTypeTabelMutation) ClearField(name string) error {
+	switch name {
+	case mdtypetabel.FieldParent:
+		m.ClearParent()
+		return nil
+	}
+	return fmt.Errorf("unknown MDTypeTabel nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *MDTypeTabelMutation) ResetField(name string) error {
+	switch name {
+	case mdtypetabel.FieldNameeng:
+		m.ResetNameeng()
+		return nil
+	case mdtypetabel.FieldSynonym:
+		m.ResetSynonym()
+		return nil
+	case mdtypetabel.FieldPor:
+		m.ResetPor()
+		return nil
+	case mdtypetabel.FieldParent:
+		m.ResetParent()
+		return nil
+	}
+	return fmt.Errorf("unknown MDTypeTabel field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *MDTypeTabelMutation) AddedEdges() []string {
+	edges := make([]string, 0, 3)
+	if m.child_mdtypetabels != nil {
+		edges = append(edges, mdtypetabel.EdgeChildMdtypetabels)
+	}
+	if m.parent_mdtypetabels != nil {
+		edges = append(edges, mdtypetabel.EdgeParentMdtypetabels)
+	}
+	if m.mdtypetabels != nil {
+		edges = append(edges, mdtypetabel.EdgeMdtypetabels)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *MDTypeTabelMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case mdtypetabel.EdgeChildMdtypetabels:
+		ids := make([]ent.Value, 0, len(m.child_mdtypetabels))
+		for id := range m.child_mdtypetabels {
+			ids = append(ids, id)
+		}
+		return ids
+	case mdtypetabel.EdgeParentMdtypetabels:
+		if id := m.parent_mdtypetabels; id != nil {
+			return []ent.Value{*id}
+		}
+	case mdtypetabel.EdgeMdtypetabels:
+		ids := make([]ent.Value, 0, len(m.mdtypetabels))
+		for id := range m.mdtypetabels {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *MDTypeTabelMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 3)
+	if m.removedchild_mdtypetabels != nil {
+		edges = append(edges, mdtypetabel.EdgeChildMdtypetabels)
+	}
+	if m.removedmdtypetabels != nil {
+		edges = append(edges, mdtypetabel.EdgeMdtypetabels)
+	}
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *MDTypeTabelMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case mdtypetabel.EdgeChildMdtypetabels:
+		ids := make([]ent.Value, 0, len(m.removedchild_mdtypetabels))
+		for id := range m.removedchild_mdtypetabels {
+			ids = append(ids, id)
+		}
+		return ids
+	case mdtypetabel.EdgeMdtypetabels:
+		ids := make([]ent.Value, 0, len(m.removedmdtypetabels))
+		for id := range m.removedmdtypetabels {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *MDTypeTabelMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 3)
+	if m.clearedchild_mdtypetabels {
+		edges = append(edges, mdtypetabel.EdgeChildMdtypetabels)
+	}
+	if m.clearedparent_mdtypetabels {
+		edges = append(edges, mdtypetabel.EdgeParentMdtypetabels)
+	}
+	if m.clearedmdtypetabels {
+		edges = append(edges, mdtypetabel.EdgeMdtypetabels)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *MDTypeTabelMutation) EdgeCleared(name string) bool {
+	switch name {
+	case mdtypetabel.EdgeChildMdtypetabels:
+		return m.clearedchild_mdtypetabels
+	case mdtypetabel.EdgeParentMdtypetabels:
+		return m.clearedparent_mdtypetabels
+	case mdtypetabel.EdgeMdtypetabels:
+		return m.clearedmdtypetabels
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *MDTypeTabelMutation) ClearEdge(name string) error {
+	switch name {
+	case mdtypetabel.EdgeParentMdtypetabels:
+		m.ClearParentMdtypetabels()
+		return nil
+	}
+	return fmt.Errorf("unknown MDTypeTabel unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *MDTypeTabelMutation) ResetEdge(name string) error {
+	switch name {
+	case mdtypetabel.EdgeChildMdtypetabels:
+		m.ResetChildMdtypetabels()
+		return nil
+	case mdtypetabel.EdgeParentMdtypetabels:
+		m.ResetParentMdtypetabels()
+		return nil
+	case mdtypetabel.EdgeMdtypetabels:
+		m.ResetMdtypetabels()
+		return nil
+	}
+	return fmt.Errorf("unknown MDTypeTabel edge %s", name)
 }

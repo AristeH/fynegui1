@@ -7,22 +7,18 @@ const (
 	Label = "md_rekvizit"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "ID"
-	// FieldNamerus holds the string denoting the namerus field in the database.
-	FieldNamerus = "Namerus"
 	// FieldNameeng holds the string denoting the nameeng field in the database.
 	FieldNameeng = "Nameeng"
 	// FieldSynonym holds the string denoting the synonym field in the database.
 	FieldSynonym = "Synonym"
 	// FieldPor holds the string denoting the por field in the database.
 	FieldPor = "por"
-	// FieldWidthElem holds the string denoting the widthelem field in the database.
-	FieldWidthElem = "width_elem"
-	// FieldWidthSpisok holds the string denoting the widthspisok field in the database.
-	FieldWidthSpisok = "width_spisok"
 	// FieldType holds the string denoting the type field in the database.
 	FieldType = "Type"
 	// FieldOwnerID holds the string denoting the owner_id field in the database.
 	FieldOwnerID = "owner_id"
+	// FieldWidthSpisok holds the string denoting the widthspisok field in the database.
+	FieldWidthSpisok = "width_spisok"
 	// EdgeOwner holds the string denoting the owner edge name in mutations.
 	EdgeOwner = "owner"
 	// Table holds the table name of the mdrekvizit in the database.
@@ -39,14 +35,12 @@ const (
 // Columns holds all SQL columns for mdrekvizit fields.
 var Columns = []string{
 	FieldID,
-	FieldNamerus,
 	FieldNameeng,
 	FieldSynonym,
 	FieldPor,
-	FieldWidthElem,
-	FieldWidthSpisok,
 	FieldType,
 	FieldOwnerID,
+	FieldWidthSpisok,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -60,8 +54,6 @@ func ValidColumn(column string) bool {
 }
 
 var (
-	// NamerusValidator is a validator for the "namerus" field. It is called by the builders before save.
-	NamerusValidator func(string) error
 	// NameengValidator is a validator for the "nameeng" field. It is called by the builders before save.
 	NameengValidator func(string) error
 	// SynonymValidator is a validator for the "synonym" field. It is called by the builders before save.

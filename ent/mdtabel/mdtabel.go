@@ -7,22 +7,38 @@ const (
 	Label = "md_tabel"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "ID"
-	// FieldNamerus holds the string denoting the namerus field in the database.
-	FieldNamerus = "Namerus"
 	// FieldNameeng holds the string denoting the nameeng field in the database.
 	FieldNameeng = "Nameeng"
 	// FieldSynonym holds the string denoting the synonym field in the database.
 	FieldSynonym = "Synonym"
+	// FieldPor holds the string denoting the por field in the database.
+	FieldPor = "Por"
+	// FieldParent holds the string denoting the parent field in the database.
+	FieldParent = "Parent"
+	// FieldTypesID holds the string denoting the types_id field in the database.
+	FieldTypesID = "types_id"
 	// FieldFile holds the string denoting the file field in the database.
 	FieldFile = "File"
-	// FieldType holds the string denoting the type field in the database.
-	FieldType = "Type"
+	// EdgeChildMdtabel holds the string denoting the child_mdtabel edge name in mutations.
+	EdgeChildMdtabel = "child_mdtabel"
+	// EdgeParentMdtabel holds the string denoting the parent_mdtabel edge name in mutations.
+	EdgeParentMdtabel = "parent_mdtabel"
 	// EdgeMdsubsystems holds the string denoting the mdsubsystems edge name in mutations.
 	EdgeMdsubsystems = "mdsubsystems"
 	// EdgeMdrekvizits holds the string denoting the mdrekvizits edge name in mutations.
 	EdgeMdrekvizits = "mdrekvizits"
+	// EdgeMdtypetabel holds the string denoting the mdtypetabel edge name in mutations.
+	EdgeMdtypetabel = "mdtypetabel"
 	// Table holds the table name of the mdtabel in the database.
 	Table = "md_tabels"
+	// ChildMdtabelTable is the table that holds the child_mdtabel relation/edge.
+	ChildMdtabelTable = "md_tabels"
+	// ChildMdtabelColumn is the table column denoting the child_mdtabel relation/edge.
+	ChildMdtabelColumn = "Parent"
+	// ParentMdtabelTable is the table that holds the parent_mdtabel relation/edge.
+	ParentMdtabelTable = "md_tabels"
+	// ParentMdtabelColumn is the table column denoting the parent_mdtabel relation/edge.
+	ParentMdtabelColumn = "Parent"
 	// MdsubsystemsTable is the table that holds the mdsubsystems relation/edge. The primary key declared below.
 	MdsubsystemsTable = "md_sub_systems_mdtables"
 	// MdsubsystemsInverseTable is the table name for the MDSubSystems entity.
@@ -35,16 +51,24 @@ const (
 	MdrekvizitsInverseTable = "md_rekvizits"
 	// MdrekvizitsColumn is the table column denoting the mdrekvizits relation/edge.
 	MdrekvizitsColumn = "owner_id"
+	// MdtypetabelTable is the table that holds the mdtypetabel relation/edge.
+	MdtypetabelTable = "md_tabels"
+	// MdtypetabelInverseTable is the table name for the MDTypeTabel entity.
+	// It exists in this package in order to avoid circular dependency with the "mdtypetabel" package.
+	MdtypetabelInverseTable = "md_type_tabels"
+	// MdtypetabelColumn is the table column denoting the mdtypetabel relation/edge.
+	MdtypetabelColumn = "types_id"
 )
 
 // Columns holds all SQL columns for mdtabel fields.
 var Columns = []string{
 	FieldID,
-	FieldNamerus,
 	FieldNameeng,
 	FieldSynonym,
+	FieldPor,
+	FieldParent,
+	FieldTypesID,
 	FieldFile,
-	FieldType,
 }
 
 var (
@@ -64,16 +88,14 @@ func ValidColumn(column string) bool {
 }
 
 var (
-	// NamerusValidator is a validator for the "namerus" field. It is called by the builders before save.
-	NamerusValidator func(string) error
 	// NameengValidator is a validator for the "nameeng" field. It is called by the builders before save.
 	NameengValidator func(string) error
 	// SynonymValidator is a validator for the "synonym" field. It is called by the builders before save.
 	SynonymValidator func(string) error
+	// TypesIDValidator is a validator for the "types_id" field. It is called by the builders before save.
+	TypesIDValidator func(string) error
 	// FileValidator is a validator for the "file" field. It is called by the builders before save.
 	FileValidator func(string) error
-	// TypeValidator is a validator for the "type" field. It is called by the builders before save.
-	TypeValidator func(string) error
 	// IDValidator is a validator for the "id" field. It is called by the builders before save.
 	IDValidator func(string) error
 )

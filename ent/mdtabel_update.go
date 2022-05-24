@@ -9,6 +9,7 @@ import (
 	"fynegui/ent/mdrekvizit"
 	"fynegui/ent/mdsubsystems"
 	"fynegui/ent/mdtabel"
+	"fynegui/ent/mdtypetabel"
 	"fynegui/ent/predicate"
 
 	"entgo.io/ent/dialect/sql"
@@ -29,12 +30,6 @@ func (mtu *MDTabelUpdate) Where(ps ...predicate.MDTabel) *MDTabelUpdate {
 	return mtu
 }
 
-// SetNamerus sets the "namerus" field.
-func (mtu *MDTabelUpdate) SetNamerus(s string) *MDTabelUpdate {
-	mtu.mutation.SetNamerus(s)
-	return mtu
-}
-
 // SetNameeng sets the "nameeng" field.
 func (mtu *MDTabelUpdate) SetNameeng(s string) *MDTabelUpdate {
 	mtu.mutation.SetNameeng(s)
@@ -47,16 +42,90 @@ func (mtu *MDTabelUpdate) SetSynonym(s string) *MDTabelUpdate {
 	return mtu
 }
 
+// SetPor sets the "por" field.
+func (mtu *MDTabelUpdate) SetPor(s string) *MDTabelUpdate {
+	mtu.mutation.SetPor(s)
+	return mtu
+}
+
+// SetParent sets the "parent" field.
+func (mtu *MDTabelUpdate) SetParent(s string) *MDTabelUpdate {
+	mtu.mutation.SetParent(s)
+	return mtu
+}
+
+// SetNillableParent sets the "parent" field if the given value is not nil.
+func (mtu *MDTabelUpdate) SetNillableParent(s *string) *MDTabelUpdate {
+	if s != nil {
+		mtu.SetParent(*s)
+	}
+	return mtu
+}
+
+// ClearParent clears the value of the "parent" field.
+func (mtu *MDTabelUpdate) ClearParent() *MDTabelUpdate {
+	mtu.mutation.ClearParent()
+	return mtu
+}
+
+// SetTypesID sets the "types_id" field.
+func (mtu *MDTabelUpdate) SetTypesID(s string) *MDTabelUpdate {
+	mtu.mutation.SetTypesID(s)
+	return mtu
+}
+
+// SetNillableTypesID sets the "types_id" field if the given value is not nil.
+func (mtu *MDTabelUpdate) SetNillableTypesID(s *string) *MDTabelUpdate {
+	if s != nil {
+		mtu.SetTypesID(*s)
+	}
+	return mtu
+}
+
+// ClearTypesID clears the value of the "types_id" field.
+func (mtu *MDTabelUpdate) ClearTypesID() *MDTabelUpdate {
+	mtu.mutation.ClearTypesID()
+	return mtu
+}
+
 // SetFile sets the "file" field.
 func (mtu *MDTabelUpdate) SetFile(s string) *MDTabelUpdate {
 	mtu.mutation.SetFile(s)
 	return mtu
 }
 
-// SetType sets the "type" field.
-func (mtu *MDTabelUpdate) SetType(s string) *MDTabelUpdate {
-	mtu.mutation.SetType(s)
+// AddChildMdtabelIDs adds the "child_mdtabel" edge to the MDTabel entity by IDs.
+func (mtu *MDTabelUpdate) AddChildMdtabelIDs(ids ...string) *MDTabelUpdate {
+	mtu.mutation.AddChildMdtabelIDs(ids...)
 	return mtu
+}
+
+// AddChildMdtabel adds the "child_mdtabel" edges to the MDTabel entity.
+func (mtu *MDTabelUpdate) AddChildMdtabel(m ...*MDTabel) *MDTabelUpdate {
+	ids := make([]string, len(m))
+	for i := range m {
+		ids[i] = m[i].ID
+	}
+	return mtu.AddChildMdtabelIDs(ids...)
+}
+
+// SetParentMdtabelID sets the "parent_mdtabel" edge to the MDTabel entity by ID.
+func (mtu *MDTabelUpdate) SetParentMdtabelID(id string) *MDTabelUpdate {
+	mtu.mutation.SetParentMdtabelID(id)
+	return mtu
+}
+
+// SetNillableParentMdtabelID sets the "parent_mdtabel" edge to the MDTabel entity by ID if the given value is not nil.
+func (mtu *MDTabelUpdate) SetNillableParentMdtabelID(id *string) *MDTabelUpdate {
+	if id != nil {
+		mtu = mtu.SetParentMdtabelID(*id)
+	}
+	return mtu
+}
+
+// SetParentMdtabel sets the "parent_mdtabel" edge to the MDTabel entity.
+func (mtu *MDTabelUpdate) SetParentMdtabel(m *MDTabel) *MDTabelUpdate {
+	return mtu.SetParentMdtabelID(m.ID)
 }
 
 // AddMdsubsystemIDs adds the "mdsubsystems" edge to the MDSubSystems entity by IDs.
@@ -89,9 +158,55 @@ func (mtu *MDTabelUpdate) AddMdrekvizits(m ...*MDRekvizit) *MDTabelUpdate {
 	return mtu.AddMdrekvizitIDs(ids...)
 }
 
+// SetMdtypetabelID sets the "mdtypetabel" edge to the MDTypeTabel entity by ID.
+func (mtu *MDTabelUpdate) SetMdtypetabelID(id string) *MDTabelUpdate {
+	mtu.mutation.SetMdtypetabelID(id)
+	return mtu
+}
+
+// SetNillableMdtypetabelID sets the "mdtypetabel" edge to the MDTypeTabel entity by ID if the given value is not nil.
+func (mtu *MDTabelUpdate) SetNillableMdtypetabelID(id *string) *MDTabelUpdate {
+	if id != nil {
+		mtu = mtu.SetMdtypetabelID(*id)
+	}
+	return mtu
+}
+
+// SetMdtypetabel sets the "mdtypetabel" edge to the MDTypeTabel entity.
+func (mtu *MDTabelUpdate) SetMdtypetabel(m *MDTypeTabel) *MDTabelUpdate {
+	return mtu.SetMdtypetabelID(m.ID)
+}
+
 // Mutation returns the MDTabelMutation object of the builder.
 func (mtu *MDTabelUpdate) Mutation() *MDTabelMutation {
 	return mtu.mutation
+}
+
+// ClearChildMdtabel clears all "child_mdtabel" edges to the MDTabel entity.
+func (mtu *MDTabelUpdate) ClearChildMdtabel() *MDTabelUpdate {
+	mtu.mutation.ClearChildMdtabel()
+	return mtu
+}
+
+// RemoveChildMdtabelIDs removes the "child_mdtabel" edge to MDTabel entities by IDs.
+func (mtu *MDTabelUpdate) RemoveChildMdtabelIDs(ids ...string) *MDTabelUpdate {
+	mtu.mutation.RemoveChildMdtabelIDs(ids...)
+	return mtu
+}
+
+// RemoveChildMdtabel removes "child_mdtabel" edges to MDTabel entities.
+func (mtu *MDTabelUpdate) RemoveChildMdtabel(m ...*MDTabel) *MDTabelUpdate {
+	ids := make([]string, len(m))
+	for i := range m {
+		ids[i] = m[i].ID
+	}
+	return mtu.RemoveChildMdtabelIDs(ids...)
+}
+
+// ClearParentMdtabel clears the "parent_mdtabel" edge to the MDTabel entity.
+func (mtu *MDTabelUpdate) ClearParentMdtabel() *MDTabelUpdate {
+	mtu.mutation.ClearParentMdtabel()
+	return mtu
 }
 
 // ClearMdsubsystems clears all "mdsubsystems" edges to the MDSubSystems entity.
@@ -134,6 +249,12 @@ func (mtu *MDTabelUpdate) RemoveMdrekvizits(m ...*MDRekvizit) *MDTabelUpdate {
 		ids[i] = m[i].ID
 	}
 	return mtu.RemoveMdrekvizitIDs(ids...)
+}
+
+// ClearMdtypetabel clears the "mdtypetabel" edge to the MDTypeTabel entity.
+func (mtu *MDTabelUpdate) ClearMdtypetabel() *MDTabelUpdate {
+	mtu.mutation.ClearMdtypetabel()
+	return mtu
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -198,11 +319,6 @@ func (mtu *MDTabelUpdate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (mtu *MDTabelUpdate) check() error {
-	if v, ok := mtu.mutation.Namerus(); ok {
-		if err := mdtabel.NamerusValidator(v); err != nil {
-			return &ValidationError{Name: "namerus", err: fmt.Errorf(`ent: validator failed for field "MDTabel.namerus": %w`, err)}
-		}
-	}
 	if v, ok := mtu.mutation.Nameeng(); ok {
 		if err := mdtabel.NameengValidator(v); err != nil {
 			return &ValidationError{Name: "nameeng", err: fmt.Errorf(`ent: validator failed for field "MDTabel.nameeng": %w`, err)}
@@ -213,14 +329,14 @@ func (mtu *MDTabelUpdate) check() error {
 			return &ValidationError{Name: "synonym", err: fmt.Errorf(`ent: validator failed for field "MDTabel.synonym": %w`, err)}
 		}
 	}
+	if v, ok := mtu.mutation.TypesID(); ok {
+		if err := mdtabel.TypesIDValidator(v); err != nil {
+			return &ValidationError{Name: "types_id", err: fmt.Errorf(`ent: validator failed for field "MDTabel.types_id": %w`, err)}
+		}
+	}
 	if v, ok := mtu.mutation.File(); ok {
 		if err := mdtabel.FileValidator(v); err != nil {
 			return &ValidationError{Name: "file", err: fmt.Errorf(`ent: validator failed for field "MDTabel.file": %w`, err)}
-		}
-	}
-	if v, ok := mtu.mutation.GetType(); ok {
-		if err := mdtabel.TypeValidator(v); err != nil {
-			return &ValidationError{Name: "type", err: fmt.Errorf(`ent: validator failed for field "MDTabel.type": %w`, err)}
 		}
 	}
 	return nil
@@ -244,13 +360,6 @@ func (mtu *MDTabelUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
-	if value, ok := mtu.mutation.Namerus(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: mdtabel.FieldNamerus,
-		})
-	}
 	if value, ok := mtu.mutation.Nameeng(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
@@ -265,6 +374,13 @@ func (mtu *MDTabelUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: mdtabel.FieldSynonym,
 		})
 	}
+	if value, ok := mtu.mutation.Por(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: mdtabel.FieldPor,
+		})
+	}
 	if value, ok := mtu.mutation.File(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
@@ -272,12 +388,94 @@ func (mtu *MDTabelUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: mdtabel.FieldFile,
 		})
 	}
-	if value, ok := mtu.mutation.GetType(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: mdtabel.FieldType,
-		})
+	if mtu.mutation.ChildMdtabelCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   mdtabel.ChildMdtabelTable,
+			Columns: []string{mdtabel.ChildMdtabelColumn},
+			Bidi:    true,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeString,
+					Column: mdtabel.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := mtu.mutation.RemovedChildMdtabelIDs(); len(nodes) > 0 && !mtu.mutation.ChildMdtabelCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   mdtabel.ChildMdtabelTable,
+			Columns: []string{mdtabel.ChildMdtabelColumn},
+			Bidi:    true,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeString,
+					Column: mdtabel.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := mtu.mutation.ChildMdtabelIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   mdtabel.ChildMdtabelTable,
+			Columns: []string{mdtabel.ChildMdtabelColumn},
+			Bidi:    true,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeString,
+					Column: mdtabel.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if mtu.mutation.ParentMdtabelCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   mdtabel.ParentMdtabelTable,
+			Columns: []string{mdtabel.ParentMdtabelColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeString,
+					Column: mdtabel.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := mtu.mutation.ParentMdtabelIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   mdtabel.ParentMdtabelTable,
+			Columns: []string{mdtabel.ParentMdtabelColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeString,
+					Column: mdtabel.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if mtu.mutation.MdsubsystemsCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -387,6 +585,41 @@ func (mtu *MDTabelUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if mtu.mutation.MdtypetabelCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   mdtabel.MdtypetabelTable,
+			Columns: []string{mdtabel.MdtypetabelColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeString,
+					Column: mdtypetabel.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := mtu.mutation.MdtypetabelIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   mdtabel.MdtypetabelTable,
+			Columns: []string{mdtabel.MdtypetabelColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeString,
+					Column: mdtypetabel.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, mtu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{mdtabel.Label}
@@ -406,12 +639,6 @@ type MDTabelUpdateOne struct {
 	mutation *MDTabelMutation
 }
 
-// SetNamerus sets the "namerus" field.
-func (mtuo *MDTabelUpdateOne) SetNamerus(s string) *MDTabelUpdateOne {
-	mtuo.mutation.SetNamerus(s)
-	return mtuo
-}
-
 // SetNameeng sets the "nameeng" field.
 func (mtuo *MDTabelUpdateOne) SetNameeng(s string) *MDTabelUpdateOne {
 	mtuo.mutation.SetNameeng(s)
@@ -424,16 +651,90 @@ func (mtuo *MDTabelUpdateOne) SetSynonym(s string) *MDTabelUpdateOne {
 	return mtuo
 }
 
+// SetPor sets the "por" field.
+func (mtuo *MDTabelUpdateOne) SetPor(s string) *MDTabelUpdateOne {
+	mtuo.mutation.SetPor(s)
+	return mtuo
+}
+
+// SetParent sets the "parent" field.
+func (mtuo *MDTabelUpdateOne) SetParent(s string) *MDTabelUpdateOne {
+	mtuo.mutation.SetParent(s)
+	return mtuo
+}
+
+// SetNillableParent sets the "parent" field if the given value is not nil.
+func (mtuo *MDTabelUpdateOne) SetNillableParent(s *string) *MDTabelUpdateOne {
+	if s != nil {
+		mtuo.SetParent(*s)
+	}
+	return mtuo
+}
+
+// ClearParent clears the value of the "parent" field.
+func (mtuo *MDTabelUpdateOne) ClearParent() *MDTabelUpdateOne {
+	mtuo.mutation.ClearParent()
+	return mtuo
+}
+
+// SetTypesID sets the "types_id" field.
+func (mtuo *MDTabelUpdateOne) SetTypesID(s string) *MDTabelUpdateOne {
+	mtuo.mutation.SetTypesID(s)
+	return mtuo
+}
+
+// SetNillableTypesID sets the "types_id" field if the given value is not nil.
+func (mtuo *MDTabelUpdateOne) SetNillableTypesID(s *string) *MDTabelUpdateOne {
+	if s != nil {
+		mtuo.SetTypesID(*s)
+	}
+	return mtuo
+}
+
+// ClearTypesID clears the value of the "types_id" field.
+func (mtuo *MDTabelUpdateOne) ClearTypesID() *MDTabelUpdateOne {
+	mtuo.mutation.ClearTypesID()
+	return mtuo
+}
+
 // SetFile sets the "file" field.
 func (mtuo *MDTabelUpdateOne) SetFile(s string) *MDTabelUpdateOne {
 	mtuo.mutation.SetFile(s)
 	return mtuo
 }
 
-// SetType sets the "type" field.
-func (mtuo *MDTabelUpdateOne) SetType(s string) *MDTabelUpdateOne {
-	mtuo.mutation.SetType(s)
+// AddChildMdtabelIDs adds the "child_mdtabel" edge to the MDTabel entity by IDs.
+func (mtuo *MDTabelUpdateOne) AddChildMdtabelIDs(ids ...string) *MDTabelUpdateOne {
+	mtuo.mutation.AddChildMdtabelIDs(ids...)
 	return mtuo
+}
+
+// AddChildMdtabel adds the "child_mdtabel" edges to the MDTabel entity.
+func (mtuo *MDTabelUpdateOne) AddChildMdtabel(m ...*MDTabel) *MDTabelUpdateOne {
+	ids := make([]string, len(m))
+	for i := range m {
+		ids[i] = m[i].ID
+	}
+	return mtuo.AddChildMdtabelIDs(ids...)
+}
+
+// SetParentMdtabelID sets the "parent_mdtabel" edge to the MDTabel entity by ID.
+func (mtuo *MDTabelUpdateOne) SetParentMdtabelID(id string) *MDTabelUpdateOne {
+	mtuo.mutation.SetParentMdtabelID(id)
+	return mtuo
+}
+
+// SetNillableParentMdtabelID sets the "parent_mdtabel" edge to the MDTabel entity by ID if the given value is not nil.
+func (mtuo *MDTabelUpdateOne) SetNillableParentMdtabelID(id *string) *MDTabelUpdateOne {
+	if id != nil {
+		mtuo = mtuo.SetParentMdtabelID(*id)
+	}
+	return mtuo
+}
+
+// SetParentMdtabel sets the "parent_mdtabel" edge to the MDTabel entity.
+func (mtuo *MDTabelUpdateOne) SetParentMdtabel(m *MDTabel) *MDTabelUpdateOne {
+	return mtuo.SetParentMdtabelID(m.ID)
 }
 
 // AddMdsubsystemIDs adds the "mdsubsystems" edge to the MDSubSystems entity by IDs.
@@ -466,9 +767,55 @@ func (mtuo *MDTabelUpdateOne) AddMdrekvizits(m ...*MDRekvizit) *MDTabelUpdateOne
 	return mtuo.AddMdrekvizitIDs(ids...)
 }
 
+// SetMdtypetabelID sets the "mdtypetabel" edge to the MDTypeTabel entity by ID.
+func (mtuo *MDTabelUpdateOne) SetMdtypetabelID(id string) *MDTabelUpdateOne {
+	mtuo.mutation.SetMdtypetabelID(id)
+	return mtuo
+}
+
+// SetNillableMdtypetabelID sets the "mdtypetabel" edge to the MDTypeTabel entity by ID if the given value is not nil.
+func (mtuo *MDTabelUpdateOne) SetNillableMdtypetabelID(id *string) *MDTabelUpdateOne {
+	if id != nil {
+		mtuo = mtuo.SetMdtypetabelID(*id)
+	}
+	return mtuo
+}
+
+// SetMdtypetabel sets the "mdtypetabel" edge to the MDTypeTabel entity.
+func (mtuo *MDTabelUpdateOne) SetMdtypetabel(m *MDTypeTabel) *MDTabelUpdateOne {
+	return mtuo.SetMdtypetabelID(m.ID)
+}
+
 // Mutation returns the MDTabelMutation object of the builder.
 func (mtuo *MDTabelUpdateOne) Mutation() *MDTabelMutation {
 	return mtuo.mutation
+}
+
+// ClearChildMdtabel clears all "child_mdtabel" edges to the MDTabel entity.
+func (mtuo *MDTabelUpdateOne) ClearChildMdtabel() *MDTabelUpdateOne {
+	mtuo.mutation.ClearChildMdtabel()
+	return mtuo
+}
+
+// RemoveChildMdtabelIDs removes the "child_mdtabel" edge to MDTabel entities by IDs.
+func (mtuo *MDTabelUpdateOne) RemoveChildMdtabelIDs(ids ...string) *MDTabelUpdateOne {
+	mtuo.mutation.RemoveChildMdtabelIDs(ids...)
+	return mtuo
+}
+
+// RemoveChildMdtabel removes "child_mdtabel" edges to MDTabel entities.
+func (mtuo *MDTabelUpdateOne) RemoveChildMdtabel(m ...*MDTabel) *MDTabelUpdateOne {
+	ids := make([]string, len(m))
+	for i := range m {
+		ids[i] = m[i].ID
+	}
+	return mtuo.RemoveChildMdtabelIDs(ids...)
+}
+
+// ClearParentMdtabel clears the "parent_mdtabel" edge to the MDTabel entity.
+func (mtuo *MDTabelUpdateOne) ClearParentMdtabel() *MDTabelUpdateOne {
+	mtuo.mutation.ClearParentMdtabel()
+	return mtuo
 }
 
 // ClearMdsubsystems clears all "mdsubsystems" edges to the MDSubSystems entity.
@@ -511,6 +858,12 @@ func (mtuo *MDTabelUpdateOne) RemoveMdrekvizits(m ...*MDRekvizit) *MDTabelUpdate
 		ids[i] = m[i].ID
 	}
 	return mtuo.RemoveMdrekvizitIDs(ids...)
+}
+
+// ClearMdtypetabel clears the "mdtypetabel" edge to the MDTypeTabel entity.
+func (mtuo *MDTabelUpdateOne) ClearMdtypetabel() *MDTabelUpdateOne {
+	mtuo.mutation.ClearMdtypetabel()
+	return mtuo
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
@@ -582,11 +935,6 @@ func (mtuo *MDTabelUpdateOne) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (mtuo *MDTabelUpdateOne) check() error {
-	if v, ok := mtuo.mutation.Namerus(); ok {
-		if err := mdtabel.NamerusValidator(v); err != nil {
-			return &ValidationError{Name: "namerus", err: fmt.Errorf(`ent: validator failed for field "MDTabel.namerus": %w`, err)}
-		}
-	}
 	if v, ok := mtuo.mutation.Nameeng(); ok {
 		if err := mdtabel.NameengValidator(v); err != nil {
 			return &ValidationError{Name: "nameeng", err: fmt.Errorf(`ent: validator failed for field "MDTabel.nameeng": %w`, err)}
@@ -597,14 +945,14 @@ func (mtuo *MDTabelUpdateOne) check() error {
 			return &ValidationError{Name: "synonym", err: fmt.Errorf(`ent: validator failed for field "MDTabel.synonym": %w`, err)}
 		}
 	}
+	if v, ok := mtuo.mutation.TypesID(); ok {
+		if err := mdtabel.TypesIDValidator(v); err != nil {
+			return &ValidationError{Name: "types_id", err: fmt.Errorf(`ent: validator failed for field "MDTabel.types_id": %w`, err)}
+		}
+	}
 	if v, ok := mtuo.mutation.File(); ok {
 		if err := mdtabel.FileValidator(v); err != nil {
 			return &ValidationError{Name: "file", err: fmt.Errorf(`ent: validator failed for field "MDTabel.file": %w`, err)}
-		}
-	}
-	if v, ok := mtuo.mutation.GetType(); ok {
-		if err := mdtabel.TypeValidator(v); err != nil {
-			return &ValidationError{Name: "type", err: fmt.Errorf(`ent: validator failed for field "MDTabel.type": %w`, err)}
 		}
 	}
 	return nil
@@ -645,13 +993,6 @@ func (mtuo *MDTabelUpdateOne) sqlSave(ctx context.Context) (_node *MDTabel, err 
 			}
 		}
 	}
-	if value, ok := mtuo.mutation.Namerus(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: mdtabel.FieldNamerus,
-		})
-	}
 	if value, ok := mtuo.mutation.Nameeng(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
@@ -666,6 +1007,13 @@ func (mtuo *MDTabelUpdateOne) sqlSave(ctx context.Context) (_node *MDTabel, err 
 			Column: mdtabel.FieldSynonym,
 		})
 	}
+	if value, ok := mtuo.mutation.Por(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: mdtabel.FieldPor,
+		})
+	}
 	if value, ok := mtuo.mutation.File(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
@@ -673,12 +1021,94 @@ func (mtuo *MDTabelUpdateOne) sqlSave(ctx context.Context) (_node *MDTabel, err 
 			Column: mdtabel.FieldFile,
 		})
 	}
-	if value, ok := mtuo.mutation.GetType(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: mdtabel.FieldType,
-		})
+	if mtuo.mutation.ChildMdtabelCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   mdtabel.ChildMdtabelTable,
+			Columns: []string{mdtabel.ChildMdtabelColumn},
+			Bidi:    true,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeString,
+					Column: mdtabel.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := mtuo.mutation.RemovedChildMdtabelIDs(); len(nodes) > 0 && !mtuo.mutation.ChildMdtabelCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   mdtabel.ChildMdtabelTable,
+			Columns: []string{mdtabel.ChildMdtabelColumn},
+			Bidi:    true,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeString,
+					Column: mdtabel.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := mtuo.mutation.ChildMdtabelIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   mdtabel.ChildMdtabelTable,
+			Columns: []string{mdtabel.ChildMdtabelColumn},
+			Bidi:    true,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeString,
+					Column: mdtabel.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if mtuo.mutation.ParentMdtabelCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   mdtabel.ParentMdtabelTable,
+			Columns: []string{mdtabel.ParentMdtabelColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeString,
+					Column: mdtabel.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := mtuo.mutation.ParentMdtabelIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   mdtabel.ParentMdtabelTable,
+			Columns: []string{mdtabel.ParentMdtabelColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeString,
+					Column: mdtabel.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if mtuo.mutation.MdsubsystemsCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -780,6 +1210,41 @@ func (mtuo *MDTabelUpdateOne) sqlSave(ctx context.Context) (_node *MDTabel, err 
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeString,
 					Column: mdrekvizit.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if mtuo.mutation.MdtypetabelCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   mdtabel.MdtypetabelTable,
+			Columns: []string{mdtabel.MdtypetabelColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeString,
+					Column: mdtypetabel.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := mtuo.mutation.MdtypetabelIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   mdtabel.MdtypetabelTable,
+			Columns: []string{mdtabel.MdtypetabelColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeString,
+					Column: mdtypetabel.FieldID,
 				},
 			},
 		}

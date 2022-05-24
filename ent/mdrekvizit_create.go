@@ -23,12 +23,6 @@ type MDRekvizitCreate struct {
 	conflict []sql.ConflictOption
 }
 
-// SetNamerus sets the "namerus" field.
-func (mrc *MDRekvizitCreate) SetNamerus(s string) *MDRekvizitCreate {
-	mrc.mutation.SetNamerus(s)
-	return mrc
-}
-
 // SetNameeng sets the "nameeng" field.
 func (mrc *MDRekvizitCreate) SetNameeng(s string) *MDRekvizitCreate {
 	mrc.mutation.SetNameeng(s)
@@ -44,18 +38,6 @@ func (mrc *MDRekvizitCreate) SetSynonym(s string) *MDRekvizitCreate {
 // SetPor sets the "por" field.
 func (mrc *MDRekvizitCreate) SetPor(s string) *MDRekvizitCreate {
 	mrc.mutation.SetPor(s)
-	return mrc
-}
-
-// SetWidthElem sets the "widthElem" field.
-func (mrc *MDRekvizitCreate) SetWidthElem(f float64) *MDRekvizitCreate {
-	mrc.mutation.SetWidthElem(f)
-	return mrc
-}
-
-// SetWidthSpisok sets the "widthSpisok" field.
-func (mrc *MDRekvizitCreate) SetWidthSpisok(f float64) *MDRekvizitCreate {
-	mrc.mutation.SetWidthSpisok(f)
 	return mrc
 }
 
@@ -76,6 +58,12 @@ func (mrc *MDRekvizitCreate) SetNillableOwnerID(s *string) *MDRekvizitCreate {
 	if s != nil {
 		mrc.SetOwnerID(*s)
 	}
+	return mrc
+}
+
+// SetWidthSpisok sets the "widthSpisok" field.
+func (mrc *MDRekvizitCreate) SetWidthSpisok(f float64) *MDRekvizitCreate {
+	mrc.mutation.SetWidthSpisok(f)
 	return mrc
 }
 
@@ -160,14 +148,6 @@ func (mrc *MDRekvizitCreate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (mrc *MDRekvizitCreate) check() error {
-	if _, ok := mrc.mutation.Namerus(); !ok {
-		return &ValidationError{Name: "namerus", err: errors.New(`ent: missing required field "MDRekvizit.namerus"`)}
-	}
-	if v, ok := mrc.mutation.Namerus(); ok {
-		if err := mdrekvizit.NamerusValidator(v); err != nil {
-			return &ValidationError{Name: "namerus", err: fmt.Errorf(`ent: validator failed for field "MDRekvizit.namerus": %w`, err)}
-		}
-	}
 	if _, ok := mrc.mutation.Nameeng(); !ok {
 		return &ValidationError{Name: "nameeng", err: errors.New(`ent: missing required field "MDRekvizit.nameeng"`)}
 	}
@@ -192,12 +172,6 @@ func (mrc *MDRekvizitCreate) check() error {
 			return &ValidationError{Name: "por", err: fmt.Errorf(`ent: validator failed for field "MDRekvizit.por": %w`, err)}
 		}
 	}
-	if _, ok := mrc.mutation.WidthElem(); !ok {
-		return &ValidationError{Name: "widthElem", err: errors.New(`ent: missing required field "MDRekvizit.widthElem"`)}
-	}
-	if _, ok := mrc.mutation.WidthSpisok(); !ok {
-		return &ValidationError{Name: "widthSpisok", err: errors.New(`ent: missing required field "MDRekvizit.widthSpisok"`)}
-	}
 	if _, ok := mrc.mutation.GetType(); !ok {
 		return &ValidationError{Name: "type", err: errors.New(`ent: missing required field "MDRekvizit.type"`)}
 	}
@@ -210,6 +184,9 @@ func (mrc *MDRekvizitCreate) check() error {
 		if err := mdrekvizit.OwnerIDValidator(v); err != nil {
 			return &ValidationError{Name: "owner_id", err: fmt.Errorf(`ent: validator failed for field "MDRekvizit.owner_id": %w`, err)}
 		}
+	}
+	if _, ok := mrc.mutation.WidthSpisok(); !ok {
+		return &ValidationError{Name: "widthSpisok", err: errors.New(`ent: missing required field "MDRekvizit.widthSpisok"`)}
 	}
 	if v, ok := mrc.mutation.ID(); ok {
 		if err := mdrekvizit.IDValidator(v); err != nil {
@@ -253,14 +230,6 @@ func (mrc *MDRekvizitCreate) createSpec() (*MDRekvizit, *sqlgraph.CreateSpec) {
 		_node.ID = id
 		_spec.ID.Value = id
 	}
-	if value, ok := mrc.mutation.Namerus(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: mdrekvizit.FieldNamerus,
-		})
-		_node.Namerus = value
-	}
 	if value, ok := mrc.mutation.Nameeng(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
@@ -285,13 +254,13 @@ func (mrc *MDRekvizitCreate) createSpec() (*MDRekvizit, *sqlgraph.CreateSpec) {
 		})
 		_node.Por = value
 	}
-	if value, ok := mrc.mutation.WidthElem(); ok {
+	if value, ok := mrc.mutation.GetType(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeFloat64,
+			Type:   field.TypeString,
 			Value:  value,
-			Column: mdrekvizit.FieldWidthElem,
+			Column: mdrekvizit.FieldType,
 		})
-		_node.WidthElem = value
+		_node.Type = value
 	}
 	if value, ok := mrc.mutation.WidthSpisok(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -300,14 +269,6 @@ func (mrc *MDRekvizitCreate) createSpec() (*MDRekvizit, *sqlgraph.CreateSpec) {
 			Column: mdrekvizit.FieldWidthSpisok,
 		})
 		_node.WidthSpisok = value
-	}
-	if value, ok := mrc.mutation.GetType(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: mdrekvizit.FieldType,
-		})
-		_node.Type = value
 	}
 	if nodes := mrc.mutation.OwnerIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -336,7 +297,7 @@ func (mrc *MDRekvizitCreate) createSpec() (*MDRekvizit, *sqlgraph.CreateSpec) {
 // of the `INSERT` statement. For example:
 //
 //	client.MDRekvizit.Create().
-//		SetNamerus(v).
+//		SetNameeng(v).
 //		OnConflict(
 //			// Update the row with the new values
 //			// the was proposed for insertion.
@@ -345,7 +306,7 @@ func (mrc *MDRekvizitCreate) createSpec() (*MDRekvizit, *sqlgraph.CreateSpec) {
 //		// Override some of the fields with custom
 //		// update values.
 //		Update(func(u *ent.MDRekvizitUpsert) {
-//			SetNamerus(v+v).
+//			SetNameeng(v+v).
 //		}).
 //		Exec(ctx)
 //
@@ -383,18 +344,6 @@ type (
 	}
 )
 
-// SetNamerus sets the "namerus" field.
-func (u *MDRekvizitUpsert) SetNamerus(v string) *MDRekvizitUpsert {
-	u.Set(mdrekvizit.FieldNamerus, v)
-	return u
-}
-
-// UpdateNamerus sets the "namerus" field to the value that was provided on create.
-func (u *MDRekvizitUpsert) UpdateNamerus() *MDRekvizitUpsert {
-	u.SetExcluded(mdrekvizit.FieldNamerus)
-	return u
-}
-
 // SetNameeng sets the "nameeng" field.
 func (u *MDRekvizitUpsert) SetNameeng(v string) *MDRekvizitUpsert {
 	u.Set(mdrekvizit.FieldNameeng, v)
@@ -431,42 +380,6 @@ func (u *MDRekvizitUpsert) UpdatePor() *MDRekvizitUpsert {
 	return u
 }
 
-// SetWidthElem sets the "widthElem" field.
-func (u *MDRekvizitUpsert) SetWidthElem(v float64) *MDRekvizitUpsert {
-	u.Set(mdrekvizit.FieldWidthElem, v)
-	return u
-}
-
-// UpdateWidthElem sets the "widthElem" field to the value that was provided on create.
-func (u *MDRekvizitUpsert) UpdateWidthElem() *MDRekvizitUpsert {
-	u.SetExcluded(mdrekvizit.FieldWidthElem)
-	return u
-}
-
-// AddWidthElem adds v to the "widthElem" field.
-func (u *MDRekvizitUpsert) AddWidthElem(v float64) *MDRekvizitUpsert {
-	u.Add(mdrekvizit.FieldWidthElem, v)
-	return u
-}
-
-// SetWidthSpisok sets the "widthSpisok" field.
-func (u *MDRekvizitUpsert) SetWidthSpisok(v float64) *MDRekvizitUpsert {
-	u.Set(mdrekvizit.FieldWidthSpisok, v)
-	return u
-}
-
-// UpdateWidthSpisok sets the "widthSpisok" field to the value that was provided on create.
-func (u *MDRekvizitUpsert) UpdateWidthSpisok() *MDRekvizitUpsert {
-	u.SetExcluded(mdrekvizit.FieldWidthSpisok)
-	return u
-}
-
-// AddWidthSpisok adds v to the "widthSpisok" field.
-func (u *MDRekvizitUpsert) AddWidthSpisok(v float64) *MDRekvizitUpsert {
-	u.Add(mdrekvizit.FieldWidthSpisok, v)
-	return u
-}
-
 // SetType sets the "type" field.
 func (u *MDRekvizitUpsert) SetType(v string) *MDRekvizitUpsert {
 	u.Set(mdrekvizit.FieldType, v)
@@ -494,6 +407,24 @@ func (u *MDRekvizitUpsert) UpdateOwnerID() *MDRekvizitUpsert {
 // ClearOwnerID clears the value of the "owner_id" field.
 func (u *MDRekvizitUpsert) ClearOwnerID() *MDRekvizitUpsert {
 	u.SetNull(mdrekvizit.FieldOwnerID)
+	return u
+}
+
+// SetWidthSpisok sets the "widthSpisok" field.
+func (u *MDRekvizitUpsert) SetWidthSpisok(v float64) *MDRekvizitUpsert {
+	u.Set(mdrekvizit.FieldWidthSpisok, v)
+	return u
+}
+
+// UpdateWidthSpisok sets the "widthSpisok" field to the value that was provided on create.
+func (u *MDRekvizitUpsert) UpdateWidthSpisok() *MDRekvizitUpsert {
+	u.SetExcluded(mdrekvizit.FieldWidthSpisok)
+	return u
+}
+
+// AddWidthSpisok adds v to the "widthSpisok" field.
+func (u *MDRekvizitUpsert) AddWidthSpisok(v float64) *MDRekvizitUpsert {
+	u.Add(mdrekvizit.FieldWidthSpisok, v)
 	return u
 }
 
@@ -547,20 +478,6 @@ func (u *MDRekvizitUpsertOne) Update(set func(*MDRekvizitUpsert)) *MDRekvizitUps
 	return u
 }
 
-// SetNamerus sets the "namerus" field.
-func (u *MDRekvizitUpsertOne) SetNamerus(v string) *MDRekvizitUpsertOne {
-	return u.Update(func(s *MDRekvizitUpsert) {
-		s.SetNamerus(v)
-	})
-}
-
-// UpdateNamerus sets the "namerus" field to the value that was provided on create.
-func (u *MDRekvizitUpsertOne) UpdateNamerus() *MDRekvizitUpsertOne {
-	return u.Update(func(s *MDRekvizitUpsert) {
-		s.UpdateNamerus()
-	})
-}
-
 // SetNameeng sets the "nameeng" field.
 func (u *MDRekvizitUpsertOne) SetNameeng(v string) *MDRekvizitUpsertOne {
 	return u.Update(func(s *MDRekvizitUpsert) {
@@ -603,48 +520,6 @@ func (u *MDRekvizitUpsertOne) UpdatePor() *MDRekvizitUpsertOne {
 	})
 }
 
-// SetWidthElem sets the "widthElem" field.
-func (u *MDRekvizitUpsertOne) SetWidthElem(v float64) *MDRekvizitUpsertOne {
-	return u.Update(func(s *MDRekvizitUpsert) {
-		s.SetWidthElem(v)
-	})
-}
-
-// AddWidthElem adds v to the "widthElem" field.
-func (u *MDRekvizitUpsertOne) AddWidthElem(v float64) *MDRekvizitUpsertOne {
-	return u.Update(func(s *MDRekvizitUpsert) {
-		s.AddWidthElem(v)
-	})
-}
-
-// UpdateWidthElem sets the "widthElem" field to the value that was provided on create.
-func (u *MDRekvizitUpsertOne) UpdateWidthElem() *MDRekvizitUpsertOne {
-	return u.Update(func(s *MDRekvizitUpsert) {
-		s.UpdateWidthElem()
-	})
-}
-
-// SetWidthSpisok sets the "widthSpisok" field.
-func (u *MDRekvizitUpsertOne) SetWidthSpisok(v float64) *MDRekvizitUpsertOne {
-	return u.Update(func(s *MDRekvizitUpsert) {
-		s.SetWidthSpisok(v)
-	})
-}
-
-// AddWidthSpisok adds v to the "widthSpisok" field.
-func (u *MDRekvizitUpsertOne) AddWidthSpisok(v float64) *MDRekvizitUpsertOne {
-	return u.Update(func(s *MDRekvizitUpsert) {
-		s.AddWidthSpisok(v)
-	})
-}
-
-// UpdateWidthSpisok sets the "widthSpisok" field to the value that was provided on create.
-func (u *MDRekvizitUpsertOne) UpdateWidthSpisok() *MDRekvizitUpsertOne {
-	return u.Update(func(s *MDRekvizitUpsert) {
-		s.UpdateWidthSpisok()
-	})
-}
-
 // SetType sets the "type" field.
 func (u *MDRekvizitUpsertOne) SetType(v string) *MDRekvizitUpsertOne {
 	return u.Update(func(s *MDRekvizitUpsert) {
@@ -677,6 +552,27 @@ func (u *MDRekvizitUpsertOne) UpdateOwnerID() *MDRekvizitUpsertOne {
 func (u *MDRekvizitUpsertOne) ClearOwnerID() *MDRekvizitUpsertOne {
 	return u.Update(func(s *MDRekvizitUpsert) {
 		s.ClearOwnerID()
+	})
+}
+
+// SetWidthSpisok sets the "widthSpisok" field.
+func (u *MDRekvizitUpsertOne) SetWidthSpisok(v float64) *MDRekvizitUpsertOne {
+	return u.Update(func(s *MDRekvizitUpsert) {
+		s.SetWidthSpisok(v)
+	})
+}
+
+// AddWidthSpisok adds v to the "widthSpisok" field.
+func (u *MDRekvizitUpsertOne) AddWidthSpisok(v float64) *MDRekvizitUpsertOne {
+	return u.Update(func(s *MDRekvizitUpsert) {
+		s.AddWidthSpisok(v)
+	})
+}
+
+// UpdateWidthSpisok sets the "widthSpisok" field to the value that was provided on create.
+func (u *MDRekvizitUpsertOne) UpdateWidthSpisok() *MDRekvizitUpsertOne {
+	return u.Update(func(s *MDRekvizitUpsert) {
+		s.UpdateWidthSpisok()
 	})
 }
 
@@ -811,7 +707,7 @@ func (mrcb *MDRekvizitCreateBulk) ExecX(ctx context.Context) {
 //		// Override some of the fields with custom
 //		// update values.
 //		Update(func(u *ent.MDRekvizitUpsert) {
-//			SetNamerus(v+v).
+//			SetNameeng(v+v).
 //		}).
 //		Exec(ctx)
 //
@@ -895,20 +791,6 @@ func (u *MDRekvizitUpsertBulk) Update(set func(*MDRekvizitUpsert)) *MDRekvizitUp
 	return u
 }
 
-// SetNamerus sets the "namerus" field.
-func (u *MDRekvizitUpsertBulk) SetNamerus(v string) *MDRekvizitUpsertBulk {
-	return u.Update(func(s *MDRekvizitUpsert) {
-		s.SetNamerus(v)
-	})
-}
-
-// UpdateNamerus sets the "namerus" field to the value that was provided on create.
-func (u *MDRekvizitUpsertBulk) UpdateNamerus() *MDRekvizitUpsertBulk {
-	return u.Update(func(s *MDRekvizitUpsert) {
-		s.UpdateNamerus()
-	})
-}
-
 // SetNameeng sets the "nameeng" field.
 func (u *MDRekvizitUpsertBulk) SetNameeng(v string) *MDRekvizitUpsertBulk {
 	return u.Update(func(s *MDRekvizitUpsert) {
@@ -951,48 +833,6 @@ func (u *MDRekvizitUpsertBulk) UpdatePor() *MDRekvizitUpsertBulk {
 	})
 }
 
-// SetWidthElem sets the "widthElem" field.
-func (u *MDRekvizitUpsertBulk) SetWidthElem(v float64) *MDRekvizitUpsertBulk {
-	return u.Update(func(s *MDRekvizitUpsert) {
-		s.SetWidthElem(v)
-	})
-}
-
-// AddWidthElem adds v to the "widthElem" field.
-func (u *MDRekvizitUpsertBulk) AddWidthElem(v float64) *MDRekvizitUpsertBulk {
-	return u.Update(func(s *MDRekvizitUpsert) {
-		s.AddWidthElem(v)
-	})
-}
-
-// UpdateWidthElem sets the "widthElem" field to the value that was provided on create.
-func (u *MDRekvizitUpsertBulk) UpdateWidthElem() *MDRekvizitUpsertBulk {
-	return u.Update(func(s *MDRekvizitUpsert) {
-		s.UpdateWidthElem()
-	})
-}
-
-// SetWidthSpisok sets the "widthSpisok" field.
-func (u *MDRekvizitUpsertBulk) SetWidthSpisok(v float64) *MDRekvizitUpsertBulk {
-	return u.Update(func(s *MDRekvizitUpsert) {
-		s.SetWidthSpisok(v)
-	})
-}
-
-// AddWidthSpisok adds v to the "widthSpisok" field.
-func (u *MDRekvizitUpsertBulk) AddWidthSpisok(v float64) *MDRekvizitUpsertBulk {
-	return u.Update(func(s *MDRekvizitUpsert) {
-		s.AddWidthSpisok(v)
-	})
-}
-
-// UpdateWidthSpisok sets the "widthSpisok" field to the value that was provided on create.
-func (u *MDRekvizitUpsertBulk) UpdateWidthSpisok() *MDRekvizitUpsertBulk {
-	return u.Update(func(s *MDRekvizitUpsert) {
-		s.UpdateWidthSpisok()
-	})
-}
-
 // SetType sets the "type" field.
 func (u *MDRekvizitUpsertBulk) SetType(v string) *MDRekvizitUpsertBulk {
 	return u.Update(func(s *MDRekvizitUpsert) {
@@ -1025,6 +865,27 @@ func (u *MDRekvizitUpsertBulk) UpdateOwnerID() *MDRekvizitUpsertBulk {
 func (u *MDRekvizitUpsertBulk) ClearOwnerID() *MDRekvizitUpsertBulk {
 	return u.Update(func(s *MDRekvizitUpsert) {
 		s.ClearOwnerID()
+	})
+}
+
+// SetWidthSpisok sets the "widthSpisok" field.
+func (u *MDRekvizitUpsertBulk) SetWidthSpisok(v float64) *MDRekvizitUpsertBulk {
+	return u.Update(func(s *MDRekvizitUpsert) {
+		s.SetWidthSpisok(v)
+	})
+}
+
+// AddWidthSpisok adds v to the "widthSpisok" field.
+func (u *MDRekvizitUpsertBulk) AddWidthSpisok(v float64) *MDRekvizitUpsertBulk {
+	return u.Update(func(s *MDRekvizitUpsert) {
+		s.AddWidthSpisok(v)
+	})
+}
+
+// UpdateWidthSpisok sets the "widthSpisok" field to the value that was provided on create.
+func (u *MDRekvizitUpsertBulk) UpdateWidthSpisok() *MDRekvizitUpsertBulk {
+	return u.Update(func(s *MDRekvizitUpsert) {
+		s.UpdateWidthSpisok()
 	})
 }
 

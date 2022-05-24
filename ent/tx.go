@@ -18,6 +18,8 @@ type Tx struct {
 	MDSubSystems *MDSubSystemsClient
 	// MDTabel is the client for interacting with the MDTabel builders.
 	MDTabel *MDTabelClient
+	// MDTypeTabel is the client for interacting with the MDTypeTabel builders.
+	MDTypeTabel *MDTypeTabelClient
 
 	// lazily loaded.
 	client     *Client
@@ -156,6 +158,7 @@ func (tx *Tx) init() {
 	tx.MDRekvizit = NewMDRekvizitClient(tx.config)
 	tx.MDSubSystems = NewMDSubSystemsClient(tx.config)
 	tx.MDTabel = NewMDTabelClient(tx.config)
+	tx.MDTypeTabel = NewMDTypeTabelClient(tx.config)
 }
 
 // txDriver wraps the given dialect.Tx with a nop dialect.Driver implementation.

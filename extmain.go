@@ -13,6 +13,7 @@ import (
 var sLogName = "aristeh.log"
 var mfu map[string]func(*MessageGob) []byte
 
+
 // Client  - структура
 type Client struct {
 	id     string

@@ -14,3 +14,6 @@ type MDSubSystems func(*sql.Selector)
 
 // MDTabel is the predicate function for mdtabel builders.
 type MDTabel func(*sql.Selector)
+
+// MDTypeTabel is the predicate function for mdtypetabel builders.
+type MDTypeTabel func(*sql.Selector)

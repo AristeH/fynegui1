@@ -291,12 +291,12 @@ func (mrq *MDRekvizitQuery) WithOwner(opts ...func(*MDTabelQuery)) *MDRekvizitQu
 // Example:
 //
 //	var v []struct {
-//		Namerus string `json:"ИмяРус,omitempty"`
+//		Nameeng string `json:"ИмяАнгл,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.MDRekvizit.Query().
-//		GroupBy(mdrekvizit.FieldNamerus).
+//		GroupBy(mdrekvizit.FieldNameeng).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 //
@@ -318,11 +318,11 @@ func (mrq *MDRekvizitQuery) GroupBy(field string, fields ...string) *MDRekvizitG
 // Example:
 //
 //	var v []struct {
-//		Namerus string `json:"ИмяРус,omitempty"`
+//		Nameeng string `json:"ИмяАнгл,omitempty"`
 //	}
 //
 //	client.MDRekvizit.Query().
-//		Select(mdrekvizit.FieldNamerus).
+//		Select(mdrekvizit.FieldNameeng).
 //		Scan(ctx, &v)
 //
 func (mrq *MDRekvizitQuery) Select(fields ...string) *MDRekvizitSelect {

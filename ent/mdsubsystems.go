@@ -15,12 +15,12 @@ type MDSubSystems struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID string `json:"ссылка,omitempty"`
-	// Namerus holds the value of the "namerus" field.
-	Namerus string `json:"ИмяРус,omitempty"`
 	// Nameeng holds the value of the "nameeng" field.
 	Nameeng string `json:"ИмяАнгл,omitempty"`
 	// Synonym holds the value of the "synonym" field.
 	Synonym string `json:"Синоним,omitempty"`
+	// Por holds the value of the "por" field.
+	Por string `json:"Порядок,omitempty"`
 	// Parent holds the value of the "parent" field.
 	Parent string `json:"Родитель,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -78,7 +78,7 @@ func (*MDSubSystems) scanValues(columns []string) ([]interface{}, error) {
 	values := make([]interface{}, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case mdsubsystems.FieldID, mdsubsystems.FieldNamerus, mdsubsystems.FieldNameeng, mdsubsystems.FieldSynonym, mdsubsystems.FieldParent:
+		case mdsubsystems.FieldID, mdsubsystems.FieldNameeng, mdsubsystems.FieldSynonym, mdsubsystems.FieldPor, mdsubsystems.FieldParent:
 			values[i] = new(sql.NullString)
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type MDSubSystems", columns[i])
@@ -101,12 +101,6 @@ func (mss *MDSubSystems) assignValues(columns []string, values []interface{}) er
 			} else if value.Valid {
 				mss.ID = value.String
 			}
-		case mdsubsystems.FieldNamerus:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field namerus", values[i])
-			} else if value.Valid {
-				mss.Namerus = value.String
-			}
 		case mdsubsystems.FieldNameeng:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field nameeng", values[i])
@@ -118,6 +112,12 @@ func (mss *MDSubSystems) assignValues(columns []string, values []interface{}) er
 				return fmt.Errorf("unexpected type %T for field synonym", values[i])
 			} else if value.Valid {
 				mss.Synonym = value.String
+			}
+		case mdsubsystems.FieldPor:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field por", values[i])
+			} else if value.Valid {
+				mss.Por = value.String
 			}
 		case mdsubsystems.FieldParent:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -168,12 +168,12 @@ func (mss *MDSubSystems) String() string {
 	var builder strings.Builder
 	builder.WriteString("MDSubSystems(")
 	builder.WriteString(fmt.Sprintf("id=%v", mss.ID))
-	builder.WriteString(", namerus=")
-	builder.WriteString(mss.Namerus)
 	builder.WriteString(", nameeng=")
 	builder.WriteString(mss.Nameeng)
 	builder.WriteString(", synonym=")
 	builder.WriteString(mss.Synonym)
+	builder.WriteString(", por=")
+	builder.WriteString(mss.Por)
 	builder.WriteString(", parent=")
 	builder.WriteString(mss.Parent)
 	builder.WriteByte(')')

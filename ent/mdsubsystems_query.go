@@ -362,12 +362,12 @@ func (mssq *MDSubSystemsQuery) WithMdtables(opts ...func(*MDTabelQuery)) *MDSubS
 // Example:
 //
 //	var v []struct {
-//		Namerus string `json:"ИмяРус,omitempty"`
+//		Nameeng string `json:"ИмяАнгл,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.MDSubSystems.Query().
-//		GroupBy(mdsubsystems.FieldNamerus).
+//		GroupBy(mdsubsystems.FieldNameeng).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 //
@@ -389,11 +389,11 @@ func (mssq *MDSubSystemsQuery) GroupBy(field string, fields ...string) *MDSubSys
 // Example:
 //
 //	var v []struct {
-//		Namerus string `json:"ИмяРус,omitempty"`
+//		Nameeng string `json:"ИмяАнгл,omitempty"`
 //	}
 //
 //	client.MDSubSystems.Query().
-//		Select(mdsubsystems.FieldNamerus).
+//		Select(mdsubsystems.FieldNameeng).
 //		Scan(ctx, &v)
 //
 func (mssq *MDSubSystemsQuery) Select(fields ...string) *MDSubSystemsSelect {

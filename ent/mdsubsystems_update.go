@@ -28,12 +28,6 @@ func (mssu *MDSubSystemsUpdate) Where(ps ...predicate.MDSubSystems) *MDSubSystem
 	return mssu
 }
 
-// SetNamerus sets the "namerus" field.
-func (mssu *MDSubSystemsUpdate) SetNamerus(s string) *MDSubSystemsUpdate {
-	mssu.mutation.SetNamerus(s)
-	return mssu
-}
-
 // SetNameeng sets the "nameeng" field.
 func (mssu *MDSubSystemsUpdate) SetNameeng(s string) *MDSubSystemsUpdate {
 	mssu.mutation.SetNameeng(s)
@@ -43,6 +37,12 @@ func (mssu *MDSubSystemsUpdate) SetNameeng(s string) *MDSubSystemsUpdate {
 // SetSynonym sets the "synonym" field.
 func (mssu *MDSubSystemsUpdate) SetSynonym(s string) *MDSubSystemsUpdate {
 	mssu.mutation.SetSynonym(s)
+	return mssu
+}
+
+// SetPor sets the "por" field.
+func (mssu *MDSubSystemsUpdate) SetPor(s string) *MDSubSystemsUpdate {
+	mssu.mutation.SetPor(s)
 	return mssu
 }
 
@@ -230,11 +230,6 @@ func (mssu *MDSubSystemsUpdate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (mssu *MDSubSystemsUpdate) check() error {
-	if v, ok := mssu.mutation.Namerus(); ok {
-		if err := mdsubsystems.NamerusValidator(v); err != nil {
-			return &ValidationError{Name: "namerus", err: fmt.Errorf(`ent: validator failed for field "MDSubSystems.namerus": %w`, err)}
-		}
-	}
 	if v, ok := mssu.mutation.Nameeng(); ok {
 		if err := mdsubsystems.NameengValidator(v); err != nil {
 			return &ValidationError{Name: "nameeng", err: fmt.Errorf(`ent: validator failed for field "MDSubSystems.nameeng": %w`, err)}
@@ -266,13 +261,6 @@ func (mssu *MDSubSystemsUpdate) sqlSave(ctx context.Context) (n int, err error) 
 			}
 		}
 	}
-	if value, ok := mssu.mutation.Namerus(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: mdsubsystems.FieldNamerus,
-		})
-	}
 	if value, ok := mssu.mutation.Nameeng(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
@@ -285,6 +273,13 @@ func (mssu *MDSubSystemsUpdate) sqlSave(ctx context.Context) (n int, err error) 
 			Type:   field.TypeString,
 			Value:  value,
 			Column: mdsubsystems.FieldSynonym,
+		})
+	}
+	if value, ok := mssu.mutation.Por(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: mdsubsystems.FieldPor,
 		})
 	}
 	if mssu.mutation.ChildMdsubsystemsCleared() {
@@ -449,12 +444,6 @@ type MDSubSystemsUpdateOne struct {
 	mutation *MDSubSystemsMutation
 }
 
-// SetNamerus sets the "namerus" field.
-func (mssuo *MDSubSystemsUpdateOne) SetNamerus(s string) *MDSubSystemsUpdateOne {
-	mssuo.mutation.SetNamerus(s)
-	return mssuo
-}
-
 // SetNameeng sets the "nameeng" field.
 func (mssuo *MDSubSystemsUpdateOne) SetNameeng(s string) *MDSubSystemsUpdateOne {
 	mssuo.mutation.SetNameeng(s)
@@ -464,6 +453,12 @@ func (mssuo *MDSubSystemsUpdateOne) SetNameeng(s string) *MDSubSystemsUpdateOne 
 // SetSynonym sets the "synonym" field.
 func (mssuo *MDSubSystemsUpdateOne) SetSynonym(s string) *MDSubSystemsUpdateOne {
 	mssuo.mutation.SetSynonym(s)
+	return mssuo
+}
+
+// SetPor sets the "por" field.
+func (mssuo *MDSubSystemsUpdateOne) SetPor(s string) *MDSubSystemsUpdateOne {
+	mssuo.mutation.SetPor(s)
 	return mssuo
 }
 
@@ -658,11 +653,6 @@ func (mssuo *MDSubSystemsUpdateOne) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (mssuo *MDSubSystemsUpdateOne) check() error {
-	if v, ok := mssuo.mutation.Namerus(); ok {
-		if err := mdsubsystems.NamerusValidator(v); err != nil {
-			return &ValidationError{Name: "namerus", err: fmt.Errorf(`ent: validator failed for field "MDSubSystems.namerus": %w`, err)}
-		}
-	}
 	if v, ok := mssuo.mutation.Nameeng(); ok {
 		if err := mdsubsystems.NameengValidator(v); err != nil {
 			return &ValidationError{Name: "nameeng", err: fmt.Errorf(`ent: validator failed for field "MDSubSystems.nameeng": %w`, err)}
@@ -711,13 +701,6 @@ func (mssuo *MDSubSystemsUpdateOne) sqlSave(ctx context.Context) (_node *MDSubSy
 			}
 		}
 	}
-	if value, ok := mssuo.mutation.Namerus(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: mdsubsystems.FieldNamerus,
-		})
-	}
 	if value, ok := mssuo.mutation.Nameeng(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
@@ -730,6 +713,13 @@ func (mssuo *MDSubSystemsUpdateOne) sqlSave(ctx context.Context) (_node *MDSubSy
 			Type:   field.TypeString,
 			Value:  value,
 			Column: mdsubsystems.FieldSynonym,
+		})
+	}
+	if value, ok := mssuo.mutation.Por(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: mdsubsystems.FieldPor,
 		})
 	}
 	if mssuo.mutation.ChildMdsubsystemsCleared() {

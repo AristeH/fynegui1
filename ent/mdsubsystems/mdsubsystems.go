@@ -7,12 +7,12 @@ const (
 	Label = "md_sub_systems"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "ID"
-	// FieldNamerus holds the string denoting the namerus field in the database.
-	FieldNamerus = "Namerus"
 	// FieldNameeng holds the string denoting the nameeng field in the database.
 	FieldNameeng = "Nameeng"
 	// FieldSynonym holds the string denoting the synonym field in the database.
 	FieldSynonym = "Synonym"
+	// FieldPor holds the string denoting the por field in the database.
+	FieldPor = "Por"
 	// FieldParent holds the string denoting the parent field in the database.
 	FieldParent = "Parent"
 	// EdgeChildMdsubsystems holds the string denoting the child_mdsubsystems edge name in mutations.
@@ -41,9 +41,9 @@ const (
 // Columns holds all SQL columns for mdsubsystems fields.
 var Columns = []string{
 	FieldID,
-	FieldNamerus,
 	FieldNameeng,
 	FieldSynonym,
+	FieldPor,
 	FieldParent,
 }
 
@@ -64,8 +64,6 @@ func ValidColumn(column string) bool {
 }
 
 var (
-	// NamerusValidator is a validator for the "namerus" field. It is called by the builders before save.
-	NamerusValidator func(string) error
 	// NameengValidator is a validator for the "nameeng" field. It is called by the builders before save.
 	NameengValidator func(string) error
 	// SynonymValidator is a validator for the "synonym" field. It is called by the builders before save.

@@ -28,12 +28,6 @@ func (mru *MDRekvizitUpdate) Where(ps ...predicate.MDRekvizit) *MDRekvizitUpdate
 	return mru
 }
 
-// SetNamerus sets the "namerus" field.
-func (mru *MDRekvizitUpdate) SetNamerus(s string) *MDRekvizitUpdate {
-	mru.mutation.SetNamerus(s)
-	return mru
-}
-
 // SetNameeng sets the "nameeng" field.
 func (mru *MDRekvizitUpdate) SetNameeng(s string) *MDRekvizitUpdate {
 	mru.mutation.SetNameeng(s)
@@ -49,32 +43,6 @@ func (mru *MDRekvizitUpdate) SetSynonym(s string) *MDRekvizitUpdate {
 // SetPor sets the "por" field.
 func (mru *MDRekvizitUpdate) SetPor(s string) *MDRekvizitUpdate {
 	mru.mutation.SetPor(s)
-	return mru
-}
-
-// SetWidthElem sets the "widthElem" field.
-func (mru *MDRekvizitUpdate) SetWidthElem(f float64) *MDRekvizitUpdate {
-	mru.mutation.ResetWidthElem()
-	mru.mutation.SetWidthElem(f)
-	return mru
-}
-
-// AddWidthElem adds f to the "widthElem" field.
-func (mru *MDRekvizitUpdate) AddWidthElem(f float64) *MDRekvizitUpdate {
-	mru.mutation.AddWidthElem(f)
-	return mru
-}
-
-// SetWidthSpisok sets the "widthSpisok" field.
-func (mru *MDRekvizitUpdate) SetWidthSpisok(f float64) *MDRekvizitUpdate {
-	mru.mutation.ResetWidthSpisok()
-	mru.mutation.SetWidthSpisok(f)
-	return mru
-}
-
-// AddWidthSpisok adds f to the "widthSpisok" field.
-func (mru *MDRekvizitUpdate) AddWidthSpisok(f float64) *MDRekvizitUpdate {
-	mru.mutation.AddWidthSpisok(f)
 	return mru
 }
 
@@ -101,6 +69,19 @@ func (mru *MDRekvizitUpdate) SetNillableOwnerID(s *string) *MDRekvizitUpdate {
 // ClearOwnerID clears the value of the "owner_id" field.
 func (mru *MDRekvizitUpdate) ClearOwnerID() *MDRekvizitUpdate {
 	mru.mutation.ClearOwnerID()
+	return mru
+}
+
+// SetWidthSpisok sets the "widthSpisok" field.
+func (mru *MDRekvizitUpdate) SetWidthSpisok(f float64) *MDRekvizitUpdate {
+	mru.mutation.ResetWidthSpisok()
+	mru.mutation.SetWidthSpisok(f)
+	return mru
+}
+
+// AddWidthSpisok adds f to the "widthSpisok" field.
+func (mru *MDRekvizitUpdate) AddWidthSpisok(f float64) *MDRekvizitUpdate {
+	mru.mutation.AddWidthSpisok(f)
 	return mru
 }
 
@@ -182,11 +163,6 @@ func (mru *MDRekvizitUpdate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (mru *MDRekvizitUpdate) check() error {
-	if v, ok := mru.mutation.Namerus(); ok {
-		if err := mdrekvizit.NamerusValidator(v); err != nil {
-			return &ValidationError{Name: "namerus", err: fmt.Errorf(`ent: validator failed for field "MDRekvizit.namerus": %w`, err)}
-		}
-	}
 	if v, ok := mru.mutation.Nameeng(); ok {
 		if err := mdrekvizit.NameengValidator(v); err != nil {
 			return &ValidationError{Name: "nameeng", err: fmt.Errorf(`ent: validator failed for field "MDRekvizit.nameeng": %w`, err)}
@@ -233,13 +209,6 @@ func (mru *MDRekvizitUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
-	if value, ok := mru.mutation.Namerus(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: mdrekvizit.FieldNamerus,
-		})
-	}
 	if value, ok := mru.mutation.Nameeng(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
@@ -261,18 +230,11 @@ func (mru *MDRekvizitUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: mdrekvizit.FieldPor,
 		})
 	}
-	if value, ok := mru.mutation.WidthElem(); ok {
+	if value, ok := mru.mutation.GetType(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeFloat64,
+			Type:   field.TypeString,
 			Value:  value,
-			Column: mdrekvizit.FieldWidthElem,
-		})
-	}
-	if value, ok := mru.mutation.AddedWidthElem(); ok {
-		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
-			Type:   field.TypeFloat64,
-			Value:  value,
-			Column: mdrekvizit.FieldWidthElem,
+			Column: mdrekvizit.FieldType,
 		})
 	}
 	if value, ok := mru.mutation.WidthSpisok(); ok {
@@ -287,13 +249,6 @@ func (mru *MDRekvizitUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Type:   field.TypeFloat64,
 			Value:  value,
 			Column: mdrekvizit.FieldWidthSpisok,
-		})
-	}
-	if value, ok := mru.mutation.GetType(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: mdrekvizit.FieldType,
 		})
 	}
 	if mru.mutation.OwnerCleared() {
@@ -350,12 +305,6 @@ type MDRekvizitUpdateOne struct {
 	mutation *MDRekvizitMutation
 }
 
-// SetNamerus sets the "namerus" field.
-func (mruo *MDRekvizitUpdateOne) SetNamerus(s string) *MDRekvizitUpdateOne {
-	mruo.mutation.SetNamerus(s)
-	return mruo
-}
-
 // SetNameeng sets the "nameeng" field.
 func (mruo *MDRekvizitUpdateOne) SetNameeng(s string) *MDRekvizitUpdateOne {
 	mruo.mutation.SetNameeng(s)
@@ -371,32 +320,6 @@ func (mruo *MDRekvizitUpdateOne) SetSynonym(s string) *MDRekvizitUpdateOne {
 // SetPor sets the "por" field.
 func (mruo *MDRekvizitUpdateOne) SetPor(s string) *MDRekvizitUpdateOne {
 	mruo.mutation.SetPor(s)
-	return mruo
-}
-
-// SetWidthElem sets the "widthElem" field.
-func (mruo *MDRekvizitUpdateOne) SetWidthElem(f float64) *MDRekvizitUpdateOne {
-	mruo.mutation.ResetWidthElem()
-	mruo.mutation.SetWidthElem(f)
-	return mruo
-}
-
-// AddWidthElem adds f to the "widthElem" field.
-func (mruo *MDRekvizitUpdateOne) AddWidthElem(f float64) *MDRekvizitUpdateOne {
-	mruo.mutation.AddWidthElem(f)
-	return mruo
-}
-
-// SetWidthSpisok sets the "widthSpisok" field.
-func (mruo *MDRekvizitUpdateOne) SetWidthSpisok(f float64) *MDRekvizitUpdateOne {
-	mruo.mutation.ResetWidthSpisok()
-	mruo.mutation.SetWidthSpisok(f)
-	return mruo
-}
-
-// AddWidthSpisok adds f to the "widthSpisok" field.
-func (mruo *MDRekvizitUpdateOne) AddWidthSpisok(f float64) *MDRekvizitUpdateOne {
-	mruo.mutation.AddWidthSpisok(f)
 	return mruo
 }
 
@@ -423,6 +346,19 @@ func (mruo *MDRekvizitUpdateOne) SetNillableOwnerID(s *string) *MDRekvizitUpdate
 // ClearOwnerID clears the value of the "owner_id" field.
 func (mruo *MDRekvizitUpdateOne) ClearOwnerID() *MDRekvizitUpdateOne {
 	mruo.mutation.ClearOwnerID()
+	return mruo
+}
+
+// SetWidthSpisok sets the "widthSpisok" field.
+func (mruo *MDRekvizitUpdateOne) SetWidthSpisok(f float64) *MDRekvizitUpdateOne {
+	mruo.mutation.ResetWidthSpisok()
+	mruo.mutation.SetWidthSpisok(f)
+	return mruo
+}
+
+// AddWidthSpisok adds f to the "widthSpisok" field.
+func (mruo *MDRekvizitUpdateOne) AddWidthSpisok(f float64) *MDRekvizitUpdateOne {
+	mruo.mutation.AddWidthSpisok(f)
 	return mruo
 }
 
@@ -511,11 +447,6 @@ func (mruo *MDRekvizitUpdateOne) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (mruo *MDRekvizitUpdateOne) check() error {
-	if v, ok := mruo.mutation.Namerus(); ok {
-		if err := mdrekvizit.NamerusValidator(v); err != nil {
-			return &ValidationError{Name: "namerus", err: fmt.Errorf(`ent: validator failed for field "MDRekvizit.namerus": %w`, err)}
-		}
-	}
 	if v, ok := mruo.mutation.Nameeng(); ok {
 		if err := mdrekvizit.NameengValidator(v); err != nil {
 			return &ValidationError{Name: "nameeng", err: fmt.Errorf(`ent: validator failed for field "MDRekvizit.nameeng": %w`, err)}
@@ -579,13 +510,6 @@ func (mruo *MDRekvizitUpdateOne) sqlSave(ctx context.Context) (_node *MDRekvizit
 			}
 		}
 	}
-	if value, ok := mruo.mutation.Namerus(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: mdrekvizit.FieldNamerus,
-		})
-	}
 	if value, ok := mruo.mutation.Nameeng(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
@@ -607,18 +531,11 @@ func (mruo *MDRekvizitUpdateOne) sqlSave(ctx context.Context) (_node *MDRekvizit
 			Column: mdrekvizit.FieldPor,
 		})
 	}
-	if value, ok := mruo.mutation.WidthElem(); ok {
+	if value, ok := mruo.mutation.GetType(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeFloat64,
+			Type:   field.TypeString,
 			Value:  value,
-			Column: mdrekvizit.FieldWidthElem,
-		})
-	}
-	if value, ok := mruo.mutation.AddedWidthElem(); ok {
-		_spec.Fields.Add = append(_spec.Fields.Add, &sqlgraph.FieldSpec{
-			Type:   field.TypeFloat64,
-			Value:  value,
-			Column: mdrekvizit.FieldWidthElem,
+			Column: mdrekvizit.FieldType,
 		})
 	}
 	if value, ok := mruo.mutation.WidthSpisok(); ok {
@@ -633,13 +550,6 @@ func (mruo *MDRekvizitUpdateOne) sqlSave(ctx context.Context) (_node *MDRekvizit
 			Type:   field.TypeFloat64,
 			Value:  value,
 			Column: mdrekvizit.FieldWidthSpisok,
-		})
-	}
-	if value, ok := mruo.mutation.GetType(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: mdrekvizit.FieldType,
 		})
 	}
 	if mruo.mutation.OwnerCleared() {

@@ -27,6 +27,7 @@ type hooks struct {
 	MDRekvizit   []ent.Hook
 	MDSubSystems []ent.Hook
 	MDTabel      []ent.Hook
+	MDTypeTabel  []ent.Hook
 }
 
 // Options applies the options on the config object.

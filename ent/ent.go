@@ -8,6 +8,7 @@ import (
 	"fynegui/ent/mdrekvizit"
 	"fynegui/ent/mdsubsystems"
 	"fynegui/ent/mdtabel"
+	"fynegui/ent/mdtypetabel"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
@@ -34,6 +35,7 @@ func columnChecker(table string) func(string) error {
 		mdrekvizit.Table:   mdrekvizit.ValidColumn,
 		mdsubsystems.Table: mdsubsystems.ValidColumn,
 		mdtabel.Table:      mdtabel.ValidColumn,
+		mdtypetabel.Table:  mdtypetabel.ValidColumn,
 	}
 	check, ok := checks[table]
 	if !ok {

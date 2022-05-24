@@ -5,6 +5,7 @@ package ent
 import (
 	"fmt"
 	"fynegui/ent/mdtabel"
+	"fynegui/ent/mdtypetabel"
 	"strings"
 
 	"entgo.io/ent/dialect/sql"
@@ -15,16 +16,18 @@ type MDTabel struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID string `json:"ссылка,omitempty"`
-	// Namerus holds the value of the "namerus" field.
-	Namerus string `json:"ИмяРус,omitempty"`
 	// Nameeng holds the value of the "nameeng" field.
 	Nameeng string `json:"ИмяАнгл,omitempty"`
 	// Synonym holds the value of the "synonym" field.
 	Synonym string `json:"Синоним,omitempty"`
+	// Por holds the value of the "por" field.
+	Por string `json:"Порядок,omitempty"`
+	// Parent holds the value of the "parent" field.
+	Parent string `json:"Родитель,omitempty"`
+	// TypesID holds the value of the "types_id" field.
+	TypesID string `json:"types_id,omitempty"`
 	// File holds the value of the "file" field.
 	File string `json:"ИмяФайла,omitempty"`
-	// Type holds the value of the "type" field.
-	Type string `json:"Тип,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the MDTabelQuery when eager-loading is set.
 	Edges MDTabelEdges `json:"edges"`
@@ -32,19 +35,48 @@ type MDTabel struct {
 
 // MDTabelEdges holds the relations/edges for other nodes in the graph.
 type MDTabelEdges struct {
+	// ChildMdtabel holds the value of the child_mdtabel edge.
+	ChildMdtabel []*MDTabel `json:"child_mdtabel,omitempty"`
+	// ParentMdtabel holds the value of the parent_mdtabel edge.
+	ParentMdtabel *MDTabel `json:"родитель,omitempty"`
 	// Mdsubsystems holds the value of the mdsubsystems edge.
 	Mdsubsystems []*MDSubSystems `json:"mdsubsystems,omitempty"`
 	// Mdrekvizits holds the value of the mdrekvizits edge.
 	Mdrekvizits []*MDRekvizit `json:"mdrekvizits,omitempty"`
+	// Mdtypetabel holds the value of the mdtypetabel edge.
+	Mdtypetabel *MDTypeTabel `json:"mdtypetabel,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [2]bool
+	loadedTypes [5]bool
+}
+
+// ChildMdtabelOrErr returns the ChildMdtabel value or an error if the edge
+// was not loaded in eager-loading.
+func (e MDTabelEdges) ChildMdtabelOrErr() ([]*MDTabel, error) {
+	if e.loadedTypes[0] {
+		return e.ChildMdtabel, nil
+	}
+	return nil, &NotLoadedError{edge: "child_mdtabel"}
+}
+
+// ParentMdtabelOrErr returns the ParentMdtabel value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e MDTabelEdges) ParentMdtabelOrErr() (*MDTabel, error) {
+	if e.loadedTypes[1] {
+		if e.ParentMdtabel == nil {
+			// The edge parent_mdtabel was loaded in eager-loading,
+			// but was not found.
+			return nil, &NotFoundError{label: mdtabel.Label}
+		}
+		return e.ParentMdtabel, nil
+	}
+	return nil, &NotLoadedError{edge: "parent_mdtabel"}
 }
 
 // MdsubsystemsOrErr returns the Mdsubsystems value or an error if the edge
 // was not loaded in eager-loading.
 func (e MDTabelEdges) MdsubsystemsOrErr() ([]*MDSubSystems, error) {
-	if e.loadedTypes[0] {
+	if e.loadedTypes[2] {
 		return e.Mdsubsystems, nil
 	}
 	return nil, &NotLoadedError{edge: "mdsubsystems"}
@@ -53,10 +85,24 @@ func (e MDTabelEdges) MdsubsystemsOrErr() ([]*MDSubSystems, error) {
 // MdrekvizitsOrErr returns the Mdrekvizits value or an error if the edge
 // was not loaded in eager-loading.
 func (e MDTabelEdges) MdrekvizitsOrErr() ([]*MDRekvizit, error) {
-	if e.loadedTypes[1] {
+	if e.loadedTypes[3] {
 		return e.Mdrekvizits, nil
 	}
 	return nil, &NotLoadedError{edge: "mdrekvizits"}
+}
+
+// MdtypetabelOrErr returns the Mdtypetabel value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e MDTabelEdges) MdtypetabelOrErr() (*MDTypeTabel, error) {
+	if e.loadedTypes[4] {
+		if e.Mdtypetabel == nil {
+			// The edge mdtypetabel was loaded in eager-loading,
+			// but was not found.
+			return nil, &NotFoundError{label: mdtypetabel.Label}
+		}
+		return e.Mdtypetabel, nil
+	}
+	return nil, &NotLoadedError{edge: "mdtypetabel"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -64,7 +110,7 @@ func (*MDTabel) scanValues(columns []string) ([]interface{}, error) {
 	values := make([]interface{}, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case mdtabel.FieldID, mdtabel.FieldNamerus, mdtabel.FieldNameeng, mdtabel.FieldSynonym, mdtabel.FieldFile, mdtabel.FieldType:
+		case mdtabel.FieldID, mdtabel.FieldNameeng, mdtabel.FieldSynonym, mdtabel.FieldPor, mdtabel.FieldParent, mdtabel.FieldTypesID, mdtabel.FieldFile:
 			values[i] = new(sql.NullString)
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type MDTabel", columns[i])
@@ -87,12 +133,6 @@ func (mt *MDTabel) assignValues(columns []string, values []interface{}) error {
 			} else if value.Valid {
 				mt.ID = value.String
 			}
-		case mdtabel.FieldNamerus:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field namerus", values[i])
-			} else if value.Valid {
-				mt.Namerus = value.String
-			}
 		case mdtabel.FieldNameeng:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field nameeng", values[i])
@@ -105,21 +145,43 @@ func (mt *MDTabel) assignValues(columns []string, values []interface{}) error {
 			} else if value.Valid {
 				mt.Synonym = value.String
 			}
+		case mdtabel.FieldPor:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field por", values[i])
+			} else if value.Valid {
+				mt.Por = value.String
+			}
+		case mdtabel.FieldParent:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field parent", values[i])
+			} else if value.Valid {
+				mt.Parent = value.String
+			}
+		case mdtabel.FieldTypesID:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field types_id", values[i])
+			} else if value.Valid {
+				mt.TypesID = value.String
+			}
 		case mdtabel.FieldFile:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field file", values[i])
 			} else if value.Valid {
 				mt.File = value.String
 			}
-		case mdtabel.FieldType:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field type", values[i])
-			} else if value.Valid {
-				mt.Type = value.String
-			}
 		}
 	}
 	return nil
+}
+
+// QueryChildMdtabel queries the "child_mdtabel" edge of the MDTabel entity.
+func (mt *MDTabel) QueryChildMdtabel() *MDTabelQuery {
+	return (&MDTabelClient{config: mt.config}).QueryChildMdtabel(mt)
+}
+
+// QueryParentMdtabel queries the "parent_mdtabel" edge of the MDTabel entity.
+func (mt *MDTabel) QueryParentMdtabel() *MDTabelQuery {
+	return (&MDTabelClient{config: mt.config}).QueryParentMdtabel(mt)
 }
 
 // QueryMdsubsystems queries the "mdsubsystems" edge of the MDTabel entity.
@@ -130,6 +192,11 @@ func (mt *MDTabel) QueryMdsubsystems() *MDSubSystemsQuery {
 // QueryMdrekvizits queries the "mdrekvizits" edge of the MDTabel entity.
 func (mt *MDTabel) QueryMdrekvizits() *MDRekvizitQuery {
 	return (&MDTabelClient{config: mt.config}).QueryMdrekvizits(mt)
+}
+
+// QueryMdtypetabel queries the "mdtypetabel" edge of the MDTabel entity.
+func (mt *MDTabel) QueryMdtypetabel() *MDTypeTabelQuery {
+	return (&MDTabelClient{config: mt.config}).QueryMdtypetabel(mt)
 }
 
 // Update returns a builder for updating this MDTabel.
@@ -155,16 +222,18 @@ func (mt *MDTabel) String() string {
 	var builder strings.Builder
 	builder.WriteString("MDTabel(")
 	builder.WriteString(fmt.Sprintf("id=%v", mt.ID))
-	builder.WriteString(", namerus=")
-	builder.WriteString(mt.Namerus)
 	builder.WriteString(", nameeng=")
 	builder.WriteString(mt.Nameeng)
 	builder.WriteString(", synonym=")
 	builder.WriteString(mt.Synonym)
+	builder.WriteString(", por=")
+	builder.WriteString(mt.Por)
+	builder.WriteString(", parent=")
+	builder.WriteString(mt.Parent)
+	builder.WriteString(", types_id=")
+	builder.WriteString(mt.TypesID)
 	builder.WriteString(", file=")
 	builder.WriteString(mt.File)
-	builder.WriteString(", type=")
-	builder.WriteString(mt.Type)
 	builder.WriteByte(')')
 	return builder.String()
 }

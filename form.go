@@ -1,15 +1,23 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
+	"fynegui/ent/mdsubsystems"
+	"image/color"
+
 	"fyne.io/fyne/v2"
+	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
+
 	// "strconv"
 	"strings"
 )
+
+
 
 //UserForm структура описывающая форму
 type UserForm struct {
@@ -37,11 +45,12 @@ type ButtonData struct {
 
 //FormData - данные формы
 type FormData struct {
-	Entry  map[string]entryForm   // Entry  - список полей ввода формы
-	Table  map[string]*TableOtoko // Table  - список таблиц формы
-	Tree   map[string]*TreeOtoko  // Table  - список таблиц формы
-	Button map[string]ButtonData  // Button - список кнопок формы
-	W      fyne.Window
+	Entry   map[string]entryForm   // Entry  - список полей ввода формы
+	Table   map[string]*TableOtoko // Table  - список таблиц формы
+	Tree    map[string]*TreeOtoko  // Table  - список таблиц формы
+	Button  map[string]ButtonData  // Button - список кнопок формы
+	ToolBar map[string]*fyne.Container
+	W       fyne.Window
 }
 
 //FieldSection - описание поля со значением и ролью
@@ -59,7 +68,6 @@ type Form struct {
 	Fields  []byte
 	Table   []byte
 }
-
 
 // func create_form(res Message) {
 // 	var form_data Form
@@ -196,10 +204,10 @@ func FieldsCreate(id string, f []FieldSection) *fyne.Container {
 func findButton(d *widget.Button) (*ButtonData, *FormData) {
 	for _, f := range app_values {
 		for _, b := range f.Button {
-		if b.Widget == d {
-			return &b, f
+			if b.Widget == d {
+				return &b, f
+			}
 		}
-	}
 	}
 	return &ButtonData{}, &FormData{}
 }
@@ -210,17 +218,47 @@ func findButton(d *widget.Button) (*ButtonData, *FormData) {
 
 // }
 
-func ToolBarCreate(id string, but [][]string) *fyne.Container {
-	
-	fd := app_values[id]
-	fd.Button = make(map[string]ButtonData)
-	toolbar := container.New(layout.NewHBoxLayout())
+func GetMenupodsystem(fd *FormData, p string) []byte {
+	var b1 [][]string
+	ctx := context.Background()
+	f, _ := client.MDSubSystems.Query().Where(mdsubsystems.ParentEQ(p)).All(ctx)
+	for i := range f {
+		output := make([]string, 12)
+		output[ID] = f[i].ID
+		output[Nameeng] = f[i].Nameeng
+		output[Synonym] = f[i].Synonym
+		output[OrderOutput] = f[i].Por
+		output[ParentID] = f[i].Parent
+		output[Fun] = "tabl"
+		b1 = append(b1, output)
+	}
+	tb := ToolBarCreate("main", b1, color.Gray{240})
+	fd.ToolBar["main2"] = tb
+	top := container.NewVBox()
+	top.Add(fd.ToolBar["main1"])
+	top.Add(fd.ToolBar["main2"])
+	ch:= toolMain21(f[0].ID)
+	content := container.New(layout.NewBorderLayout(top, nil, ch, nil), top, ch)
+	fd.W.SetContent(content)
+	return nil
+}
 
+// ToolBarCreate - создание командной панели
+func ToolBarCreate(id string, but [][]string, color color.Color) *fyne.Container {
+	// найдем форму
+	fd := app_values[id]
+	// создадим кнопки формы
+	con := container.NewHBox()
 	for _, value := range but {
-		//	fmt.Println("Key:", key, "Value:", value)
-		d := widget.NewButtonWithIcon(value[Namerus], GetIcon(value[Namerus]), nil)
+		d := widget.NewButtonWithIcon(value[Synonym], GetIcon(value[Nameeng]), nil)
 		d.OnTapped = func() {
 			param, f := findButton(d)
+			if param.Fun == "podsystem" {
+				GetMenupodsystem(f, param.Parameters)
+			}
+			if param.Fun == "tabl" {
+				toolMain21(param.Parameters)
+			}
 			mp := strings.Split(param.Parameters, ",")
 			p := ""
 			for _, r := range mp {
@@ -236,13 +274,16 @@ func ToolBarCreate(id string, but [][]string) *fyne.Container {
 			}
 			send(mes)
 		}
-		fd.Button[value[Nameeng]] = ButtonData{Fun: "GetTable", Parameters: value[ID], Widget: d}
-		toolbar.Add(d)
+		fd.Button[value[Nameeng]] = ButtonData{Fun: value[Fun], Parameters: value[ID], Widget: d}
+		con.Add(d)
 	}
 	beans := app_values[id]
 	beans.Button = fd.Button
 	app_values[id] = beans
-	return toolbar
+	return container.New(layout.NewMaxLayout(),
+		canvas.NewRectangle(color),
+		con,
+	)
 }
 
 func GetIcon(n string) fyne.Resource {

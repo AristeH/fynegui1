@@ -47,6 +47,19 @@ func (f MDTabelFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, err
 	return f(ctx, mv)
 }
 
+// The MDTypeTabelFunc type is an adapter to allow the use of ordinary
+// function as MDTypeTabel mutator.
+type MDTypeTabelFunc func(context.Context, *ent.MDTypeTabelMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f MDTypeTabelFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.MDTypeTabelMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.MDTypeTabelMutation", m)
+	}
+	return f(ctx, mv)
+}
+
 // Condition is a hook condition function.
 type Condition func(context.Context, ent.Mutation) bool
 

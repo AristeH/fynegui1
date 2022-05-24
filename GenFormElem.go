@@ -31,8 +31,8 @@ func GenFormLayout(fd map[string]entryForm, rek []*ent.MDRekvizit) *fyne.Contain
 	var columns = make(map[float64]*widget.Form)
 	// разделим вывод
 	for _, v := range rek {
-		if _, ok := columns[v.WidthElem]; !ok {
-			columns[v.WidthElem] = widget.NewForm()
+		if _, ok := columns[v.WidthSpisok]; !ok {
+			columns[v.WidthSpisok] = widget.NewForm()
 		}
 	}
 	gri := container.New(layout.NewGridLayout(len(columns)))
@@ -43,10 +43,10 @@ func GenFormLayout(fd map[string]entryForm, rek []*ent.MDRekvizit) *fyne.Contain
 		if v.Nameeng != "id" && v.Type != "String,0" {
 			if strings.HasPrefix(v.Type, "bool") {
 				con := widget.NewCheck("", nil)
-				columns[v.WidthElem].Items = append(columns[v.WidthElem].Items, widget.NewFormItem(v.Synonym, con))
+				columns[v.WidthSpisok].Items = append(columns[v.WidthSpisok].Items, widget.NewFormItem(v.Synonym, con))
 			} else {
 				input := widget.NewEntry()
-				input.SetPlaceHolder(v.Namerus)
+				input.SetPlaceHolder(v.Nameeng)
 				fd[v.Nameeng] = entryForm{Value: "", Widget: input}
 				contentb := widget.NewButton("...", func() {
 					WriteLog("tapped")
@@ -59,7 +59,7 @@ func GenFormLayout(fd map[string]entryForm, rek []*ent.MDRekvizit) *fyne.Contain
 					// Middle
 					input,
 				)
-				columns[v.WidthElem].Items = append(columns[v.WidthElem].Items, widget.NewFormItem(v.Synonym, con))
+				columns[v.WidthSpisok].Items = append(columns[v.WidthSpisok].Items, widget.NewFormItem(v.Synonym, con))
 			}
 		}
 	}

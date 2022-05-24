@@ -12,6 +12,7 @@ import (
 	"fynegui/ent/mdrekvizit"
 	"fynegui/ent/mdsubsystems"
 	"fynegui/ent/mdtabel"
+	"fynegui/ent/mdtypetabel"
 
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
@@ -29,6 +30,8 @@ type Client struct {
 	MDSubSystems *MDSubSystemsClient
 	// MDTabel is the client for interacting with the MDTabel builders.
 	MDTabel *MDTabelClient
+	// MDTypeTabel is the client for interacting with the MDTypeTabel builders.
+	MDTypeTabel *MDTypeTabelClient
 }
 
 // NewClient creates a new client configured with the given options.
@@ -45,6 +48,7 @@ func (c *Client) init() {
 	c.MDRekvizit = NewMDRekvizitClient(c.config)
 	c.MDSubSystems = NewMDSubSystemsClient(c.config)
 	c.MDTabel = NewMDTabelClient(c.config)
+	c.MDTypeTabel = NewMDTypeTabelClient(c.config)
 }
 
 // Open opens a database/sql.DB specified by the driver name and
@@ -81,6 +85,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		MDRekvizit:   NewMDRekvizitClient(cfg),
 		MDSubSystems: NewMDSubSystemsClient(cfg),
 		MDTabel:      NewMDTabelClient(cfg),
+		MDTypeTabel:  NewMDTypeTabelClient(cfg),
 	}, nil
 }
 
@@ -103,6 +108,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		MDRekvizit:   NewMDRekvizitClient(cfg),
 		MDSubSystems: NewMDSubSystemsClient(cfg),
 		MDTabel:      NewMDTabelClient(cfg),
+		MDTypeTabel:  NewMDTypeTabelClient(cfg),
 	}, nil
 }
 
@@ -135,6 +141,7 @@ func (c *Client) Use(hooks ...Hook) {
 	c.MDRekvizit.Use(hooks...)
 	c.MDSubSystems.Use(hooks...)
 	c.MDTabel.Use(hooks...)
+	c.MDTypeTabel.Use(hooks...)
 }
 
 // MDRekvizitClient is a client for the MDRekvizit schema.
@@ -466,6 +473,38 @@ func (c *MDTabelClient) GetX(ctx context.Context, id string) *MDTabel {
 	return obj
 }
 
+// QueryChildMdtabel queries the child_mdtabel edge of a MDTabel.
+func (c *MDTabelClient) QueryChildMdtabel(mt *MDTabel) *MDTabelQuery {
+	query := &MDTabelQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := mt.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(mdtabel.Table, mdtabel.FieldID, id),
+			sqlgraph.To(mdtabel.Table, mdtabel.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, mdtabel.ChildMdtabelTable, mdtabel.ChildMdtabelColumn),
+		)
+		fromV = sqlgraph.Neighbors(mt.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryParentMdtabel queries the parent_mdtabel edge of a MDTabel.
+func (c *MDTabelClient) QueryParentMdtabel(mt *MDTabel) *MDTabelQuery {
+	query := &MDTabelQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := mt.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(mdtabel.Table, mdtabel.FieldID, id),
+			sqlgraph.To(mdtabel.Table, mdtabel.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, mdtabel.ParentMdtabelTable, mdtabel.ParentMdtabelColumn),
+		)
+		fromV = sqlgraph.Neighbors(mt.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // QueryMdsubsystems queries the mdsubsystems edge of a MDTabel.
 func (c *MDTabelClient) QueryMdsubsystems(mt *MDTabel) *MDSubSystemsQuery {
 	query := &MDSubSystemsQuery{config: c.config}
@@ -498,7 +537,161 @@ func (c *MDTabelClient) QueryMdrekvizits(mt *MDTabel) *MDRekvizitQuery {
 	return query
 }
 
+// QueryMdtypetabel queries the mdtypetabel edge of a MDTabel.
+func (c *MDTabelClient) QueryMdtypetabel(mt *MDTabel) *MDTypeTabelQuery {
+	query := &MDTypeTabelQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := mt.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(mdtabel.Table, mdtabel.FieldID, id),
+			sqlgraph.To(mdtypetabel.Table, mdtypetabel.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, mdtabel.MdtypetabelTable, mdtabel.MdtypetabelColumn),
+		)
+		fromV = sqlgraph.Neighbors(mt.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *MDTabelClient) Hooks() []Hook {
 	return c.hooks.MDTabel
+}
+
+// MDTypeTabelClient is a client for the MDTypeTabel schema.
+type MDTypeTabelClient struct {
+	config
+}
+
+// NewMDTypeTabelClient returns a client for the MDTypeTabel from the given config.
+func NewMDTypeTabelClient(c config) *MDTypeTabelClient {
+	return &MDTypeTabelClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `mdtypetabel.Hooks(f(g(h())))`.
+func (c *MDTypeTabelClient) Use(hooks ...Hook) {
+	c.hooks.MDTypeTabel = append(c.hooks.MDTypeTabel, hooks...)
+}
+
+// Create returns a create builder for MDTypeTabel.
+func (c *MDTypeTabelClient) Create() *MDTypeTabelCreate {
+	mutation := newMDTypeTabelMutation(c.config, OpCreate)
+	return &MDTypeTabelCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of MDTypeTabel entities.
+func (c *MDTypeTabelClient) CreateBulk(builders ...*MDTypeTabelCreate) *MDTypeTabelCreateBulk {
+	return &MDTypeTabelCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for MDTypeTabel.
+func (c *MDTypeTabelClient) Update() *MDTypeTabelUpdate {
+	mutation := newMDTypeTabelMutation(c.config, OpUpdate)
+	return &MDTypeTabelUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *MDTypeTabelClient) UpdateOne(mtt *MDTypeTabel) *MDTypeTabelUpdateOne {
+	mutation := newMDTypeTabelMutation(c.config, OpUpdateOne, withMDTypeTabel(mtt))
+	return &MDTypeTabelUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *MDTypeTabelClient) UpdateOneID(id string) *MDTypeTabelUpdateOne {
+	mutation := newMDTypeTabelMutation(c.config, OpUpdateOne, withMDTypeTabelID(id))
+	return &MDTypeTabelUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for MDTypeTabel.
+func (c *MDTypeTabelClient) Delete() *MDTypeTabelDelete {
+	mutation := newMDTypeTabelMutation(c.config, OpDelete)
+	return &MDTypeTabelDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a delete builder for the given entity.
+func (c *MDTypeTabelClient) DeleteOne(mtt *MDTypeTabel) *MDTypeTabelDeleteOne {
+	return c.DeleteOneID(mtt.ID)
+}
+
+// DeleteOneID returns a delete builder for the given id.
+func (c *MDTypeTabelClient) DeleteOneID(id string) *MDTypeTabelDeleteOne {
+	builder := c.Delete().Where(mdtypetabel.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &MDTypeTabelDeleteOne{builder}
+}
+
+// Query returns a query builder for MDTypeTabel.
+func (c *MDTypeTabelClient) Query() *MDTypeTabelQuery {
+	return &MDTypeTabelQuery{
+		config: c.config,
+	}
+}
+
+// Get returns a MDTypeTabel entity by its id.
+func (c *MDTypeTabelClient) Get(ctx context.Context, id string) (*MDTypeTabel, error) {
+	return c.Query().Where(mdtypetabel.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *MDTypeTabelClient) GetX(ctx context.Context, id string) *MDTypeTabel {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryChildMdtypetabels queries the child_mdtypetabels edge of a MDTypeTabel.
+func (c *MDTypeTabelClient) QueryChildMdtypetabels(mtt *MDTypeTabel) *MDTypeTabelQuery {
+	query := &MDTypeTabelQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := mtt.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(mdtypetabel.Table, mdtypetabel.FieldID, id),
+			sqlgraph.To(mdtypetabel.Table, mdtypetabel.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, mdtypetabel.ChildMdtypetabelsTable, mdtypetabel.ChildMdtypetabelsColumn),
+		)
+		fromV = sqlgraph.Neighbors(mtt.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryParentMdtypetabels queries the parent_mdtypetabels edge of a MDTypeTabel.
+func (c *MDTypeTabelClient) QueryParentMdtypetabels(mtt *MDTypeTabel) *MDTypeTabelQuery {
+	query := &MDTypeTabelQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := mtt.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(mdtypetabel.Table, mdtypetabel.FieldID, id),
+			sqlgraph.To(mdtypetabel.Table, mdtypetabel.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, mdtypetabel.ParentMdtypetabelsTable, mdtypetabel.ParentMdtypetabelsColumn),
+		)
+		fromV = sqlgraph.Neighbors(mtt.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryMdtypetabels queries the mdtypetabels edge of a MDTypeTabel.
+func (c *MDTypeTabelClient) QueryMdtypetabels(mtt *MDTypeTabel) *MDTabelQuery {
+	query := &MDTabelQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := mtt.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(mdtypetabel.Table, mdtypetabel.FieldID, id),
+			sqlgraph.To(mdtabel.Table, mdtabel.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, mdtypetabel.MdtypetabelsTable, mdtypetabel.MdtypetabelsColumn),
+		)
+		fromV = sqlgraph.Neighbors(mtt.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *MDTypeTabelClient) Hooks() []Hook {
+	return c.hooks.MDTypeTabel
 }

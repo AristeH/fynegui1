@@ -92,13 +92,6 @@ func IDLTE(id string) predicate.MDTabel {
 	})
 }
 
-// Namerus applies equality check predicate on the "namerus" field. It's identical to NamerusEQ.
-func Namerus(v string) predicate.MDTabel {
-	return predicate.MDTabel(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldNamerus), v))
-	})
-}
-
 // Nameeng applies equality check predicate on the "nameeng" field. It's identical to NameengEQ.
 func Nameeng(v string) predicate.MDTabel {
 	return predicate.MDTabel(func(s *sql.Selector) {
@@ -113,128 +106,31 @@ func Synonym(v string) predicate.MDTabel {
 	})
 }
 
+// Por applies equality check predicate on the "por" field. It's identical to PorEQ.
+func Por(v string) predicate.MDTabel {
+	return predicate.MDTabel(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldPor), v))
+	})
+}
+
+// Parent applies equality check predicate on the "parent" field. It's identical to ParentEQ.
+func Parent(v string) predicate.MDTabel {
+	return predicate.MDTabel(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldParent), v))
+	})
+}
+
+// TypesID applies equality check predicate on the "types_id" field. It's identical to TypesIDEQ.
+func TypesID(v string) predicate.MDTabel {
+	return predicate.MDTabel(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldTypesID), v))
+	})
+}
+
 // File applies equality check predicate on the "file" field. It's identical to FileEQ.
 func File(v string) predicate.MDTabel {
 	return predicate.MDTabel(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldFile), v))
-	})
-}
-
-// Type applies equality check predicate on the "type" field. It's identical to TypeEQ.
-func Type(v string) predicate.MDTabel {
-	return predicate.MDTabel(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldType), v))
-	})
-}
-
-// NamerusEQ applies the EQ predicate on the "namerus" field.
-func NamerusEQ(v string) predicate.MDTabel {
-	return predicate.MDTabel(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldNamerus), v))
-	})
-}
-
-// NamerusNEQ applies the NEQ predicate on the "namerus" field.
-func NamerusNEQ(v string) predicate.MDTabel {
-	return predicate.MDTabel(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldNamerus), v))
-	})
-}
-
-// NamerusIn applies the In predicate on the "namerus" field.
-func NamerusIn(vs ...string) predicate.MDTabel {
-	v := make([]interface{}, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.MDTabel(func(s *sql.Selector) {
-		// if not arguments were provided, append the FALSE constants,
-		// since we can't apply "IN ()". This will make this predicate falsy.
-		if len(v) == 0 {
-			s.Where(sql.False())
-			return
-		}
-		s.Where(sql.In(s.C(FieldNamerus), v...))
-	})
-}
-
-// NamerusNotIn applies the NotIn predicate on the "namerus" field.
-func NamerusNotIn(vs ...string) predicate.MDTabel {
-	v := make([]interface{}, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.MDTabel(func(s *sql.Selector) {
-		// if not arguments were provided, append the FALSE constants,
-		// since we can't apply "IN ()". This will make this predicate falsy.
-		if len(v) == 0 {
-			s.Where(sql.False())
-			return
-		}
-		s.Where(sql.NotIn(s.C(FieldNamerus), v...))
-	})
-}
-
-// NamerusGT applies the GT predicate on the "namerus" field.
-func NamerusGT(v string) predicate.MDTabel {
-	return predicate.MDTabel(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldNamerus), v))
-	})
-}
-
-// NamerusGTE applies the GTE predicate on the "namerus" field.
-func NamerusGTE(v string) predicate.MDTabel {
-	return predicate.MDTabel(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldNamerus), v))
-	})
-}
-
-// NamerusLT applies the LT predicate on the "namerus" field.
-func NamerusLT(v string) predicate.MDTabel {
-	return predicate.MDTabel(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldNamerus), v))
-	})
-}
-
-// NamerusLTE applies the LTE predicate on the "namerus" field.
-func NamerusLTE(v string) predicate.MDTabel {
-	return predicate.MDTabel(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldNamerus), v))
-	})
-}
-
-// NamerusContains applies the Contains predicate on the "namerus" field.
-func NamerusContains(v string) predicate.MDTabel {
-	return predicate.MDTabel(func(s *sql.Selector) {
-		s.Where(sql.Contains(s.C(FieldNamerus), v))
-	})
-}
-
-// NamerusHasPrefix applies the HasPrefix predicate on the "namerus" field.
-func NamerusHasPrefix(v string) predicate.MDTabel {
-	return predicate.MDTabel(func(s *sql.Selector) {
-		s.Where(sql.HasPrefix(s.C(FieldNamerus), v))
-	})
-}
-
-// NamerusHasSuffix applies the HasSuffix predicate on the "namerus" field.
-func NamerusHasSuffix(v string) predicate.MDTabel {
-	return predicate.MDTabel(func(s *sql.Selector) {
-		s.Where(sql.HasSuffix(s.C(FieldNamerus), v))
-	})
-}
-
-// NamerusEqualFold applies the EqualFold predicate on the "namerus" field.
-func NamerusEqualFold(v string) predicate.MDTabel {
-	return predicate.MDTabel(func(s *sql.Selector) {
-		s.Where(sql.EqualFold(s.C(FieldNamerus), v))
-	})
-}
-
-// NamerusContainsFold applies the ContainsFold predicate on the "namerus" field.
-func NamerusContainsFold(v string) predicate.MDTabel {
-	return predicate.MDTabel(func(s *sql.Selector) {
-		s.Where(sql.ContainsFold(s.C(FieldNamerus), v))
 	})
 }
 
@@ -460,6 +356,367 @@ func SynonymContainsFold(v string) predicate.MDTabel {
 	})
 }
 
+// PorEQ applies the EQ predicate on the "por" field.
+func PorEQ(v string) predicate.MDTabel {
+	return predicate.MDTabel(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldPor), v))
+	})
+}
+
+// PorNEQ applies the NEQ predicate on the "por" field.
+func PorNEQ(v string) predicate.MDTabel {
+	return predicate.MDTabel(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldPor), v))
+	})
+}
+
+// PorIn applies the In predicate on the "por" field.
+func PorIn(vs ...string) predicate.MDTabel {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.MDTabel(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.In(s.C(FieldPor), v...))
+	})
+}
+
+// PorNotIn applies the NotIn predicate on the "por" field.
+func PorNotIn(vs ...string) predicate.MDTabel {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.MDTabel(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.NotIn(s.C(FieldPor), v...))
+	})
+}
+
+// PorGT applies the GT predicate on the "por" field.
+func PorGT(v string) predicate.MDTabel {
+	return predicate.MDTabel(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldPor), v))
+	})
+}
+
+// PorGTE applies the GTE predicate on the "por" field.
+func PorGTE(v string) predicate.MDTabel {
+	return predicate.MDTabel(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldPor), v))
+	})
+}
+
+// PorLT applies the LT predicate on the "por" field.
+func PorLT(v string) predicate.MDTabel {
+	return predicate.MDTabel(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldPor), v))
+	})
+}
+
+// PorLTE applies the LTE predicate on the "por" field.
+func PorLTE(v string) predicate.MDTabel {
+	return predicate.MDTabel(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldPor), v))
+	})
+}
+
+// PorContains applies the Contains predicate on the "por" field.
+func PorContains(v string) predicate.MDTabel {
+	return predicate.MDTabel(func(s *sql.Selector) {
+		s.Where(sql.Contains(s.C(FieldPor), v))
+	})
+}
+
+// PorHasPrefix applies the HasPrefix predicate on the "por" field.
+func PorHasPrefix(v string) predicate.MDTabel {
+	return predicate.MDTabel(func(s *sql.Selector) {
+		s.Where(sql.HasPrefix(s.C(FieldPor), v))
+	})
+}
+
+// PorHasSuffix applies the HasSuffix predicate on the "por" field.
+func PorHasSuffix(v string) predicate.MDTabel {
+	return predicate.MDTabel(func(s *sql.Selector) {
+		s.Where(sql.HasSuffix(s.C(FieldPor), v))
+	})
+}
+
+// PorEqualFold applies the EqualFold predicate on the "por" field.
+func PorEqualFold(v string) predicate.MDTabel {
+	return predicate.MDTabel(func(s *sql.Selector) {
+		s.Where(sql.EqualFold(s.C(FieldPor), v))
+	})
+}
+
+// PorContainsFold applies the ContainsFold predicate on the "por" field.
+func PorContainsFold(v string) predicate.MDTabel {
+	return predicate.MDTabel(func(s *sql.Selector) {
+		s.Where(sql.ContainsFold(s.C(FieldPor), v))
+	})
+}
+
+// ParentEQ applies the EQ predicate on the "parent" field.
+func ParentEQ(v string) predicate.MDTabel {
+	return predicate.MDTabel(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldParent), v))
+	})
+}
+
+// ParentNEQ applies the NEQ predicate on the "parent" field.
+func ParentNEQ(v string) predicate.MDTabel {
+	return predicate.MDTabel(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldParent), v))
+	})
+}
+
+// ParentIn applies the In predicate on the "parent" field.
+func ParentIn(vs ...string) predicate.MDTabel {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.MDTabel(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.In(s.C(FieldParent), v...))
+	})
+}
+
+// ParentNotIn applies the NotIn predicate on the "parent" field.
+func ParentNotIn(vs ...string) predicate.MDTabel {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.MDTabel(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.NotIn(s.C(FieldParent), v...))
+	})
+}
+
+// ParentGT applies the GT predicate on the "parent" field.
+func ParentGT(v string) predicate.MDTabel {
+	return predicate.MDTabel(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldParent), v))
+	})
+}
+
+// ParentGTE applies the GTE predicate on the "parent" field.
+func ParentGTE(v string) predicate.MDTabel {
+	return predicate.MDTabel(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldParent), v))
+	})
+}
+
+// ParentLT applies the LT predicate on the "parent" field.
+func ParentLT(v string) predicate.MDTabel {
+	return predicate.MDTabel(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldParent), v))
+	})
+}
+
+// ParentLTE applies the LTE predicate on the "parent" field.
+func ParentLTE(v string) predicate.MDTabel {
+	return predicate.MDTabel(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldParent), v))
+	})
+}
+
+// ParentContains applies the Contains predicate on the "parent" field.
+func ParentContains(v string) predicate.MDTabel {
+	return predicate.MDTabel(func(s *sql.Selector) {
+		s.Where(sql.Contains(s.C(FieldParent), v))
+	})
+}
+
+// ParentHasPrefix applies the HasPrefix predicate on the "parent" field.
+func ParentHasPrefix(v string) predicate.MDTabel {
+	return predicate.MDTabel(func(s *sql.Selector) {
+		s.Where(sql.HasPrefix(s.C(FieldParent), v))
+	})
+}
+
+// ParentHasSuffix applies the HasSuffix predicate on the "parent" field.
+func ParentHasSuffix(v string) predicate.MDTabel {
+	return predicate.MDTabel(func(s *sql.Selector) {
+		s.Where(sql.HasSuffix(s.C(FieldParent), v))
+	})
+}
+
+// ParentIsNil applies the IsNil predicate on the "parent" field.
+func ParentIsNil() predicate.MDTabel {
+	return predicate.MDTabel(func(s *sql.Selector) {
+		s.Where(sql.IsNull(s.C(FieldParent)))
+	})
+}
+
+// ParentNotNil applies the NotNil predicate on the "parent" field.
+func ParentNotNil() predicate.MDTabel {
+	return predicate.MDTabel(func(s *sql.Selector) {
+		s.Where(sql.NotNull(s.C(FieldParent)))
+	})
+}
+
+// ParentEqualFold applies the EqualFold predicate on the "parent" field.
+func ParentEqualFold(v string) predicate.MDTabel {
+	return predicate.MDTabel(func(s *sql.Selector) {
+		s.Where(sql.EqualFold(s.C(FieldParent), v))
+	})
+}
+
+// ParentContainsFold applies the ContainsFold predicate on the "parent" field.
+func ParentContainsFold(v string) predicate.MDTabel {
+	return predicate.MDTabel(func(s *sql.Selector) {
+		s.Where(sql.ContainsFold(s.C(FieldParent), v))
+	})
+}
+
+// TypesIDEQ applies the EQ predicate on the "types_id" field.
+func TypesIDEQ(v string) predicate.MDTabel {
+	return predicate.MDTabel(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldTypesID), v))
+	})
+}
+
+// TypesIDNEQ applies the NEQ predicate on the "types_id" field.
+func TypesIDNEQ(v string) predicate.MDTabel {
+	return predicate.MDTabel(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldTypesID), v))
+	})
+}
+
+// TypesIDIn applies the In predicate on the "types_id" field.
+func TypesIDIn(vs ...string) predicate.MDTabel {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.MDTabel(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.In(s.C(FieldTypesID), v...))
+	})
+}
+
+// TypesIDNotIn applies the NotIn predicate on the "types_id" field.
+func TypesIDNotIn(vs ...string) predicate.MDTabel {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.MDTabel(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.NotIn(s.C(FieldTypesID), v...))
+	})
+}
+
+// TypesIDGT applies the GT predicate on the "types_id" field.
+func TypesIDGT(v string) predicate.MDTabel {
+	return predicate.MDTabel(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldTypesID), v))
+	})
+}
+
+// TypesIDGTE applies the GTE predicate on the "types_id" field.
+func TypesIDGTE(v string) predicate.MDTabel {
+	return predicate.MDTabel(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldTypesID), v))
+	})
+}
+
+// TypesIDLT applies the LT predicate on the "types_id" field.
+func TypesIDLT(v string) predicate.MDTabel {
+	return predicate.MDTabel(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldTypesID), v))
+	})
+}
+
+// TypesIDLTE applies the LTE predicate on the "types_id" field.
+func TypesIDLTE(v string) predicate.MDTabel {
+	return predicate.MDTabel(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldTypesID), v))
+	})
+}
+
+// TypesIDContains applies the Contains predicate on the "types_id" field.
+func TypesIDContains(v string) predicate.MDTabel {
+	return predicate.MDTabel(func(s *sql.Selector) {
+		s.Where(sql.Contains(s.C(FieldTypesID), v))
+	})
+}
+
+// TypesIDHasPrefix applies the HasPrefix predicate on the "types_id" field.
+func TypesIDHasPrefix(v string) predicate.MDTabel {
+	return predicate.MDTabel(func(s *sql.Selector) {
+		s.Where(sql.HasPrefix(s.C(FieldTypesID), v))
+	})
+}
+
+// TypesIDHasSuffix applies the HasSuffix predicate on the "types_id" field.
+func TypesIDHasSuffix(v string) predicate.MDTabel {
+	return predicate.MDTabel(func(s *sql.Selector) {
+		s.Where(sql.HasSuffix(s.C(FieldTypesID), v))
+	})
+}
+
+// TypesIDIsNil applies the IsNil predicate on the "types_id" field.
+func TypesIDIsNil() predicate.MDTabel {
+	return predicate.MDTabel(func(s *sql.Selector) {
+		s.Where(sql.IsNull(s.C(FieldTypesID)))
+	})
+}
+
+// TypesIDNotNil applies the NotNil predicate on the "types_id" field.
+func TypesIDNotNil() predicate.MDTabel {
+	return predicate.MDTabel(func(s *sql.Selector) {
+		s.Where(sql.NotNull(s.C(FieldTypesID)))
+	})
+}
+
+// TypesIDEqualFold applies the EqualFold predicate on the "types_id" field.
+func TypesIDEqualFold(v string) predicate.MDTabel {
+	return predicate.MDTabel(func(s *sql.Selector) {
+		s.Where(sql.EqualFold(s.C(FieldTypesID), v))
+	})
+}
+
+// TypesIDContainsFold applies the ContainsFold predicate on the "types_id" field.
+func TypesIDContainsFold(v string) predicate.MDTabel {
+	return predicate.MDTabel(func(s *sql.Selector) {
+		s.Where(sql.ContainsFold(s.C(FieldTypesID), v))
+	})
+}
+
 // FileEQ applies the EQ predicate on the "file" field.
 func FileEQ(v string) predicate.MDTabel {
 	return predicate.MDTabel(func(s *sql.Selector) {
@@ -571,114 +828,59 @@ func FileContainsFold(v string) predicate.MDTabel {
 	})
 }
 
-// TypeEQ applies the EQ predicate on the "type" field.
-func TypeEQ(v string) predicate.MDTabel {
+// HasChildMdtabel applies the HasEdge predicate on the "child_mdtabel" edge.
+func HasChildMdtabel() predicate.MDTabel {
 	return predicate.MDTabel(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldType), v))
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(ChildMdtabelTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, ChildMdtabelTable, ChildMdtabelColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// TypeNEQ applies the NEQ predicate on the "type" field.
-func TypeNEQ(v string) predicate.MDTabel {
+// HasChildMdtabelWith applies the HasEdge predicate on the "child_mdtabel" edge with a given conditions (other predicates).
+func HasChildMdtabelWith(preds ...predicate.MDTabel) predicate.MDTabel {
 	return predicate.MDTabel(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldType), v))
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, ChildMdtabelTable, ChildMdtabelColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
 	})
 }
 
-// TypeIn applies the In predicate on the "type" field.
-func TypeIn(vs ...string) predicate.MDTabel {
-	v := make([]interface{}, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
+// HasParentMdtabel applies the HasEdge predicate on the "parent_mdtabel" edge.
+func HasParentMdtabel() predicate.MDTabel {
 	return predicate.MDTabel(func(s *sql.Selector) {
-		// if not arguments were provided, append the FALSE constants,
-		// since we can't apply "IN ()". This will make this predicate falsy.
-		if len(v) == 0 {
-			s.Where(sql.False())
-			return
-		}
-		s.Where(sql.In(s.C(FieldType), v...))
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(ParentMdtabelTable, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, ParentMdtabelTable, ParentMdtabelColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// TypeNotIn applies the NotIn predicate on the "type" field.
-func TypeNotIn(vs ...string) predicate.MDTabel {
-	v := make([]interface{}, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
+// HasParentMdtabelWith applies the HasEdge predicate on the "parent_mdtabel" edge with a given conditions (other predicates).
+func HasParentMdtabelWith(preds ...predicate.MDTabel) predicate.MDTabel {
 	return predicate.MDTabel(func(s *sql.Selector) {
-		// if not arguments were provided, append the FALSE constants,
-		// since we can't apply "IN ()". This will make this predicate falsy.
-		if len(v) == 0 {
-			s.Where(sql.False())
-			return
-		}
-		s.Where(sql.NotIn(s.C(FieldType), v...))
-	})
-}
-
-// TypeGT applies the GT predicate on the "type" field.
-func TypeGT(v string) predicate.MDTabel {
-	return predicate.MDTabel(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldType), v))
-	})
-}
-
-// TypeGTE applies the GTE predicate on the "type" field.
-func TypeGTE(v string) predicate.MDTabel {
-	return predicate.MDTabel(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldType), v))
-	})
-}
-
-// TypeLT applies the LT predicate on the "type" field.
-func TypeLT(v string) predicate.MDTabel {
-	return predicate.MDTabel(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldType), v))
-	})
-}
-
-// TypeLTE applies the LTE predicate on the "type" field.
-func TypeLTE(v string) predicate.MDTabel {
-	return predicate.MDTabel(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldType), v))
-	})
-}
-
-// TypeContains applies the Contains predicate on the "type" field.
-func TypeContains(v string) predicate.MDTabel {
-	return predicate.MDTabel(func(s *sql.Selector) {
-		s.Where(sql.Contains(s.C(FieldType), v))
-	})
-}
-
-// TypeHasPrefix applies the HasPrefix predicate on the "type" field.
-func TypeHasPrefix(v string) predicate.MDTabel {
-	return predicate.MDTabel(func(s *sql.Selector) {
-		s.Where(sql.HasPrefix(s.C(FieldType), v))
-	})
-}
-
-// TypeHasSuffix applies the HasSuffix predicate on the "type" field.
-func TypeHasSuffix(v string) predicate.MDTabel {
-	return predicate.MDTabel(func(s *sql.Selector) {
-		s.Where(sql.HasSuffix(s.C(FieldType), v))
-	})
-}
-
-// TypeEqualFold applies the EqualFold predicate on the "type" field.
-func TypeEqualFold(v string) predicate.MDTabel {
-	return predicate.MDTabel(func(s *sql.Selector) {
-		s.Where(sql.EqualFold(s.C(FieldType), v))
-	})
-}
-
-// TypeContainsFold applies the ContainsFold predicate on the "type" field.
-func TypeContainsFold(v string) predicate.MDTabel {
-	return predicate.MDTabel(func(s *sql.Selector) {
-		s.Where(sql.ContainsFold(s.C(FieldType), v))
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, ParentMdtabelTable, ParentMdtabelColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
 	})
 }
 
@@ -729,6 +931,34 @@ func HasMdrekvizitsWith(preds ...predicate.MDRekvizit) predicate.MDTabel {
 			sqlgraph.From(Table, FieldID),
 			sqlgraph.To(MdrekvizitsInverseTable, FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, MdrekvizitsTable, MdrekvizitsColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasMdtypetabel applies the HasEdge predicate on the "mdtypetabel" edge.
+func HasMdtypetabel() predicate.MDTabel {
+	return predicate.MDTabel(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(MdtypetabelTable, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, MdtypetabelTable, MdtypetabelColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasMdtypetabelWith applies the HasEdge predicate on the "mdtypetabel" edge with a given conditions (other predicates).
+func HasMdtypetabelWith(preds ...predicate.MDTypeTabel) predicate.MDTabel {
+	return predicate.MDTabel(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(MdtypetabelInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, MdtypetabelTable, MdtypetabelColumn),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {

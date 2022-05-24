@@ -23,12 +23,6 @@ type MDSubSystemsCreate struct {
 	conflict []sql.ConflictOption
 }
 
-// SetNamerus sets the "namerus" field.
-func (mssc *MDSubSystemsCreate) SetNamerus(s string) *MDSubSystemsCreate {
-	mssc.mutation.SetNamerus(s)
-	return mssc
-}
-
 // SetNameeng sets the "nameeng" field.
 func (mssc *MDSubSystemsCreate) SetNameeng(s string) *MDSubSystemsCreate {
 	mssc.mutation.SetNameeng(s)
@@ -38,6 +32,12 @@ func (mssc *MDSubSystemsCreate) SetNameeng(s string) *MDSubSystemsCreate {
 // SetSynonym sets the "synonym" field.
 func (mssc *MDSubSystemsCreate) SetSynonym(s string) *MDSubSystemsCreate {
 	mssc.mutation.SetSynonym(s)
+	return mssc
+}
+
+// SetPor sets the "por" field.
+func (mssc *MDSubSystemsCreate) SetPor(s string) *MDSubSystemsCreate {
+	mssc.mutation.SetPor(s)
 	return mssc
 }
 
@@ -180,14 +180,6 @@ func (mssc *MDSubSystemsCreate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (mssc *MDSubSystemsCreate) check() error {
-	if _, ok := mssc.mutation.Namerus(); !ok {
-		return &ValidationError{Name: "namerus", err: errors.New(`ent: missing required field "MDSubSystems.namerus"`)}
-	}
-	if v, ok := mssc.mutation.Namerus(); ok {
-		if err := mdsubsystems.NamerusValidator(v); err != nil {
-			return &ValidationError{Name: "namerus", err: fmt.Errorf(`ent: validator failed for field "MDSubSystems.namerus": %w`, err)}
-		}
-	}
 	if _, ok := mssc.mutation.Nameeng(); !ok {
 		return &ValidationError{Name: "nameeng", err: errors.New(`ent: missing required field "MDSubSystems.nameeng"`)}
 	}
@@ -203,6 +195,9 @@ func (mssc *MDSubSystemsCreate) check() error {
 		if err := mdsubsystems.SynonymValidator(v); err != nil {
 			return &ValidationError{Name: "synonym", err: fmt.Errorf(`ent: validator failed for field "MDSubSystems.synonym": %w`, err)}
 		}
+	}
+	if _, ok := mssc.mutation.Por(); !ok {
+		return &ValidationError{Name: "por", err: errors.New(`ent: missing required field "MDSubSystems.por"`)}
 	}
 	if v, ok := mssc.mutation.ID(); ok {
 		if err := mdsubsystems.IDValidator(v); err != nil {
@@ -246,14 +241,6 @@ func (mssc *MDSubSystemsCreate) createSpec() (*MDSubSystems, *sqlgraph.CreateSpe
 		_node.ID = id
 		_spec.ID.Value = id
 	}
-	if value, ok := mssc.mutation.Namerus(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: mdsubsystems.FieldNamerus,
-		})
-		_node.Namerus = value
-	}
 	if value, ok := mssc.mutation.Nameeng(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
@@ -269,6 +256,14 @@ func (mssc *MDSubSystemsCreate) createSpec() (*MDSubSystems, *sqlgraph.CreateSpe
 			Column: mdsubsystems.FieldSynonym,
 		})
 		_node.Synonym = value
+	}
+	if value, ok := mssc.mutation.Por(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: mdsubsystems.FieldPor,
+		})
+		_node.Por = value
 	}
 	if nodes := mssc.mutation.ChildMdsubsystemsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -335,7 +330,7 @@ func (mssc *MDSubSystemsCreate) createSpec() (*MDSubSystems, *sqlgraph.CreateSpe
 // of the `INSERT` statement. For example:
 //
 //	client.MDSubSystems.Create().
-//		SetNamerus(v).
+//		SetNameeng(v).
 //		OnConflict(
 //			// Update the row with the new values
 //			// the was proposed for insertion.
@@ -344,7 +339,7 @@ func (mssc *MDSubSystemsCreate) createSpec() (*MDSubSystems, *sqlgraph.CreateSpe
 //		// Override some of the fields with custom
 //		// update values.
 //		Update(func(u *ent.MDSubSystemsUpsert) {
-//			SetNamerus(v+v).
+//			SetNameeng(v+v).
 //		}).
 //		Exec(ctx)
 //
@@ -382,18 +377,6 @@ type (
 	}
 )
 
-// SetNamerus sets the "namerus" field.
-func (u *MDSubSystemsUpsert) SetNamerus(v string) *MDSubSystemsUpsert {
-	u.Set(mdsubsystems.FieldNamerus, v)
-	return u
-}
-
-// UpdateNamerus sets the "namerus" field to the value that was provided on create.
-func (u *MDSubSystemsUpsert) UpdateNamerus() *MDSubSystemsUpsert {
-	u.SetExcluded(mdsubsystems.FieldNamerus)
-	return u
-}
-
 // SetNameeng sets the "nameeng" field.
 func (u *MDSubSystemsUpsert) SetNameeng(v string) *MDSubSystemsUpsert {
 	u.Set(mdsubsystems.FieldNameeng, v)
@@ -415,6 +398,18 @@ func (u *MDSubSystemsUpsert) SetSynonym(v string) *MDSubSystemsUpsert {
 // UpdateSynonym sets the "synonym" field to the value that was provided on create.
 func (u *MDSubSystemsUpsert) UpdateSynonym() *MDSubSystemsUpsert {
 	u.SetExcluded(mdsubsystems.FieldSynonym)
+	return u
+}
+
+// SetPor sets the "por" field.
+func (u *MDSubSystemsUpsert) SetPor(v string) *MDSubSystemsUpsert {
+	u.Set(mdsubsystems.FieldPor, v)
+	return u
+}
+
+// UpdatePor sets the "por" field to the value that was provided on create.
+func (u *MDSubSystemsUpsert) UpdatePor() *MDSubSystemsUpsert {
+	u.SetExcluded(mdsubsystems.FieldPor)
 	return u
 }
 
@@ -486,20 +481,6 @@ func (u *MDSubSystemsUpsertOne) Update(set func(*MDSubSystemsUpsert)) *MDSubSyst
 	return u
 }
 
-// SetNamerus sets the "namerus" field.
-func (u *MDSubSystemsUpsertOne) SetNamerus(v string) *MDSubSystemsUpsertOne {
-	return u.Update(func(s *MDSubSystemsUpsert) {
-		s.SetNamerus(v)
-	})
-}
-
-// UpdateNamerus sets the "namerus" field to the value that was provided on create.
-func (u *MDSubSystemsUpsertOne) UpdateNamerus() *MDSubSystemsUpsertOne {
-	return u.Update(func(s *MDSubSystemsUpsert) {
-		s.UpdateNamerus()
-	})
-}
-
 // SetNameeng sets the "nameeng" field.
 func (u *MDSubSystemsUpsertOne) SetNameeng(v string) *MDSubSystemsUpsertOne {
 	return u.Update(func(s *MDSubSystemsUpsert) {
@@ -525,6 +506,20 @@ func (u *MDSubSystemsUpsertOne) SetSynonym(v string) *MDSubSystemsUpsertOne {
 func (u *MDSubSystemsUpsertOne) UpdateSynonym() *MDSubSystemsUpsertOne {
 	return u.Update(func(s *MDSubSystemsUpsert) {
 		s.UpdateSynonym()
+	})
+}
+
+// SetPor sets the "por" field.
+func (u *MDSubSystemsUpsertOne) SetPor(v string) *MDSubSystemsUpsertOne {
+	return u.Update(func(s *MDSubSystemsUpsert) {
+		s.SetPor(v)
+	})
+}
+
+// UpdatePor sets the "por" field to the value that was provided on create.
+func (u *MDSubSystemsUpsertOne) UpdatePor() *MDSubSystemsUpsertOne {
+	return u.Update(func(s *MDSubSystemsUpsert) {
+		s.UpdatePor()
 	})
 }
 
@@ -680,7 +675,7 @@ func (msscb *MDSubSystemsCreateBulk) ExecX(ctx context.Context) {
 //		// Override some of the fields with custom
 //		// update values.
 //		Update(func(u *ent.MDSubSystemsUpsert) {
-//			SetNamerus(v+v).
+//			SetNameeng(v+v).
 //		}).
 //		Exec(ctx)
 //
@@ -764,20 +759,6 @@ func (u *MDSubSystemsUpsertBulk) Update(set func(*MDSubSystemsUpsert)) *MDSubSys
 	return u
 }
 
-// SetNamerus sets the "namerus" field.
-func (u *MDSubSystemsUpsertBulk) SetNamerus(v string) *MDSubSystemsUpsertBulk {
-	return u.Update(func(s *MDSubSystemsUpsert) {
-		s.SetNamerus(v)
-	})
-}
-
-// UpdateNamerus sets the "namerus" field to the value that was provided on create.
-func (u *MDSubSystemsUpsertBulk) UpdateNamerus() *MDSubSystemsUpsertBulk {
-	return u.Update(func(s *MDSubSystemsUpsert) {
-		s.UpdateNamerus()
-	})
-}
-
 // SetNameeng sets the "nameeng" field.
 func (u *MDSubSystemsUpsertBulk) SetNameeng(v string) *MDSubSystemsUpsertBulk {
 	return u.Update(func(s *MDSubSystemsUpsert) {
@@ -803,6 +784,20 @@ func (u *MDSubSystemsUpsertBulk) SetSynonym(v string) *MDSubSystemsUpsertBulk {
 func (u *MDSubSystemsUpsertBulk) UpdateSynonym() *MDSubSystemsUpsertBulk {
 	return u.Update(func(s *MDSubSystemsUpsert) {
 		s.UpdateSynonym()
+	})
+}
+
+// SetPor sets the "por" field.
+func (u *MDSubSystemsUpsertBulk) SetPor(v string) *MDSubSystemsUpsertBulk {
+	return u.Update(func(s *MDSubSystemsUpsert) {
+		s.SetPor(v)
+	})
+}
+
+// UpdatePor sets the "por" field to the value that was provided on create.
+func (u *MDSubSystemsUpsertBulk) UpdatePor() *MDSubSystemsUpsertBulk {
+	return u.Update(func(s *MDSubSystemsUpsert) {
+		s.UpdatePor()
 	})
 }
 

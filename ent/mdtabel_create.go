@@ -9,6 +9,7 @@ import (
 	"fynegui/ent/mdrekvizit"
 	"fynegui/ent/mdsubsystems"
 	"fynegui/ent/mdtabel"
+	"fynegui/ent/mdtypetabel"
 
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
@@ -24,12 +25,6 @@ type MDTabelCreate struct {
 	conflict []sql.ConflictOption
 }
 
-// SetNamerus sets the "namerus" field.
-func (mtc *MDTabelCreate) SetNamerus(s string) *MDTabelCreate {
-	mtc.mutation.SetNamerus(s)
-	return mtc
-}
-
 // SetNameeng sets the "nameeng" field.
 func (mtc *MDTabelCreate) SetNameeng(s string) *MDTabelCreate {
 	mtc.mutation.SetNameeng(s)
@@ -42,15 +37,43 @@ func (mtc *MDTabelCreate) SetSynonym(s string) *MDTabelCreate {
 	return mtc
 }
 
-// SetFile sets the "file" field.
-func (mtc *MDTabelCreate) SetFile(s string) *MDTabelCreate {
-	mtc.mutation.SetFile(s)
+// SetPor sets the "por" field.
+func (mtc *MDTabelCreate) SetPor(s string) *MDTabelCreate {
+	mtc.mutation.SetPor(s)
 	return mtc
 }
 
-// SetType sets the "type" field.
-func (mtc *MDTabelCreate) SetType(s string) *MDTabelCreate {
-	mtc.mutation.SetType(s)
+// SetParent sets the "parent" field.
+func (mtc *MDTabelCreate) SetParent(s string) *MDTabelCreate {
+	mtc.mutation.SetParent(s)
+	return mtc
+}
+
+// SetNillableParent sets the "parent" field if the given value is not nil.
+func (mtc *MDTabelCreate) SetNillableParent(s *string) *MDTabelCreate {
+	if s != nil {
+		mtc.SetParent(*s)
+	}
+	return mtc
+}
+
+// SetTypesID sets the "types_id" field.
+func (mtc *MDTabelCreate) SetTypesID(s string) *MDTabelCreate {
+	mtc.mutation.SetTypesID(s)
+	return mtc
+}
+
+// SetNillableTypesID sets the "types_id" field if the given value is not nil.
+func (mtc *MDTabelCreate) SetNillableTypesID(s *string) *MDTabelCreate {
+	if s != nil {
+		mtc.SetTypesID(*s)
+	}
+	return mtc
+}
+
+// SetFile sets the "file" field.
+func (mtc *MDTabelCreate) SetFile(s string) *MDTabelCreate {
+	mtc.mutation.SetFile(s)
 	return mtc
 }
 
@@ -58,6 +81,40 @@ func (mtc *MDTabelCreate) SetType(s string) *MDTabelCreate {
 func (mtc *MDTabelCreate) SetID(s string) *MDTabelCreate {
 	mtc.mutation.SetID(s)
 	return mtc
+}
+
+// AddChildMdtabelIDs adds the "child_mdtabel" edge to the MDTabel entity by IDs.
+func (mtc *MDTabelCreate) AddChildMdtabelIDs(ids ...string) *MDTabelCreate {
+	mtc.mutation.AddChildMdtabelIDs(ids...)
+	return mtc
+}
+
+// AddChildMdtabel adds the "child_mdtabel" edges to the MDTabel entity.
+func (mtc *MDTabelCreate) AddChildMdtabel(m ...*MDTabel) *MDTabelCreate {
+	ids := make([]string, len(m))
+	for i := range m {
+		ids[i] = m[i].ID
+	}
+	return mtc.AddChildMdtabelIDs(ids...)
+}
+
+// SetParentMdtabelID sets the "parent_mdtabel" edge to the MDTabel entity by ID.
+func (mtc *MDTabelCreate) SetParentMdtabelID(id string) *MDTabelCreate {
+	mtc.mutation.SetParentMdtabelID(id)
+	return mtc
+}
+
+// SetNillableParentMdtabelID sets the "parent_mdtabel" edge to the MDTabel entity by ID if the given value is not nil.
+func (mtc *MDTabelCreate) SetNillableParentMdtabelID(id *string) *MDTabelCreate {
+	if id != nil {
+		mtc = mtc.SetParentMdtabelID(*id)
+	}
+	return mtc
+}
+
+// SetParentMdtabel sets the "parent_mdtabel" edge to the MDTabel entity.
+func (mtc *MDTabelCreate) SetParentMdtabel(m *MDTabel) *MDTabelCreate {
+	return mtc.SetParentMdtabelID(m.ID)
 }
 
 // AddMdsubsystemIDs adds the "mdsubsystems" edge to the MDSubSystems entity by IDs.
@@ -88,6 +145,25 @@ func (mtc *MDTabelCreate) AddMdrekvizits(m ...*MDRekvizit) *MDTabelCreate {
 		ids[i] = m[i].ID
 	}
 	return mtc.AddMdrekvizitIDs(ids...)
+}
+
+// SetMdtypetabelID sets the "mdtypetabel" edge to the MDTypeTabel entity by ID.
+func (mtc *MDTabelCreate) SetMdtypetabelID(id string) *MDTabelCreate {
+	mtc.mutation.SetMdtypetabelID(id)
+	return mtc
+}
+
+// SetNillableMdtypetabelID sets the "mdtypetabel" edge to the MDTypeTabel entity by ID if the given value is not nil.
+func (mtc *MDTabelCreate) SetNillableMdtypetabelID(id *string) *MDTabelCreate {
+	if id != nil {
+		mtc = mtc.SetMdtypetabelID(*id)
+	}
+	return mtc
+}
+
+// SetMdtypetabel sets the "mdtypetabel" edge to the MDTypeTabel entity.
+func (mtc *MDTabelCreate) SetMdtypetabel(m *MDTypeTabel) *MDTabelCreate {
+	return mtc.SetMdtypetabelID(m.ID)
 }
 
 // Mutation returns the MDTabelMutation object of the builder.
@@ -160,14 +236,6 @@ func (mtc *MDTabelCreate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (mtc *MDTabelCreate) check() error {
-	if _, ok := mtc.mutation.Namerus(); !ok {
-		return &ValidationError{Name: "namerus", err: errors.New(`ent: missing required field "MDTabel.namerus"`)}
-	}
-	if v, ok := mtc.mutation.Namerus(); ok {
-		if err := mdtabel.NamerusValidator(v); err != nil {
-			return &ValidationError{Name: "namerus", err: fmt.Errorf(`ent: validator failed for field "MDTabel.namerus": %w`, err)}
-		}
-	}
 	if _, ok := mtc.mutation.Nameeng(); !ok {
 		return &ValidationError{Name: "nameeng", err: errors.New(`ent: missing required field "MDTabel.nameeng"`)}
 	}
@@ -184,20 +252,20 @@ func (mtc *MDTabelCreate) check() error {
 			return &ValidationError{Name: "synonym", err: fmt.Errorf(`ent: validator failed for field "MDTabel.synonym": %w`, err)}
 		}
 	}
+	if _, ok := mtc.mutation.Por(); !ok {
+		return &ValidationError{Name: "por", err: errors.New(`ent: missing required field "MDTabel.por"`)}
+	}
+	if v, ok := mtc.mutation.TypesID(); ok {
+		if err := mdtabel.TypesIDValidator(v); err != nil {
+			return &ValidationError{Name: "types_id", err: fmt.Errorf(`ent: validator failed for field "MDTabel.types_id": %w`, err)}
+		}
+	}
 	if _, ok := mtc.mutation.File(); !ok {
 		return &ValidationError{Name: "file", err: errors.New(`ent: missing required field "MDTabel.file"`)}
 	}
 	if v, ok := mtc.mutation.File(); ok {
 		if err := mdtabel.FileValidator(v); err != nil {
 			return &ValidationError{Name: "file", err: fmt.Errorf(`ent: validator failed for field "MDTabel.file": %w`, err)}
-		}
-	}
-	if _, ok := mtc.mutation.GetType(); !ok {
-		return &ValidationError{Name: "type", err: errors.New(`ent: missing required field "MDTabel.type"`)}
-	}
-	if v, ok := mtc.mutation.GetType(); ok {
-		if err := mdtabel.TypeValidator(v); err != nil {
-			return &ValidationError{Name: "type", err: fmt.Errorf(`ent: validator failed for field "MDTabel.type": %w`, err)}
 		}
 	}
 	if v, ok := mtc.mutation.ID(); ok {
@@ -242,14 +310,6 @@ func (mtc *MDTabelCreate) createSpec() (*MDTabel, *sqlgraph.CreateSpec) {
 		_node.ID = id
 		_spec.ID.Value = id
 	}
-	if value, ok := mtc.mutation.Namerus(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: mdtabel.FieldNamerus,
-		})
-		_node.Namerus = value
-	}
 	if value, ok := mtc.mutation.Nameeng(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
@@ -266,6 +326,14 @@ func (mtc *MDTabelCreate) createSpec() (*MDTabel, *sqlgraph.CreateSpec) {
 		})
 		_node.Synonym = value
 	}
+	if value, ok := mtc.mutation.Por(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: mdtabel.FieldPor,
+		})
+		_node.Por = value
+	}
 	if value, ok := mtc.mutation.File(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
@@ -274,13 +342,44 @@ func (mtc *MDTabelCreate) createSpec() (*MDTabel, *sqlgraph.CreateSpec) {
 		})
 		_node.File = value
 	}
-	if value, ok := mtc.mutation.GetType(); ok {
-		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: mdtabel.FieldType,
-		})
-		_node.Type = value
+	if nodes := mtc.mutation.ChildMdtabelIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   mdtabel.ChildMdtabelTable,
+			Columns: []string{mdtabel.ChildMdtabelColumn},
+			Bidi:    true,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeString,
+					Column: mdtabel.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := mtc.mutation.ParentMdtabelIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   mdtabel.ParentMdtabelTable,
+			Columns: []string{mdtabel.ParentMdtabelColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeString,
+					Column: mdtabel.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.Parent = nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := mtc.mutation.MdsubsystemsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -320,6 +419,26 @@ func (mtc *MDTabelCreate) createSpec() (*MDTabel, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
+	if nodes := mtc.mutation.MdtypetabelIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   mdtabel.MdtypetabelTable,
+			Columns: []string{mdtabel.MdtypetabelColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeString,
+					Column: mdtypetabel.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.TypesID = nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
 	return _node, _spec
 }
 
@@ -327,7 +446,7 @@ func (mtc *MDTabelCreate) createSpec() (*MDTabel, *sqlgraph.CreateSpec) {
 // of the `INSERT` statement. For example:
 //
 //	client.MDTabel.Create().
-//		SetNamerus(v).
+//		SetNameeng(v).
 //		OnConflict(
 //			// Update the row with the new values
 //			// the was proposed for insertion.
@@ -336,7 +455,7 @@ func (mtc *MDTabelCreate) createSpec() (*MDTabel, *sqlgraph.CreateSpec) {
 //		// Override some of the fields with custom
 //		// update values.
 //		Update(func(u *ent.MDTabelUpsert) {
-//			SetNamerus(v+v).
+//			SetNameeng(v+v).
 //		}).
 //		Exec(ctx)
 //
@@ -374,18 +493,6 @@ type (
 	}
 )
 
-// SetNamerus sets the "namerus" field.
-func (u *MDTabelUpsert) SetNamerus(v string) *MDTabelUpsert {
-	u.Set(mdtabel.FieldNamerus, v)
-	return u
-}
-
-// UpdateNamerus sets the "namerus" field to the value that was provided on create.
-func (u *MDTabelUpsert) UpdateNamerus() *MDTabelUpsert {
-	u.SetExcluded(mdtabel.FieldNamerus)
-	return u
-}
-
 // SetNameeng sets the "nameeng" field.
 func (u *MDTabelUpsert) SetNameeng(v string) *MDTabelUpsert {
 	u.Set(mdtabel.FieldNameeng, v)
@@ -410,6 +517,54 @@ func (u *MDTabelUpsert) UpdateSynonym() *MDTabelUpsert {
 	return u
 }
 
+// SetPor sets the "por" field.
+func (u *MDTabelUpsert) SetPor(v string) *MDTabelUpsert {
+	u.Set(mdtabel.FieldPor, v)
+	return u
+}
+
+// UpdatePor sets the "por" field to the value that was provided on create.
+func (u *MDTabelUpsert) UpdatePor() *MDTabelUpsert {
+	u.SetExcluded(mdtabel.FieldPor)
+	return u
+}
+
+// SetParent sets the "parent" field.
+func (u *MDTabelUpsert) SetParent(v string) *MDTabelUpsert {
+	u.Set(mdtabel.FieldParent, v)
+	return u
+}
+
+// UpdateParent sets the "parent" field to the value that was provided on create.
+func (u *MDTabelUpsert) UpdateParent() *MDTabelUpsert {
+	u.SetExcluded(mdtabel.FieldParent)
+	return u
+}
+
+// ClearParent clears the value of the "parent" field.
+func (u *MDTabelUpsert) ClearParent() *MDTabelUpsert {
+	u.SetNull(mdtabel.FieldParent)
+	return u
+}
+
+// SetTypesID sets the "types_id" field.
+func (u *MDTabelUpsert) SetTypesID(v string) *MDTabelUpsert {
+	u.Set(mdtabel.FieldTypesID, v)
+	return u
+}
+
+// UpdateTypesID sets the "types_id" field to the value that was provided on create.
+func (u *MDTabelUpsert) UpdateTypesID() *MDTabelUpsert {
+	u.SetExcluded(mdtabel.FieldTypesID)
+	return u
+}
+
+// ClearTypesID clears the value of the "types_id" field.
+func (u *MDTabelUpsert) ClearTypesID() *MDTabelUpsert {
+	u.SetNull(mdtabel.FieldTypesID)
+	return u
+}
+
 // SetFile sets the "file" field.
 func (u *MDTabelUpsert) SetFile(v string) *MDTabelUpsert {
 	u.Set(mdtabel.FieldFile, v)
@@ -419,18 +574,6 @@ func (u *MDTabelUpsert) SetFile(v string) *MDTabelUpsert {
 // UpdateFile sets the "file" field to the value that was provided on create.
 func (u *MDTabelUpsert) UpdateFile() *MDTabelUpsert {
 	u.SetExcluded(mdtabel.FieldFile)
-	return u
-}
-
-// SetType sets the "type" field.
-func (u *MDTabelUpsert) SetType(v string) *MDTabelUpsert {
-	u.Set(mdtabel.FieldType, v)
-	return u
-}
-
-// UpdateType sets the "type" field to the value that was provided on create.
-func (u *MDTabelUpsert) UpdateType() *MDTabelUpsert {
-	u.SetExcluded(mdtabel.FieldType)
 	return u
 }
 
@@ -484,20 +627,6 @@ func (u *MDTabelUpsertOne) Update(set func(*MDTabelUpsert)) *MDTabelUpsertOne {
 	return u
 }
 
-// SetNamerus sets the "namerus" field.
-func (u *MDTabelUpsertOne) SetNamerus(v string) *MDTabelUpsertOne {
-	return u.Update(func(s *MDTabelUpsert) {
-		s.SetNamerus(v)
-	})
-}
-
-// UpdateNamerus sets the "namerus" field to the value that was provided on create.
-func (u *MDTabelUpsertOne) UpdateNamerus() *MDTabelUpsertOne {
-	return u.Update(func(s *MDTabelUpsert) {
-		s.UpdateNamerus()
-	})
-}
-
 // SetNameeng sets the "nameeng" field.
 func (u *MDTabelUpsertOne) SetNameeng(v string) *MDTabelUpsertOne {
 	return u.Update(func(s *MDTabelUpsert) {
@@ -526,6 +655,62 @@ func (u *MDTabelUpsertOne) UpdateSynonym() *MDTabelUpsertOne {
 	})
 }
 
+// SetPor sets the "por" field.
+func (u *MDTabelUpsertOne) SetPor(v string) *MDTabelUpsertOne {
+	return u.Update(func(s *MDTabelUpsert) {
+		s.SetPor(v)
+	})
+}
+
+// UpdatePor sets the "por" field to the value that was provided on create.
+func (u *MDTabelUpsertOne) UpdatePor() *MDTabelUpsertOne {
+	return u.Update(func(s *MDTabelUpsert) {
+		s.UpdatePor()
+	})
+}
+
+// SetParent sets the "parent" field.
+func (u *MDTabelUpsertOne) SetParent(v string) *MDTabelUpsertOne {
+	return u.Update(func(s *MDTabelUpsert) {
+		s.SetParent(v)
+	})
+}
+
+// UpdateParent sets the "parent" field to the value that was provided on create.
+func (u *MDTabelUpsertOne) UpdateParent() *MDTabelUpsertOne {
+	return u.Update(func(s *MDTabelUpsert) {
+		s.UpdateParent()
+	})
+}
+
+// ClearParent clears the value of the "parent" field.
+func (u *MDTabelUpsertOne) ClearParent() *MDTabelUpsertOne {
+	return u.Update(func(s *MDTabelUpsert) {
+		s.ClearParent()
+	})
+}
+
+// SetTypesID sets the "types_id" field.
+func (u *MDTabelUpsertOne) SetTypesID(v string) *MDTabelUpsertOne {
+	return u.Update(func(s *MDTabelUpsert) {
+		s.SetTypesID(v)
+	})
+}
+
+// UpdateTypesID sets the "types_id" field to the value that was provided on create.
+func (u *MDTabelUpsertOne) UpdateTypesID() *MDTabelUpsertOne {
+	return u.Update(func(s *MDTabelUpsert) {
+		s.UpdateTypesID()
+	})
+}
+
+// ClearTypesID clears the value of the "types_id" field.
+func (u *MDTabelUpsertOne) ClearTypesID() *MDTabelUpsertOne {
+	return u.Update(func(s *MDTabelUpsert) {
+		s.ClearTypesID()
+	})
+}
+
 // SetFile sets the "file" field.
 func (u *MDTabelUpsertOne) SetFile(v string) *MDTabelUpsertOne {
 	return u.Update(func(s *MDTabelUpsert) {
@@ -537,20 +722,6 @@ func (u *MDTabelUpsertOne) SetFile(v string) *MDTabelUpsertOne {
 func (u *MDTabelUpsertOne) UpdateFile() *MDTabelUpsertOne {
 	return u.Update(func(s *MDTabelUpsert) {
 		s.UpdateFile()
-	})
-}
-
-// SetType sets the "type" field.
-func (u *MDTabelUpsertOne) SetType(v string) *MDTabelUpsertOne {
-	return u.Update(func(s *MDTabelUpsert) {
-		s.SetType(v)
-	})
-}
-
-// UpdateType sets the "type" field to the value that was provided on create.
-func (u *MDTabelUpsertOne) UpdateType() *MDTabelUpsertOne {
-	return u.Update(func(s *MDTabelUpsert) {
-		s.UpdateType()
 	})
 }
 
@@ -685,7 +856,7 @@ func (mtcb *MDTabelCreateBulk) ExecX(ctx context.Context) {
 //		// Override some of the fields with custom
 //		// update values.
 //		Update(func(u *ent.MDTabelUpsert) {
-//			SetNamerus(v+v).
+//			SetNameeng(v+v).
 //		}).
 //		Exec(ctx)
 //
@@ -769,20 +940,6 @@ func (u *MDTabelUpsertBulk) Update(set func(*MDTabelUpsert)) *MDTabelUpsertBulk 
 	return u
 }
 
-// SetNamerus sets the "namerus" field.
-func (u *MDTabelUpsertBulk) SetNamerus(v string) *MDTabelUpsertBulk {
-	return u.Update(func(s *MDTabelUpsert) {
-		s.SetNamerus(v)
-	})
-}
-
-// UpdateNamerus sets the "namerus" field to the value that was provided on create.
-func (u *MDTabelUpsertBulk) UpdateNamerus() *MDTabelUpsertBulk {
-	return u.Update(func(s *MDTabelUpsert) {
-		s.UpdateNamerus()
-	})
-}
-
 // SetNameeng sets the "nameeng" field.
 func (u *MDTabelUpsertBulk) SetNameeng(v string) *MDTabelUpsertBulk {
 	return u.Update(func(s *MDTabelUpsert) {
@@ -811,6 +968,62 @@ func (u *MDTabelUpsertBulk) UpdateSynonym() *MDTabelUpsertBulk {
 	})
 }
 
+// SetPor sets the "por" field.
+func (u *MDTabelUpsertBulk) SetPor(v string) *MDTabelUpsertBulk {
+	return u.Update(func(s *MDTabelUpsert) {
+		s.SetPor(v)
+	})
+}
+
+// UpdatePor sets the "por" field to the value that was provided on create.
+func (u *MDTabelUpsertBulk) UpdatePor() *MDTabelUpsertBulk {
+	return u.Update(func(s *MDTabelUpsert) {
+		s.UpdatePor()
+	})
+}
+
+// SetParent sets the "parent" field.
+func (u *MDTabelUpsertBulk) SetParent(v string) *MDTabelUpsertBulk {
+	return u.Update(func(s *MDTabelUpsert) {
+		s.SetParent(v)
+	})
+}
+
+// UpdateParent sets the "parent" field to the value that was provided on create.
+func (u *MDTabelUpsertBulk) UpdateParent() *MDTabelUpsertBulk {
+	return u.Update(func(s *MDTabelUpsert) {
+		s.UpdateParent()
+	})
+}
+
+// ClearParent clears the value of the "parent" field.
+func (u *MDTabelUpsertBulk) ClearParent() *MDTabelUpsertBulk {
+	return u.Update(func(s *MDTabelUpsert) {
+		s.ClearParent()
+	})
+}
+
+// SetTypesID sets the "types_id" field.
+func (u *MDTabelUpsertBulk) SetTypesID(v string) *MDTabelUpsertBulk {
+	return u.Update(func(s *MDTabelUpsert) {
+		s.SetTypesID(v)
+	})
+}
+
+// UpdateTypesID sets the "types_id" field to the value that was provided on create.
+func (u *MDTabelUpsertBulk) UpdateTypesID() *MDTabelUpsertBulk {
+	return u.Update(func(s *MDTabelUpsert) {
+		s.UpdateTypesID()
+	})
+}
+
+// ClearTypesID clears the value of the "types_id" field.
+func (u *MDTabelUpsertBulk) ClearTypesID() *MDTabelUpsertBulk {
+	return u.Update(func(s *MDTabelUpsert) {
+		s.ClearTypesID()
+	})
+}
+
 // SetFile sets the "file" field.
 func (u *MDTabelUpsertBulk) SetFile(v string) *MDTabelUpsertBulk {
 	return u.Update(func(s *MDTabelUpsert) {
@@ -822,20 +1035,6 @@ func (u *MDTabelUpsertBulk) SetFile(v string) *MDTabelUpsertBulk {
 func (u *MDTabelUpsertBulk) UpdateFile() *MDTabelUpsertBulk {
 	return u.Update(func(s *MDTabelUpsert) {
 		s.UpdateFile()
-	})
-}
-
-// SetType sets the "type" field.
-func (u *MDTabelUpsertBulk) SetType(v string) *MDTabelUpsertBulk {
-	return u.Update(func(s *MDTabelUpsert) {
-		s.SetType(v)
-	})
-}
-
-// UpdateType sets the "type" field to the value that was provided on create.
-func (u *MDTabelUpsertBulk) UpdateType() *MDTabelUpsertBulk {
-	return u.Update(func(s *MDTabelUpsert) {
-		s.UpdateType()
 	})
 }
 

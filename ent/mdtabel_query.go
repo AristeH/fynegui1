@@ -10,6 +10,7 @@ import (
 	"fynegui/ent/mdrekvizit"
 	"fynegui/ent/mdsubsystems"
 	"fynegui/ent/mdtabel"
+	"fynegui/ent/mdtypetabel"
 	"fynegui/ent/predicate"
 	"math"
 
@@ -28,8 +29,11 @@ type MDTabelQuery struct {
 	fields     []string
 	predicates []predicate.MDTabel
 	// eager-loading edges.
-	withMdsubsystems *MDSubSystemsQuery
-	withMdrekvizits  *MDRekvizitQuery
+	withChildMdtabel  *MDTabelQuery
+	withParentMdtabel *MDTabelQuery
+	withMdsubsystems  *MDSubSystemsQuery
+	withMdrekvizits   *MDRekvizitQuery
+	withMdtypetabel   *MDTypeTabelQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -64,6 +68,50 @@ func (mtq *MDTabelQuery) Unique(unique bool) *MDTabelQuery {
 func (mtq *MDTabelQuery) Order(o ...OrderFunc) *MDTabelQuery {
 	mtq.order = append(mtq.order, o...)
 	return mtq
+}
+
+// QueryChildMdtabel chains the current query on the "child_mdtabel" edge.
+func (mtq *MDTabelQuery) QueryChildMdtabel() *MDTabelQuery {
+	query := &MDTabelQuery{config: mtq.config}
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := mtq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := mtq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(mdtabel.Table, mdtabel.FieldID, selector),
+			sqlgraph.To(mdtabel.Table, mdtabel.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, mdtabel.ChildMdtabelTable, mdtabel.ChildMdtabelColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(mtq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryParentMdtabel chains the current query on the "parent_mdtabel" edge.
+func (mtq *MDTabelQuery) QueryParentMdtabel() *MDTabelQuery {
+	query := &MDTabelQuery{config: mtq.config}
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := mtq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := mtq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(mdtabel.Table, mdtabel.FieldID, selector),
+			sqlgraph.To(mdtabel.Table, mdtabel.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, mdtabel.ParentMdtabelTable, mdtabel.ParentMdtabelColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(mtq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
 }
 
 // QueryMdsubsystems chains the current query on the "mdsubsystems" edge.
@@ -103,6 +151,28 @@ func (mtq *MDTabelQuery) QueryMdrekvizits() *MDRekvizitQuery {
 			sqlgraph.From(mdtabel.Table, mdtabel.FieldID, selector),
 			sqlgraph.To(mdrekvizit.Table, mdrekvizit.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, mdtabel.MdrekvizitsTable, mdtabel.MdrekvizitsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(mtq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryMdtypetabel chains the current query on the "mdtypetabel" edge.
+func (mtq *MDTabelQuery) QueryMdtypetabel() *MDTypeTabelQuery {
+	query := &MDTypeTabelQuery{config: mtq.config}
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := mtq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := mtq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(mdtabel.Table, mdtabel.FieldID, selector),
+			sqlgraph.To(mdtypetabel.Table, mdtypetabel.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, mdtabel.MdtypetabelTable, mdtabel.MdtypetabelColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(mtq.driver.Dialect(), step)
 		return fromU, nil
@@ -286,18 +356,43 @@ func (mtq *MDTabelQuery) Clone() *MDTabelQuery {
 		return nil
 	}
 	return &MDTabelQuery{
-		config:           mtq.config,
-		limit:            mtq.limit,
-		offset:           mtq.offset,
-		order:            append([]OrderFunc{}, mtq.order...),
-		predicates:       append([]predicate.MDTabel{}, mtq.predicates...),
-		withMdsubsystems: mtq.withMdsubsystems.Clone(),
-		withMdrekvizits:  mtq.withMdrekvizits.Clone(),
+		config:            mtq.config,
+		limit:             mtq.limit,
+		offset:            mtq.offset,
+		order:             append([]OrderFunc{}, mtq.order...),
+		predicates:        append([]predicate.MDTabel{}, mtq.predicates...),
+		withChildMdtabel:  mtq.withChildMdtabel.Clone(),
+		withParentMdtabel: mtq.withParentMdtabel.Clone(),
+		withMdsubsystems:  mtq.withMdsubsystems.Clone(),
+		withMdrekvizits:   mtq.withMdrekvizits.Clone(),
+		withMdtypetabel:   mtq.withMdtypetabel.Clone(),
 		// clone intermediate query.
 		sql:    mtq.sql.Clone(),
 		path:   mtq.path,
 		unique: mtq.unique,
 	}
+}
+
+// WithChildMdtabel tells the query-builder to eager-load the nodes that are connected to
+// the "child_mdtabel" edge. The optional arguments are used to configure the query builder of the edge.
+func (mtq *MDTabelQuery) WithChildMdtabel(opts ...func(*MDTabelQuery)) *MDTabelQuery {
+	query := &MDTabelQuery{config: mtq.config}
+	for _, opt := range opts {
+		opt(query)
+	}
+	mtq.withChildMdtabel = query
+	return mtq
+}
+
+// WithParentMdtabel tells the query-builder to eager-load the nodes that are connected to
+// the "parent_mdtabel" edge. The optional arguments are used to configure the query builder of the edge.
+func (mtq *MDTabelQuery) WithParentMdtabel(opts ...func(*MDTabelQuery)) *MDTabelQuery {
+	query := &MDTabelQuery{config: mtq.config}
+	for _, opt := range opts {
+		opt(query)
+	}
+	mtq.withParentMdtabel = query
+	return mtq
 }
 
 // WithMdsubsystems tells the query-builder to eager-load the nodes that are connected to
@@ -322,18 +417,29 @@ func (mtq *MDTabelQuery) WithMdrekvizits(opts ...func(*MDRekvizitQuery)) *MDTabe
 	return mtq
 }
 
+// WithMdtypetabel tells the query-builder to eager-load the nodes that are connected to
+// the "mdtypetabel" edge. The optional arguments are used to configure the query builder of the edge.
+func (mtq *MDTabelQuery) WithMdtypetabel(opts ...func(*MDTypeTabelQuery)) *MDTabelQuery {
+	query := &MDTypeTabelQuery{config: mtq.config}
+	for _, opt := range opts {
+		opt(query)
+	}
+	mtq.withMdtypetabel = query
+	return mtq
+}
+
 // GroupBy is used to group vertices by one or more fields/columns.
 // It is often used with aggregate functions, like: count, max, mean, min, sum.
 //
 // Example:
 //
 //	var v []struct {
-//		Namerus string `json:"ИмяРус,omitempty"`
+//		Nameeng string `json:"ИмяАнгл,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.MDTabel.Query().
-//		GroupBy(mdtabel.FieldNamerus).
+//		GroupBy(mdtabel.FieldNameeng).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 //
@@ -355,11 +461,11 @@ func (mtq *MDTabelQuery) GroupBy(field string, fields ...string) *MDTabelGroupBy
 // Example:
 //
 //	var v []struct {
-//		Namerus string `json:"ИмяРус,omitempty"`
+//		Nameeng string `json:"ИмяАнгл,omitempty"`
 //	}
 //
 //	client.MDTabel.Query().
-//		Select(mdtabel.FieldNamerus).
+//		Select(mdtabel.FieldNameeng).
 //		Scan(ctx, &v)
 //
 func (mtq *MDTabelQuery) Select(fields ...string) *MDTabelSelect {
@@ -387,9 +493,12 @@ func (mtq *MDTabelQuery) sqlAll(ctx context.Context) ([]*MDTabel, error) {
 	var (
 		nodes       = []*MDTabel{}
 		_spec       = mtq.querySpec()
-		loadedTypes = [2]bool{
+		loadedTypes = [5]bool{
+			mtq.withChildMdtabel != nil,
+			mtq.withParentMdtabel != nil,
 			mtq.withMdsubsystems != nil,
 			mtq.withMdrekvizits != nil,
+			mtq.withMdtypetabel != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]interface{}, error) {
@@ -410,6 +519,57 @@ func (mtq *MDTabelQuery) sqlAll(ctx context.Context) ([]*MDTabel, error) {
 	}
 	if len(nodes) == 0 {
 		return nodes, nil
+	}
+
+	if query := mtq.withChildMdtabel; query != nil {
+		fks := make([]driver.Value, 0, len(nodes))
+		nodeids := make(map[string]*MDTabel)
+		for i := range nodes {
+			fks = append(fks, nodes[i].ID)
+			nodeids[nodes[i].ID] = nodes[i]
+			nodes[i].Edges.ChildMdtabel = []*MDTabel{}
+		}
+		query.Where(predicate.MDTabel(func(s *sql.Selector) {
+			s.Where(sql.InValues(mdtabel.ChildMdtabelColumn, fks...))
+		}))
+		neighbors, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, n := range neighbors {
+			fk := n.Parent
+			node, ok := nodeids[fk]
+			if !ok {
+				return nil, fmt.Errorf(`unexpected foreign-key "parent" returned %v for node %v`, fk, n.ID)
+			}
+			node.Edges.ChildMdtabel = append(node.Edges.ChildMdtabel, n)
+		}
+	}
+
+	if query := mtq.withParentMdtabel; query != nil {
+		ids := make([]string, 0, len(nodes))
+		nodeids := make(map[string][]*MDTabel)
+		for i := range nodes {
+			fk := nodes[i].Parent
+			if _, ok := nodeids[fk]; !ok {
+				ids = append(ids, fk)
+			}
+			nodeids[fk] = append(nodeids[fk], nodes[i])
+		}
+		query.Where(mdtabel.IDIn(ids...))
+		neighbors, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, n := range neighbors {
+			nodes, ok := nodeids[n.ID]
+			if !ok {
+				return nil, fmt.Errorf(`unexpected foreign-key "parent" returned %v`, n.ID)
+			}
+			for i := range nodes {
+				nodes[i].Edges.ParentMdtabel = n
+			}
+		}
 	}
 
 	if query := mtq.withMdsubsystems; query != nil {
@@ -499,6 +659,32 @@ func (mtq *MDTabelQuery) sqlAll(ctx context.Context) ([]*MDTabel, error) {
 				return nil, fmt.Errorf(`unexpected foreign-key "owner_id" returned %v for node %v`, fk, n.ID)
 			}
 			node.Edges.Mdrekvizits = append(node.Edges.Mdrekvizits, n)
+		}
+	}
+
+	if query := mtq.withMdtypetabel; query != nil {
+		ids := make([]string, 0, len(nodes))
+		nodeids := make(map[string][]*MDTabel)
+		for i := range nodes {
+			fk := nodes[i].TypesID
+			if _, ok := nodeids[fk]; !ok {
+				ids = append(ids, fk)
+			}
+			nodeids[fk] = append(nodeids[fk], nodes[i])
+		}
+		query.Where(mdtypetabel.IDIn(ids...))
+		neighbors, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, n := range neighbors {
+			nodes, ok := nodeids[n.ID]
+			if !ok {
+				return nil, fmt.Errorf(`unexpected foreign-key "types_id" returned %v`, n.ID)
+			}
+			for i := range nodes {
+				nodes[i].Edges.Mdtypetabel = n
+			}
 		}
 	}
 
