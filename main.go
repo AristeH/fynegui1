@@ -2,7 +2,11 @@ package main
 
 import (
 	// "context"
+	"context"
+	"fmt"
 	"fynegui/ent"
+	"fynegui/ent/migrate"
+
 	// "fynegui/ent/mdsubsystems"
 	// "strings"
 
@@ -13,8 +17,6 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-
-
 // список форм
 var app_values = make(map[string]*FormData)
 var myApp = app.New()
@@ -23,11 +25,20 @@ var Clientsqllite *ent.Client
 var mfulocal map[string]func(*FormData,  string) []byte
 
 func main() {
+	client, _ = ent.Open("sqlite3", "C:/проект/fynegui/md.db?_fk=1")
+
+	if err := client.Schema.Create(context.Background(), migrate.WithGlobalUniqueID(true)); err != nil {
+		WriteLog(fmt.Sprintf("failed creating schema resources: %v", err))
+	}
 	RegFunc("GetFile", GetFile)
 	RegFunc("PutData", PutData)
+	RegFunc("SetMetaDataApp", SetMetaDataApp)
 	go connectServer()
+	
 	myWindow := mainform()
+	GetMetaDataApp()
 	myWindow.ShowAndRun()
+	
 }
 
 

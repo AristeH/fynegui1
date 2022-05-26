@@ -6,12 +6,12 @@ import (
 	"encoding/gob"
 	"fmt"
 	"fynegui/ent"
+	"fynegui/ent/mdforms"
 	"fynegui/ent/mdsubsystems"
-	"fynegui/ent/mdtabel"
-	//"fynegui/ent/mdtypetabel"
-	"fynegui/ent/migrate"
+
 	"image/color"
 	"strings"
+
 	//"image/color"
 	"fyne.io/fyne/v2"
 	//	"fyne.io/fyne/v2/canvas"
@@ -70,11 +70,7 @@ func GetMetaDataApp() {
 }
 
 func SetMetaDataApp(c *MessageGob) []byte {
-	client, _ = ent.Open("sqlite3", "C:/проект/fynegui/md.db?_fk=1")
 	ctx := context.Background()
-	if err := client.Schema.Create(context.Background(), migrate.WithGlobalUniqueID(true)); err != nil {
-		WriteLog(fmt.Sprintf("failed creating schema resources: %v", err))
-	}
 	app := c.Data
 	for _, b := range app.Data {
 		if len(b) > 0 {
@@ -87,14 +83,7 @@ func SetMetaDataApp(c *MessageGob) []byte {
 				if b[ParentID] != "" {
 					nw.SetParentMdsubsystemsID(b[ParentID])
 				}
-				tabl := strings.Split(b[ChildrensID], ";")
-				for _, rec := range tabl {
-					Mdtabel, _ := client.MDTabel.Query().Where(mdtabel.IDEQ(rec)).Only(ctx)
-					if Mdtabel != nil {
-						nw.AddMdtables(Mdtabel).Save(ctx)
-					}
-				}
-				nw.Save(ctx)
+
 				err := nw.OnConflict().UpdateNewValues().Exec(ctx)
 				if err != nil {
 					fmt.Println(err.Error())
@@ -123,11 +112,24 @@ func SetMetaDataApp(c *MessageGob) []byte {
 				if b[ParentID] != "" {
 					nw.SetParentMdtabelID(b[ParentID])
 				}
-				nw.Save(ctx)
+
 				if b[TypeContainer] != "" {
 					nw.SetTypesID(b[TypeContainer])
 				}
 				err := nw.OnConflict().UpdateNewValues().Exec(ctx)
+				if err != nil {
+					fmt.Println(err.Error())
+				}
+
+				tabl := strings.Split(b[ChildrensID], ";")
+				for _, rec := range tabl {
+
+					Mdtabel, _ := client.MDSubSystems.Get(ctx, rec)
+					if Mdtabel != nil {
+						nw.AddMdsubsystems(Mdtabel)
+					}
+				}
+				err = nw.OnConflict().UpdateNewValues().Exec(ctx)
 				if err != nil {
 					fmt.Println(err.Error())
 				}
@@ -141,15 +143,26 @@ func SetMetaDataApp(c *MessageGob) []byte {
 				nw.SetPor(b[OrderOutput])
 				nw.SetType(b[TypeContainer])
 				nw.SetWidthSpisok(60)
-				if b[TypeContainer] != "" {
-					nw.SetOwnerID(b[ChildrensID])
-				}
+				nw.SetOwnerID(b[ParentID])
 				err := nw.OnConflict().UpdateNewValues().Exec(ctx)
 				if err != nil {
 					fmt.Println(err.Error())
 				}
 			}
 
+			if b[TypeMetaData] == "Форма" {
+				nw := client.MDForms.Create()
+				nw.SetIdform(b[Nameeng])
+				nw.SetConteiner(b[TypeContainer])
+				if b[ParentID] != "" {
+					nw.SetParent(b[ParentID])
+				}
+				nw.SetID(b[ID])
+				err := nw.OnConflict().UpdateNewValues().Exec(ctx)
+				if err != nil {
+					fmt.Println(err.Error())
+				}
+			}
 
 		}
 	}
@@ -181,7 +194,7 @@ func SetContent(w string) {
 
 	top = container.NewVBox()
 	tb := ToolBarCreate("main", b, color.Gray{230})
-	app_values[w].ToolBar["main1"] = tb
+	app_values[w].Container["8"] = tb
 	top.Add(tb)
 	f, _ = client.MDSubSystems.Query().Where(mdsubsystems.ParentEQ(f[0].ID)).All(ctx)
 	for i := range f {
@@ -195,22 +208,25 @@ func SetContent(w string) {
 		b1 = append(b1, output)
 	}
 	tb = ToolBarCreate("main", b1, color.Gray{240})
-	app_values[w].ToolBar["main2"] = tb
+	app_values[w].Container["9"] = tb
 	top.Add(tb)
 	ch := toolMain21(f[0].ID)
+	app_values[w].Container["9"] = ch
 	content := container.New(layout.NewBorderLayout(top, nil, ch, nil), top, ch)
 	win.SetContent(content)
 
 }
 
 // toolMain функция отображающая таблицы подсистемы
-func toolMain21(sub string) fyne.CanvasObject {
+func toolMain21(sub string) *fyne.Container {
 
 	tbl, err := client.MDSubSystems.Query().Where(mdsubsystems.IDEQ(sub)).QueryMdtables().All(context.Background())
 	if err != nil {
 		println(err)
 	}
-	ch := widget.NewAccordion()
+
+	ch :=  container.NewVBox()
+	acc :=widget.NewAccordion()
 	contCatalog := container.NewVBox()
 	contDocument := container.NewVBox()
 
@@ -233,25 +249,23 @@ func toolMain21(sub string) fyne.CanvasObject {
 		}
 	}
 
-	ch.Append(&widget.AccordionItem{Title: "Документы", Detail: contDocument})
-	ch.Append(&widget.AccordionItem{Title: "Справочники", Detail: contCatalog})
-
+	acc.Append(&widget.AccordionItem{Title: "Документы", Detail: contDocument})
+	acc.Append(&widget.AccordionItem{Title: "Справочники", Detail: contCatalog})
+	ch.Add(acc)
 	return ch
 }
 
 func mainform() fyne.Window {
-	RegFunc("SetMetaDataApp", SetMetaDataApp)
-	//RegFunc("SetTableList", SetTableList)
-	//	var top *fyne.Container
-	//	var left *fyne.Container
 	myWindow := myApp.NewWindow("Телефоны")
 	myWindow.Resize(fyne.NewSize(1200, 400))
 	app_values["main"] = &FormData{}
 	app_values["main"].W = myWindow
 	app_values["main"].Button = make(map[string]ButtonData)
-	app_values["main"].ToolBar = make(map[string]*fyne.Container)
-	//middle := canvas.NewText("content", color.White)
-	//SetContent("main")
-	GetMetaDataApp()
+	app_values["main"].Container = make(map[string]*fyne.Container)
+	ctx := context.Background()
+	form, _ := client.MDForms.Query().Where(mdforms.IdformEQ("main")).All(ctx)
+	for i := range form {
+		app_values["main"].Container[form[i].ID] = nil
+	}
 	return myWindow
 }

@@ -6,6 +6,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"fynegui/ent/mdforms"
 	"fynegui/ent/mdrekvizit"
 	"fynegui/ent/mdsubsystems"
 	"fynegui/ent/mdtabel"
@@ -25,11 +26,610 @@ const (
 	OpUpdateOne = ent.OpUpdateOne
 
 	// Node types.
+	TypeMDForms      = "MDForms"
 	TypeMDRekvizit   = "MDRekvizit"
 	TypeMDSubSystems = "MDSubSystems"
 	TypeMDTabel      = "MDTabel"
 	TypeMDTypeTabel  = "MDTypeTabel"
 )
+
+// MDFormsMutation represents an operation that mutates the MDForms nodes in the graph.
+type MDFormsMutation struct {
+	config
+	op                    Op
+	typ                   string
+	id                    *string
+	idform                *string
+	conteiner             *string
+	clearedFields         map[string]struct{}
+	child_mdforms         map[string]struct{}
+	removedchild_mdforms  map[string]struct{}
+	clearedchild_mdforms  bool
+	parent_mdforms        *string
+	clearedparent_mdforms bool
+	done                  bool
+	oldValue              func(context.Context) (*MDForms, error)
+	predicates            []predicate.MDForms
+}
+
+var _ ent.Mutation = (*MDFormsMutation)(nil)
+
+// mdformsOption allows management of the mutation configuration using functional options.
+type mdformsOption func(*MDFormsMutation)
+
+// newMDFormsMutation creates new mutation for the MDForms entity.
+func newMDFormsMutation(c config, op Op, opts ...mdformsOption) *MDFormsMutation {
+	m := &MDFormsMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeMDForms,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withMDFormsID sets the ID field of the mutation.
+func withMDFormsID(id string) mdformsOption {
+	return func(m *MDFormsMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *MDForms
+		)
+		m.oldValue = func(ctx context.Context) (*MDForms, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().MDForms.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withMDForms sets the old MDForms of the mutation.
+func withMDForms(node *MDForms) mdformsOption {
+	return func(m *MDFormsMutation) {
+		m.oldValue = func(context.Context) (*MDForms, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m MDFormsMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m MDFormsMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of MDForms entities.
+func (m *MDFormsMutation) SetID(id string) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *MDFormsMutation) ID() (id string, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *MDFormsMutation) IDs(ctx context.Context) ([]string, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []string{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().MDForms.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetIdform sets the "idform" field.
+func (m *MDFormsMutation) SetIdform(s string) {
+	m.idform = &s
+}
+
+// Idform returns the value of the "idform" field in the mutation.
+func (m *MDFormsMutation) Idform() (r string, exists bool) {
+	v := m.idform
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldIdform returns the old "idform" field's value of the MDForms entity.
+// If the MDForms object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MDFormsMutation) OldIdform(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldIdform is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldIdform requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldIdform: %w", err)
+	}
+	return oldValue.Idform, nil
+}
+
+// ResetIdform resets all changes to the "idform" field.
+func (m *MDFormsMutation) ResetIdform() {
+	m.idform = nil
+}
+
+// SetConteiner sets the "conteiner" field.
+func (m *MDFormsMutation) SetConteiner(s string) {
+	m.conteiner = &s
+}
+
+// Conteiner returns the value of the "conteiner" field in the mutation.
+func (m *MDFormsMutation) Conteiner() (r string, exists bool) {
+	v := m.conteiner
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldConteiner returns the old "conteiner" field's value of the MDForms entity.
+// If the MDForms object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MDFormsMutation) OldConteiner(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldConteiner is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldConteiner requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldConteiner: %w", err)
+	}
+	return oldValue.Conteiner, nil
+}
+
+// ResetConteiner resets all changes to the "conteiner" field.
+func (m *MDFormsMutation) ResetConteiner() {
+	m.conteiner = nil
+}
+
+// SetParent sets the "parent" field.
+func (m *MDFormsMutation) SetParent(s string) {
+	m.parent_mdforms = &s
+}
+
+// Parent returns the value of the "parent" field in the mutation.
+func (m *MDFormsMutation) Parent() (r string, exists bool) {
+	v := m.parent_mdforms
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldParent returns the old "parent" field's value of the MDForms entity.
+// If the MDForms object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MDFormsMutation) OldParent(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldParent is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldParent requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldParent: %w", err)
+	}
+	return oldValue.Parent, nil
+}
+
+// ClearParent clears the value of the "parent" field.
+func (m *MDFormsMutation) ClearParent() {
+	m.parent_mdforms = nil
+	m.clearedFields[mdforms.FieldParent] = struct{}{}
+}
+
+// ParentCleared returns if the "parent" field was cleared in this mutation.
+func (m *MDFormsMutation) ParentCleared() bool {
+	_, ok := m.clearedFields[mdforms.FieldParent]
+	return ok
+}
+
+// ResetParent resets all changes to the "parent" field.
+func (m *MDFormsMutation) ResetParent() {
+	m.parent_mdforms = nil
+	delete(m.clearedFields, mdforms.FieldParent)
+}
+
+// AddChildMdformIDs adds the "child_mdforms" edge to the MDForms entity by ids.
+func (m *MDFormsMutation) AddChildMdformIDs(ids ...string) {
+	if m.child_mdforms == nil {
+		m.child_mdforms = make(map[string]struct{})
+	}
+	for i := range ids {
+		m.child_mdforms[ids[i]] = struct{}{}
+	}
+}
+
+// ClearChildMdforms clears the "child_mdforms" edge to the MDForms entity.
+func (m *MDFormsMutation) ClearChildMdforms() {
+	m.clearedchild_mdforms = true
+}
+
+// ChildMdformsCleared reports if the "child_mdforms" edge to the MDForms entity was cleared.
+func (m *MDFormsMutation) ChildMdformsCleared() bool {
+	return m.clearedchild_mdforms
+}
+
+// RemoveChildMdformIDs removes the "child_mdforms" edge to the MDForms entity by IDs.
+func (m *MDFormsMutation) RemoveChildMdformIDs(ids ...string) {
+	if m.removedchild_mdforms == nil {
+		m.removedchild_mdforms = make(map[string]struct{})
+	}
+	for i := range ids {
+		delete(m.child_mdforms, ids[i])
+		m.removedchild_mdforms[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedChildMdforms returns the removed IDs of the "child_mdforms" edge to the MDForms entity.
+func (m *MDFormsMutation) RemovedChildMdformsIDs() (ids []string) {
+	for id := range m.removedchild_mdforms {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ChildMdformsIDs returns the "child_mdforms" edge IDs in the mutation.
+func (m *MDFormsMutation) ChildMdformsIDs() (ids []string) {
+	for id := range m.child_mdforms {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetChildMdforms resets all changes to the "child_mdforms" edge.
+func (m *MDFormsMutation) ResetChildMdforms() {
+	m.child_mdforms = nil
+	m.clearedchild_mdforms = false
+	m.removedchild_mdforms = nil
+}
+
+// SetParentMdformsID sets the "parent_mdforms" edge to the MDForms entity by id.
+func (m *MDFormsMutation) SetParentMdformsID(id string) {
+	m.parent_mdforms = &id
+}
+
+// ClearParentMdforms clears the "parent_mdforms" edge to the MDForms entity.
+func (m *MDFormsMutation) ClearParentMdforms() {
+	m.clearedparent_mdforms = true
+}
+
+// ParentMdformsCleared reports if the "parent_mdforms" edge to the MDForms entity was cleared.
+func (m *MDFormsMutation) ParentMdformsCleared() bool {
+	return m.ParentCleared() || m.clearedparent_mdforms
+}
+
+// ParentMdformsID returns the "parent_mdforms" edge ID in the mutation.
+func (m *MDFormsMutation) ParentMdformsID() (id string, exists bool) {
+	if m.parent_mdforms != nil {
+		return *m.parent_mdforms, true
+	}
+	return
+}
+
+// ParentMdformsIDs returns the "parent_mdforms" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// ParentMdformsID instead. It exists only for internal usage by the builders.
+func (m *MDFormsMutation) ParentMdformsIDs() (ids []string) {
+	if id := m.parent_mdforms; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetParentMdforms resets all changes to the "parent_mdforms" edge.
+func (m *MDFormsMutation) ResetParentMdforms() {
+	m.parent_mdforms = nil
+	m.clearedparent_mdforms = false
+}
+
+// Where appends a list predicates to the MDFormsMutation builder.
+func (m *MDFormsMutation) Where(ps ...predicate.MDForms) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// Op returns the operation name.
+func (m *MDFormsMutation) Op() Op {
+	return m.op
+}
+
+// Type returns the node type of this mutation (MDForms).
+func (m *MDFormsMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *MDFormsMutation) Fields() []string {
+	fields := make([]string, 0, 3)
+	if m.idform != nil {
+		fields = append(fields, mdforms.FieldIdform)
+	}
+	if m.conteiner != nil {
+		fields = append(fields, mdforms.FieldConteiner)
+	}
+	if m.parent_mdforms != nil {
+		fields = append(fields, mdforms.FieldParent)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *MDFormsMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case mdforms.FieldIdform:
+		return m.Idform()
+	case mdforms.FieldConteiner:
+		return m.Conteiner()
+	case mdforms.FieldParent:
+		return m.Parent()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *MDFormsMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case mdforms.FieldIdform:
+		return m.OldIdform(ctx)
+	case mdforms.FieldConteiner:
+		return m.OldConteiner(ctx)
+	case mdforms.FieldParent:
+		return m.OldParent(ctx)
+	}
+	return nil, fmt.Errorf("unknown MDForms field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *MDFormsMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case mdforms.FieldIdform:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetIdform(v)
+		return nil
+	case mdforms.FieldConteiner:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetConteiner(v)
+		return nil
+	case mdforms.FieldParent:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetParent(v)
+		return nil
+	}
+	return fmt.Errorf("unknown MDForms field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *MDFormsMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *MDFormsMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *MDFormsMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown MDForms numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *MDFormsMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(mdforms.FieldParent) {
+		fields = append(fields, mdforms.FieldParent)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *MDFormsMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *MDFormsMutation) ClearField(name string) error {
+	switch name {
+	case mdforms.FieldParent:
+		m.ClearParent()
+		return nil
+	}
+	return fmt.Errorf("unknown MDForms nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *MDFormsMutation) ResetField(name string) error {
+	switch name {
+	case mdforms.FieldIdform:
+		m.ResetIdform()
+		return nil
+	case mdforms.FieldConteiner:
+		m.ResetConteiner()
+		return nil
+	case mdforms.FieldParent:
+		m.ResetParent()
+		return nil
+	}
+	return fmt.Errorf("unknown MDForms field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *MDFormsMutation) AddedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.child_mdforms != nil {
+		edges = append(edges, mdforms.EdgeChildMdforms)
+	}
+	if m.parent_mdforms != nil {
+		edges = append(edges, mdforms.EdgeParentMdforms)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *MDFormsMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case mdforms.EdgeChildMdforms:
+		ids := make([]ent.Value, 0, len(m.child_mdforms))
+		for id := range m.child_mdforms {
+			ids = append(ids, id)
+		}
+		return ids
+	case mdforms.EdgeParentMdforms:
+		if id := m.parent_mdforms; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *MDFormsMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.removedchild_mdforms != nil {
+		edges = append(edges, mdforms.EdgeChildMdforms)
+	}
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *MDFormsMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case mdforms.EdgeChildMdforms:
+		ids := make([]ent.Value, 0, len(m.removedchild_mdforms))
+		for id := range m.removedchild_mdforms {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *MDFormsMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.clearedchild_mdforms {
+		edges = append(edges, mdforms.EdgeChildMdforms)
+	}
+	if m.clearedparent_mdforms {
+		edges = append(edges, mdforms.EdgeParentMdforms)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *MDFormsMutation) EdgeCleared(name string) bool {
+	switch name {
+	case mdforms.EdgeChildMdforms:
+		return m.clearedchild_mdforms
+	case mdforms.EdgeParentMdforms:
+		return m.clearedparent_mdforms
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *MDFormsMutation) ClearEdge(name string) error {
+	switch name {
+	case mdforms.EdgeParentMdforms:
+		m.ClearParentMdforms()
+		return nil
+	}
+	return fmt.Errorf("unknown MDForms unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *MDFormsMutation) ResetEdge(name string) error {
+	switch name {
+	case mdforms.EdgeChildMdforms:
+		m.ResetChildMdforms()
+		return nil
+	case mdforms.EdgeParentMdforms:
+		m.ResetParentMdforms()
+		return nil
+	}
+	return fmt.Errorf("unknown MDForms edge %s", name)
+}
 
 // MDRekvizitMutation represents an operation that mutates the MDRekvizit nodes in the graph.
 type MDRekvizitMutation struct {

@@ -5,6 +5,7 @@ package ent
 import (
 	"errors"
 	"fmt"
+	"fynegui/ent/mdforms"
 	"fynegui/ent/mdrekvizit"
 	"fynegui/ent/mdsubsystems"
 	"fynegui/ent/mdtabel"
@@ -32,6 +33,7 @@ type OrderFunc func(*sql.Selector)
 // columnChecker returns a function indicates if the column exists in the given column.
 func columnChecker(table string) func(string) error {
 	checks := map[string]func(string) bool{
+		mdforms.Table:      mdforms.ValidColumn,
 		mdrekvizit.Table:   mdrekvizit.ValidColumn,
 		mdsubsystems.Table: mdsubsystems.ValidColumn,
 		mdtabel.Table:      mdtabel.ValidColumn,

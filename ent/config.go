@@ -24,6 +24,7 @@ type config struct {
 
 // hooks per client, for fast access.
 type hooks struct {
+	MDForms      []ent.Hook
 	MDRekvizit   []ent.Hook
 	MDSubSystems []ent.Hook
 	MDTabel      []ent.Hook

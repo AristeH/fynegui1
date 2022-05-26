@@ -8,6 +8,19 @@ import (
 	"fynegui/ent"
 )
 
+// The MDFormsFunc type is an adapter to allow the use of ordinary
+// function as MDForms mutator.
+type MDFormsFunc func(context.Context, *ent.MDFormsMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f MDFormsFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.MDFormsMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.MDFormsMutation", m)
+	}
+	return f(ctx, mv)
+}
+
 // The MDRekvizitFunc type is an adapter to allow the use of ordinary
 // function as MDRekvizit mutator.
 type MDRekvizitFunc func(context.Context, *ent.MDRekvizitMutation) (ent.Value, error)

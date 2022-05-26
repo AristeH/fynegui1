@@ -17,8 +17,6 @@ import (
 	"strings"
 )
 
-
-
 //UserForm структура описывающая форму
 type UserForm struct {
 	Name  string
@@ -45,12 +43,12 @@ type ButtonData struct {
 
 //FormData - данные формы
 type FormData struct {
-	Entry   map[string]entryForm   // Entry  - список полей ввода формы
-	Table   map[string]*TableOtoko // Table  - список таблиц формы
-	Tree    map[string]*TreeOtoko  // Table  - список таблиц формы
-	Button  map[string]ButtonData  // Button - список кнопок формы
-	ToolBar map[string]*fyne.Container
-	W       fyne.Window
+	Entry     map[string]entryForm   // Entry  - список полей ввода формы
+	Table     map[string]*TableOtoko // Table  - список таблиц формы
+	Tree      map[string]*TreeOtoko  // Table  - список таблиц формы
+	Button    map[string]ButtonData  // Button - список кнопок формы
+	Container map[string]*fyne.Container
+	W         fyne.Window
 }
 
 //FieldSection - описание поля со значением и ролью
@@ -218,6 +216,10 @@ func findButton(d *widget.Button) (*ButtonData, *FormData) {
 
 // }
 
+func UpdateFormConteiner(fd *FormData) {
+
+}
+
 func GetMenupodsystem(fd *FormData, p string) []byte {
 	var b1 [][]string
 	ctx := context.Background()
@@ -233,11 +235,11 @@ func GetMenupodsystem(fd *FormData, p string) []byte {
 		b1 = append(b1, output)
 	}
 	tb := ToolBarCreate("main", b1, color.Gray{240})
-	fd.ToolBar["main2"] = tb
+	fd.Container["9"] = tb
 	top := container.NewVBox()
-	top.Add(fd.ToolBar["main1"])
-	top.Add(fd.ToolBar["main2"])
-	ch:= toolMain21(f[0].ID)
+	top.Add(fd.Container["8"])
+	top.Add(fd.Container["9"])
+	ch := toolMain21(f[0].ID)
 	content := container.New(layout.NewBorderLayout(top, nil, ch, nil), top, ch)
 	fd.W.SetContent(content)
 	return nil
@@ -255,24 +257,29 @@ func ToolBarCreate(id string, but [][]string, color color.Color) *fyne.Container
 			param, f := findButton(d)
 			if param.Fun == "podsystem" {
 				GetMenupodsystem(f, param.Parameters)
-			}
-			if param.Fun == "tabl" {
-				toolMain21(param.Parameters)
-			}
-			mp := strings.Split(param.Parameters, ",")
-			p := ""
-			for _, r := range mp {
-				if _, ok := f.Entry[r]; ok {
-					p = p + r + ":" + f.Entry[r].Widget.Text + ","
-				} else {
-					p = p + r + ";"
+			} else if param.Fun == "tabl" {
+				top := container.NewVBox()
+				top.Add(fd.Container["8"])
+				top.Add(fd.Container["9"])
+				ch := toolMain21(param.Parameters)
+				content := container.New(layout.NewBorderLayout(top, nil, ch, nil), top, ch)
+				fd.W.SetContent(content)
+			} else {
+				mp := strings.Split(param.Parameters, ",")
+				p := ""
+				for _, r := range mp {
+					if _, ok := f.Entry[r]; ok {
+						p = p + r + ":" + f.Entry[r].Widget.Text + ","
+					} else {
+						p = p + r + ";"
+					}
 				}
+				mes := map[string]string{
+					"Action":     param.Fun,
+					"Parameters": p,
+				}
+				send(mes)
 			}
-			mes := map[string]string{
-				"Action":     param.Fun,
-				"Parameters": p,
-			}
-			send(mes)
 		}
 		fd.Button[value[Nameeng]] = ButtonData{Fun: value[Fun], Parameters: value[ID], Widget: d}
 		con.Add(d)
@@ -280,6 +287,13 @@ func ToolBarCreate(id string, but [][]string, color color.Color) *fyne.Container
 	beans := app_values[id]
 	beans.Button = fd.Button
 	app_values[id] = beans
+
+	// top := container.NewVBox()
+	// top.Add(fd.ToolBar["main1"])
+	// top.Add(fd.ToolBar["main2"])
+
+	// content := container.New(layout.NewBorderLayout(top, nil, ch, nil), top, ch)
+	// fd.W.SetContent(content)
 	return container.New(layout.NewMaxLayout(),
 		canvas.NewRectangle(color),
 		con,

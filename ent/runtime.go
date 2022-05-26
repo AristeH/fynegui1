@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"fynegui/ent/mdforms"
 	"fynegui/ent/mdrekvizit"
 	"fynegui/ent/mdsubsystems"
 	"fynegui/ent/mdtabel"
@@ -14,6 +15,34 @@ import (
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
+	mdformsFields := schema.MDForms{}.Fields()
+	_ = mdformsFields
+	// mdformsDescIdform is the schema descriptor for idform field.
+	mdformsDescIdform := mdformsFields[1].Descriptor()
+	// mdforms.IdformValidator is a validator for the "idform" field. It is called by the builders before save.
+	mdforms.IdformValidator = mdformsDescIdform.Validators[0].(func(string) error)
+	// mdformsDescParent is the schema descriptor for parent field.
+	mdformsDescParent := mdformsFields[3].Descriptor()
+	// mdforms.ParentValidator is a validator for the "parent" field. It is called by the builders before save.
+	mdforms.ParentValidator = mdformsDescParent.Validators[0].(func(string) error)
+	// mdformsDescID is the schema descriptor for id field.
+	mdformsDescID := mdformsFields[0].Descriptor()
+	// mdforms.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	mdforms.IDValidator = func() func(string) error {
+		validators := mdformsDescID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(id string) error {
+			for _, fn := range fns {
+				if err := fn(id); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
 	mdrekvizitFields := schema.MDRekvizit{}.Fields()
 	_ = mdrekvizitFields
 	// mdrekvizitDescNameeng is the schema descriptor for nameeng field.

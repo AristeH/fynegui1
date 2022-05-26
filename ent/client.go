@@ -9,6 +9,7 @@ import (
 
 	"fynegui/ent/migrate"
 
+	"fynegui/ent/mdforms"
 	"fynegui/ent/mdrekvizit"
 	"fynegui/ent/mdsubsystems"
 	"fynegui/ent/mdtabel"
@@ -24,6 +25,8 @@ type Client struct {
 	config
 	// Schema is the client for creating, migrating and dropping schema.
 	Schema *migrate.Schema
+	// MDForms is the client for interacting with the MDForms builders.
+	MDForms *MDFormsClient
 	// MDRekvizit is the client for interacting with the MDRekvizit builders.
 	MDRekvizit *MDRekvizitClient
 	// MDSubSystems is the client for interacting with the MDSubSystems builders.
@@ -45,6 +48,7 @@ func NewClient(opts ...Option) *Client {
 
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
+	c.MDForms = NewMDFormsClient(c.config)
 	c.MDRekvizit = NewMDRekvizitClient(c.config)
 	c.MDSubSystems = NewMDSubSystemsClient(c.config)
 	c.MDTabel = NewMDTabelClient(c.config)
@@ -82,6 +86,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	return &Tx{
 		ctx:          ctx,
 		config:       cfg,
+		MDForms:      NewMDFormsClient(cfg),
 		MDRekvizit:   NewMDRekvizitClient(cfg),
 		MDSubSystems: NewMDSubSystemsClient(cfg),
 		MDTabel:      NewMDTabelClient(cfg),
@@ -105,6 +110,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	return &Tx{
 		ctx:          ctx,
 		config:       cfg,
+		MDForms:      NewMDFormsClient(cfg),
 		MDRekvizit:   NewMDRekvizitClient(cfg),
 		MDSubSystems: NewMDSubSystemsClient(cfg),
 		MDTabel:      NewMDTabelClient(cfg),
@@ -115,7 +121,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 // Debug returns a new debug-client. It's used to get verbose logging on specific operations.
 //
 //	client.Debug().
-//		MDRekvizit.
+//		MDForms.
 //		Query().
 //		Count(ctx)
 //
@@ -138,10 +144,133 @@ func (c *Client) Close() error {
 // Use adds the mutation hooks to all the entity clients.
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
+	c.MDForms.Use(hooks...)
 	c.MDRekvizit.Use(hooks...)
 	c.MDSubSystems.Use(hooks...)
 	c.MDTabel.Use(hooks...)
 	c.MDTypeTabel.Use(hooks...)
+}
+
+// MDFormsClient is a client for the MDForms schema.
+type MDFormsClient struct {
+	config
+}
+
+// NewMDFormsClient returns a client for the MDForms from the given config.
+func NewMDFormsClient(c config) *MDFormsClient {
+	return &MDFormsClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `mdforms.Hooks(f(g(h())))`.
+func (c *MDFormsClient) Use(hooks ...Hook) {
+	c.hooks.MDForms = append(c.hooks.MDForms, hooks...)
+}
+
+// Create returns a create builder for MDForms.
+func (c *MDFormsClient) Create() *MDFormsCreate {
+	mutation := newMDFormsMutation(c.config, OpCreate)
+	return &MDFormsCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of MDForms entities.
+func (c *MDFormsClient) CreateBulk(builders ...*MDFormsCreate) *MDFormsCreateBulk {
+	return &MDFormsCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for MDForms.
+func (c *MDFormsClient) Update() *MDFormsUpdate {
+	mutation := newMDFormsMutation(c.config, OpUpdate)
+	return &MDFormsUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *MDFormsClient) UpdateOne(mf *MDForms) *MDFormsUpdateOne {
+	mutation := newMDFormsMutation(c.config, OpUpdateOne, withMDForms(mf))
+	return &MDFormsUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *MDFormsClient) UpdateOneID(id string) *MDFormsUpdateOne {
+	mutation := newMDFormsMutation(c.config, OpUpdateOne, withMDFormsID(id))
+	return &MDFormsUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for MDForms.
+func (c *MDFormsClient) Delete() *MDFormsDelete {
+	mutation := newMDFormsMutation(c.config, OpDelete)
+	return &MDFormsDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a delete builder for the given entity.
+func (c *MDFormsClient) DeleteOne(mf *MDForms) *MDFormsDeleteOne {
+	return c.DeleteOneID(mf.ID)
+}
+
+// DeleteOneID returns a delete builder for the given id.
+func (c *MDFormsClient) DeleteOneID(id string) *MDFormsDeleteOne {
+	builder := c.Delete().Where(mdforms.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &MDFormsDeleteOne{builder}
+}
+
+// Query returns a query builder for MDForms.
+func (c *MDFormsClient) Query() *MDFormsQuery {
+	return &MDFormsQuery{
+		config: c.config,
+	}
+}
+
+// Get returns a MDForms entity by its id.
+func (c *MDFormsClient) Get(ctx context.Context, id string) (*MDForms, error) {
+	return c.Query().Where(mdforms.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *MDFormsClient) GetX(ctx context.Context, id string) *MDForms {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryChildMdforms queries the child_mdforms edge of a MDForms.
+func (c *MDFormsClient) QueryChildMdforms(mf *MDForms) *MDFormsQuery {
+	query := &MDFormsQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := mf.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(mdforms.Table, mdforms.FieldID, id),
+			sqlgraph.To(mdforms.Table, mdforms.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, mdforms.ChildMdformsTable, mdforms.ChildMdformsColumn),
+		)
+		fromV = sqlgraph.Neighbors(mf.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryParentMdforms queries the parent_mdforms edge of a MDForms.
+func (c *MDFormsClient) QueryParentMdforms(mf *MDForms) *MDFormsQuery {
+	query := &MDFormsQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := mf.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(mdforms.Table, mdforms.FieldID, id),
+			sqlgraph.To(mdforms.Table, mdforms.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, mdforms.ParentMdformsTable, mdforms.ParentMdformsColumn),
+		)
+		fromV = sqlgraph.Neighbors(mf.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *MDFormsClient) Hooks() []Hook {
+	return c.hooks.MDForms
 }
 
 // MDRekvizitClient is a client for the MDRekvizit schema.

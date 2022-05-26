@@ -6,6 +6,9 @@ import (
 	"entgo.io/ent/dialect/sql"
 )
 
+// MDForms is the predicate function for mdforms builders.
+type MDForms func(*sql.Selector)
+
 // MDRekvizit is the predicate function for mdrekvizit builders.
 type MDRekvizit func(*sql.Selector)
 

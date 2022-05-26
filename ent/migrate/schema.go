@@ -8,6 +8,27 @@ import (
 )
 
 var (
+	// MdFormsColumns holds the columns for the "md_forms" table.
+	MdFormsColumns = []*schema.Column{
+		{Name: "ID", Type: field.TypeString, Unique: true, Size: 36},
+		{Name: "idform", Type: field.TypeString, Size: 36},
+		{Name: "conteiner", Type: field.TypeString},
+		{Name: "Parent", Type: field.TypeString, Nullable: true, Size: 36},
+	}
+	// MdFormsTable holds the schema information for the "md_forms" table.
+	MdFormsTable = &schema.Table{
+		Name:       "md_forms",
+		Columns:    MdFormsColumns,
+		PrimaryKey: []*schema.Column{MdFormsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "md_forms_md_forms_child_mdforms",
+				Columns:    []*schema.Column{MdFormsColumns[3]},
+				RefColumns: []*schema.Column{MdFormsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
 	// MdRekvizitsColumns holds the columns for the "md_rekvizits" table.
 	MdRekvizitsColumns = []*schema.Column{
 		{Name: "ID", Type: field.TypeString, Unique: true, Size: 36},
@@ -133,6 +154,7 @@ var (
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
+		MdFormsTable,
 		MdRekvizitsTable,
 		MdSubSystemsTable,
 		MdTabelsTable,
@@ -142,6 +164,7 @@ var (
 )
 
 func init() {
+	MdFormsTable.ForeignKeys[0].RefTable = MdFormsTable
 	MdRekvizitsTable.ForeignKeys[0].RefTable = MdTabelsTable
 	MdSubSystemsTable.ForeignKeys[0].RefTable = MdSubSystemsTable
 	MdTabelsTable.ForeignKeys[0].RefTable = MdTabelsTable

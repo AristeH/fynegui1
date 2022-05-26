@@ -115,3 +115,26 @@ func (MDSubSystems) Edges() []ent.Edge {
 		edge.To("mdtables", MDTabel.Type),
 	}
 }
+
+// MDTabel holds the schema definition for the MDTabel entity.
+type MDForms struct {
+	ent.Schema
+}
+
+// Fields of the MDTypeTabel .
+func (MDForms) Fields() []ent.Field {
+	return []ent.Field{
+		field.String("id").MaxLen(36).NotEmpty().Unique().Immutable().StructTag(`json:"ссылка,omitempty"`).StorageKey("ID"),
+		field.String("idform").MaxLen(36).StructTag(`json:"Родитель,omitempty"`).StorageKey("idform"),		
+		field.String("conteiner"),
+		field.String("parent").MaxLen(36).Optional().StructTag(`json:"Родитель,omitempty"`).StorageKey("Parent"),
+	}
+}
+
+// Edges of the ДанныеФормыЭлементКоллекции.
+func (MDForms) Edges() []ent.Edge {
+	return []ent.Edge{
+		edge.To("child_mdforms", MDForms.Type),
+		edge.From("parent_mdforms", MDForms.Type).Ref("child_mdforms").Unique().Field("parent").StructTag(`json:"родитель,omitempty"`),
+	}
+}
