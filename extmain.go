@@ -3,7 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/gob"
-	//"encoding/json"
+
 	"fmt"
 
 	"os"
@@ -11,8 +11,8 @@ import (
 	"github.com/gorilla/websocket"
 )
 var sLogName = "aristeh.log"
-var mfu map[string]func(*MessageGob) []byte
-
+var mfu map[string]func(*MessageGob)
+var mfulocal map[string]func(*FormData, *ButtonData)
 
 // Client  - структура
 type Client struct {
@@ -88,10 +88,12 @@ func readC() {
 	}
 }
 
+
+
 // RegFunc adds the fu func to a map of functions,
-func RegFunc(sName string, fu func(*MessageGob) []byte) {
+func RegFunc(sName string, fu func(*MessageGob)) {
 	if mfu == nil {
-		mfu = make(map[string]func(*MessageGob) []byte)
+		mfu = make(map[string]func(*MessageGob))
 	}
 	mfu[sName] = fu
 }
@@ -137,6 +139,21 @@ func write() {
 				fmt.Println("ошибка ping:", err)
 				return
 			}
+	}
+}
+
+// RegFunc adds the fu func to a map of functions,
+func RegFuncLocal(sName string, fu func(*FormData,  *ButtonData) ) {
+	if mfulocal == nil {
+		mfulocal = make(map[string]func(*FormData,  *ButtonData))
+	}
+	mfulocal[sName] = fu
+}
+
+// Runproc выполним процедуру
+func RunprocLocal(fd *FormData, sName *ButtonData) {
+	if fnc, bExist := mfulocal[sName.Fun]; bExist {
+		fnc(fd,sName)
 	}
 }
 

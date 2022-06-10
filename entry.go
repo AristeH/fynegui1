@@ -12,3 +12,4 @@ type entryForm struct {
 	Widget  *widget.Entry //widget
 }
 
+

@@ -14,7 +14,7 @@ import (
 
 
 
-func GetFile(c *MessageGob) []byte {
+func GetFile(c *MessageGob){
 	p := &c.File
 	file, err := os.Create(p.Name)
      if err != nil {
@@ -23,8 +23,6 @@ func GetFile(c *MessageGob) []byte {
 	buffer := bufio.NewWriter(file)
 	buffer.Write(p.Content)
 	defer file.Close()
-	return nil
-
 }
 
 func GetMetaData(c *MessageGob) []byte {

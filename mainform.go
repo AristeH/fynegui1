@@ -2,32 +2,22 @@ package main
 
 import (
 	"bytes"
-	"context"
 	"encoding/gob"
-	"fmt"
-	"fynegui/ent"
-	"fynegui/ent/mdforms"
-	"fynegui/ent/mdsubsystems"
-
 	"image/color"
+	"strconv"
 	"strings"
 
-	//"image/color"
+	//"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2"
-	//	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/layout"
-
-	//	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/widget"
 )
-
-var client *ent.Client
 
 // константы метаданные для вывода интерфейса пользователя, номера столбца для вывода
 const (
 	ID            int = 0  //гуид метаданного(подсистема, таблица, реквизит, форма)
-	Nameeng       int = 1  //имя англ
+	Name          int = 1  //имя англ
 	Synonym       int = 2  //синоним
 	ParentID      int = 3  //гуид родителя или владельца метаданного
 	OrderOutput   int = 4  //порядок вывода элементов интерфейса
@@ -40,12 +30,13 @@ const (
 	Fun           int = 11 // тип метаданного
 )
 
-func GetTableList(pod string) {
+//GetDescription - получим описание формы 2
+func GetDataContainer(idform string, idcontainer string) {
 	var buff bytes.Buffer
 	enc := gob.NewEncoder(&buff)
-	d := GetData{Table: "md_tabels", Type: pod}
+	d := GetData{Table: "md_forms", ID: idform, Type: idcontainer}
 	mes := MessageGob{
-		Action: "GetTableList",
+		Action: "GetDataContainer",
 		Data:   d,
 	}
 	enc.Encode(mes)
@@ -54,218 +45,243 @@ func GetTableList(pod string) {
 	Cl.Reci <- k
 }
 
-//GetMenu - получим описание метаданных приложения
-func GetMetaDataApp() {
-	var buff bytes.Buffer
-	enc := gob.NewEncoder(&buff)
-	d := GetData{Table: "md_sub_systems"}
-	mes := MessageGob{
-		Action: "GetMetaData",
-		Data:   d,
-	}
-	enc.Encode(mes)
-	k := buff.Bytes()
-	println(k)
-	Cl.Reci <- k
-}
 
-func SetMetaDataApp(c *MessageGob) []byte {
-	ctx := context.Background()
-	app := c.Data
-	for _, b := range app.Data {
-		if len(b) > 0 {
-			if b[TypeMetaData] == "Подсистема" {
-				nw := client.MDSubSystems.Create()
-				nw.SetNameeng(b[Nameeng])
-				nw.SetSynonym(b[Synonym])
-				nw.SetID(b[ID])
-				nw.SetPor("0")
-				if b[ParentID] != "" {
-					nw.SetParentMdsubsystemsID(b[ParentID])
-				}
-
-				err := nw.OnConflict().UpdateNewValues().Exec(ctx)
-				if err != nil {
-					fmt.Println(err.Error())
-				}
-			}
-
-			if b[TypeMetaData] == "Типы" {
-				nw := client.MDTypeTabel.Create()
-				nw.SetID(b[ID])
-				nw.SetNameeng(b[Nameeng])
-				nw.SetSynonym(b[Synonym])
-				nw.SetPor(b[OrderOutput])
-				err := nw.OnConflict().UpdateNewValues().Exec(ctx)
-				if err != nil {
-					fmt.Println(err.Error())
-				}
-			}
-
-			if b[TypeMetaData] == "Таблица" {
-				nw := client.MDTabel.Create()
-				nw.SetNameeng(b[Nameeng])
-				nw.SetSynonym(b[Synonym])
-				nw.SetID(b[ID])
-				nw.SetPor(b[OrderOutput])
-				nw.SetFile("")
-				if b[ParentID] != "" {
-					nw.SetParentMdtabelID(b[ParentID])
-				}
-
-				if b[TypeContainer] != "" {
-					nw.SetTypesID(b[TypeContainer])
-				}
-				err := nw.OnConflict().UpdateNewValues().Exec(ctx)
-				if err != nil {
-					fmt.Println(err.Error())
-				}
-
-				tabl := strings.Split(b[ChildrensID], ";")
-				for _, rec := range tabl {
-
-					Mdtabel, _ := client.MDSubSystems.Get(ctx, rec)
-					if Mdtabel != nil {
-						nw.AddMdsubsystems(Mdtabel)
-					}
-				}
-				err = nw.OnConflict().UpdateNewValues().Exec(ctx)
-				if err != nil {
-					fmt.Println(err.Error())
-				}
-			}
-
-			if b[TypeMetaData] == "Реквизит" {
-				nw := client.MDRekvizit.Create()
-				nw.SetNameeng(b[Nameeng])
-				nw.SetSynonym(b[Synonym])
-				nw.SetID(b[ID])
-				nw.SetPor(b[OrderOutput])
-				nw.SetType(b[TypeContainer])
-				nw.SetWidthSpisok(60)
-				nw.SetOwnerID(b[ParentID])
-				err := nw.OnConflict().UpdateNewValues().Exec(ctx)
-				if err != nil {
-					fmt.Println(err.Error())
-				}
-			}
-
-			if b[TypeMetaData] == "Форма" {
-				nw := client.MDForms.Create()
-				nw.SetIdform(b[Nameeng])
-				nw.SetConteiner(b[TypeContainer])
-				if b[ParentID] != "" {
-					nw.SetParent(b[ParentID])
-				}
-				nw.SetID(b[ID])
-				err := nw.OnConflict().UpdateNewValues().Exec(ctx)
-				if err != nil {
-					fmt.Println(err.Error())
-				}
-			}
-
+func GetListTable(fd *FormData, p *ButtonData) {
+	for i := range fd.form {
+		if fd.form[i][Fun] == "ListTable" {
+			GetDataContainer("idform:"+fd.ID+";idcontainer:"+fd.form[i][ID], p.Parameters)
 		}
 	}
-
-	SetContent("main")
-	return nil
 }
 
-func SetContent(w string) {
-	var top *fyne.Container
-	win := app_values[w].W
-	var b [][]string
-	var b1 [][]string
-	var f []*ent.MDSubSystems
-	//var t []*ent.MDTabel
-	ctx := context.Background()
-	f, _ = client.MDSubSystems.Query().Where(mdsubsystems.ParentIsNil()).All(ctx)
-
-	for i := range f {
-		output := make([]string, 12)
-		output[ID] = f[i].ID
-		output[Nameeng] = f[i].Nameeng
-		output[Synonym] = f[i].Synonym
-		output[OrderOutput] = f[i].Por
-		output[ParentID] = f[i].Parent
-		output[Fun] = "podsystem"
-		b = append(b, output)
+func GetToolBarPodsystem2(fd *FormData, p *ButtonData) {
+	for i := range fd.form {
+		if fd.form[i][Fun] == p.Fun {
+			d := GetData{ID: "idform:"+fd.ID+";idcontainer:"+fd.form[i][ID]}
+			SendMessage("GetDataContainer", d)
+		}
 	}
-
-	top = container.NewVBox()
-	tb := ToolBarCreate("main", b, color.Gray{230})
-	app_values[w].Container["8"] = tb
-	top.Add(tb)
-	f, _ = client.MDSubSystems.Query().Where(mdsubsystems.ParentEQ(f[0].ID)).All(ctx)
-	for i := range f {
-		output := make([]string, 12)
-		output[ID] = f[i].ID
-		output[Nameeng] = f[i].Nameeng
-		output[Synonym] = f[i].Synonym
-		output[OrderOutput] = f[i].Por
-		output[ParentID] = f[i].Parent
-		output[Fun] = "tabl"
-		b1 = append(b1, output)
-	}
-	tb = ToolBarCreate("main", b1, color.Gray{240})
-	app_values[w].Container["9"] = tb
-	top.Add(tb)
-	ch := toolMain21(f[0].ID)
-	app_values[w].Container["9"] = ch
-	content := container.New(layout.NewBorderLayout(top, nil, ch, nil), top, ch)
-	win.SetContent(content)
-
 }
 
-// toolMain функция отображающая таблицы подсистемы
-func toolMain21(sub string) *fyne.Container {
+func ListTable(c *MessageGob) {
 
-	tbl, err := client.MDSubSystems.Query().Where(mdsubsystems.IDEQ(sub)).QueryMdtables().All(context.Background())
-	if err != nil {
-		println(err)
-	}
-
-	ch :=  container.NewVBox()
-	acc :=widget.NewAccordion()
+   attr:= getid(c.Data.ID) 
+	
+	tbl := c.Data.Data
 	contCatalog := container.NewVBox()
 	contDocument := container.NewVBox()
-
+	acc := widget.NewAccordion()
 	for _, b := range tbl {
-		d := widget.NewButton(b.Synonym, nil)
+		d := widget.NewButton(b[Synonym], nil)
 		d.OnTapped = func() {
-			param, _ := findButton(d)
+			_, param := findButton(d)
 			mp := strings.Split(param.Parameters, ";")
-			GenForm(mp[0], mp[1])
+			w:=InitForm("TableList", mp[0], "")
+			w.Show()
 		}
-		p := b.Nameeng + ";" + "0005bfbd-e65c-11e8-8828-3440b5b05858"
-		app_values["main"].Button[b.Synonym] = ButtonData{Fun: b.Nameeng + "GenForm", Parameters: p, Widget: d}
-		switch b.TypesID {
+		p := "idform:" + b[ID]
+		app_values["main"].Button[b[Synonym]] = ButtonData{Fun: b[Name] + "GenForm", Parameters: p, Widget: d}
+		switch b[TypeMetaData] {
 		case "Справочник":
 			contCatalog.Add(d)
-
 		case "Документ":
 			contDocument.Add(d)
+		}
+	}
+	acc.Append(&widget.AccordionItem{Title: "Документы", Detail: contDocument})
+	acc.Append(&widget.AccordionItem{Title: "Справочники", Detail: contCatalog})
+	d := container.NewVBox(container.NewVScroll(acc))
+	d.Layout = layout.NewMaxLayout()
+	app_values[attr["idform"]].Container[app_values[attr["idform"]].form[attr["idcontainer"]][ParentID]] = d
+	SetContent(attr["idform"])
+}
 
+func SetContent(idform string) {
+	var root string
+
+	var top fyne.CanvasObject
+	var left fyne.CanvasObject
+	var right fyne.CanvasObject
+	var bottom fyne.CanvasObject
+	top = nil
+	bottom = nil
+	left = nil
+	right = nil
+	win := app_values[idform].W
+	f := app_values[idform].form
+	for i := range f {
+		if f[i][ParentID] == "0" {
+			root = f[i][ID]
+			break
+		}
+	}
+	mproot := strings.Split(f[root][ChildrensID], ";")
+
+	for _, recroot := range mproot {
+		if recroot != "" {
+			mpborder := strings.Split(f[recroot][ChildrensID], ";")
+			for _, recb := range mpborder {
+				if recb != "" {
+
+					if f[recb][TypeContainer] == "top" {
+
+						top = app_values[idform].Container[recb]
+
+					}
+					if f[recb][TypeContainer] == "left" {
+						left = app_values[idform].Container[recb]
+
+					}
+				}
+
+			}
 		}
 	}
 
-	acc.Append(&widget.AccordionItem{Title: "Документы", Detail: contDocument})
-	acc.Append(&widget.AccordionItem{Title: "Справочники", Detail: contCatalog})
-	ch.Add(acc)
-	return ch
+	content := container.New(layout.NewBorderLayout(top, bottom, left, right))
+	if left != nil {
+		content.Add(left)
+	}
+	if top != nil {
+		content.Add(top)
+	}
+	//middle := canvas.NewText("content", color.Black)
+	// container := container.NewBorderLayout(top, left, nil, nil)
+
+	// 	container.Objects = append(container.Objects, top)
+
+	// 	container.Objects = append(container.Objects, canvas.NewText("content", color.Black))
+
+	// 	container.Objects = append(container.Objects, canvas.NewText("fgdfgdfg", color.Black))
+
+	// 	container.Objects = append(container.Objects, canvas.NewText("eretreg", color.Black))
+
+	//	if top != left {
+	//		container.Objects = append(container.Objects, left)
+	//	}
+
+	//container.AddObject(topc.)
+
+	// 	content := container.New(lb,top)
+	win.SetContent(content)
 }
 
-func mainform() fyne.Window {
+func ToolBarPodsystem2(c *MessageGob) {
+	//ToolBarPodsystem1(c)
+}
+func getid(id string) map[string]string {
+	rm := make(map[string]string)
+	mp := strings.Split(id, ";")
+	for _, rec := range mp {
+		if rec != "" {
+			mp1 := strings.Split(rec, ":")
+			if len(mp1) == 2 {
+				switch mp1[0] {
+
+				case "idform":
+					rm["idform"] = mp1[1]
+				case "idtable":
+					rm["idtable"] = mp1[1]
+				case "idelem":
+					rm["idelem"] = mp1[1]
+				case "idcontainer":
+					rm["idcontainer"] = mp1[1]
+				}
+			}
+
+		}
+	}
+	return rm
+}
+
+func ToolBar(c *MessageGob) {
+	app := c.Data.Data
+	attr := getid(c.Data.ID)
+
+	form := app_values[attr["idform"]]
+	fd := app_values[attr["idform"]].form
+
+	tb := ToolBarCreate(attr["idform"], app, color.Gray{230})
+	app_values[attr["idform"]].Container[attr["idcontainer"]] = tb
+	parent := fd[attr["idcontainer"]][ParentID]
+	// update form top fegin
+	mp := strings.Split(fd[parent][ChildrensID], ";")
+	top := container.New(layout.NewGridLayoutWithRows(2))
+	//top.Layout=layout.NewMaxLayout()
+	for _, rec := range mp {
+		if rec != "" {
+			if form.Container[rec] != nil {
+				top.Add(form.Container[rec])
+			}
+		}
+	}
+	form.Container[parent] = top
+	SetContent(attr["idform"])
+}
+
+
+
+
+
+func InitFormLocal(c *MessageGob) {
+	app := c.Data.Data
+	attr := getid(c.Data.ID)
+	fd := app_values[attr["idform"]]
+	for i := range app {
+		fd.form[app[i][ID]] = app[i]
+		if app[i][ParentID] != "0" {
+			fd.Container[strconv.Itoa(i)] = nil
+		}
+	}
+}
+
+func InitFormView(c *MessageGob) {
+	app := c.Data.Data
+	//attr := getid(c.Data.ID)
+	fd := app_values[app[0][ID]]
+	fd.W.SetTitle(app[0][Synonym])
+	w:=strings.Split(app[0][width], ";")
+	if len(w) == 2 {
+		wf,_ := strconv.Atoi(w[0])
+		hf,_ := strconv.Atoi(w[1])
+		fd.W.Resize(fyne.NewSize(float32(wf), float32(hf)))
+	}else{
+		fd.W.Resize(fyne.NewSize(1000, 100))
+	}
+}
+
+
+// InitForm - инициализация формы 1
+func InitForm(idform,idtable,idelem string) fyne.Window {
 	myWindow := myApp.NewWindow("Телефоны")
 	myWindow.Resize(fyne.NewSize(1200, 400))
-	app_values["main"] = &FormData{}
-	app_values["main"].W = myWindow
-	app_values["main"].Button = make(map[string]ButtonData)
-	app_values["main"].Container = make(map[string]*fyne.Container)
-	ctx := context.Background()
-	form, _ := client.MDForms.Query().Where(mdforms.IdformEQ("main")).All(ctx)
-	for i := range form {
-		app_values["main"].Container[form[i].ID] = nil
-	}
+	app_values[idform] = &FormData{}
+	app_values[idform].ID = idform
+	app_values[idform].W = myWindow
+	app_values[idform].Button = make(map[string]ButtonData)
+	app_values[idform].Container = make(map[string]fyne.CanvasObject)
+	app_values[idform].Entry = make(map[string]entryForm)
+	app_values[idform].Table = make(map[string]*TableOtoko)
+	app_values[idform].Tree = make(map[string]*TreeOtoko)
+	app_values[idform].form = make(map[string][]string)
+	d := GetData{ID: "idform:"+idform}
+	SendMessage("GetDescription", d)
 	return myWindow
 }
+
+//GetDescription - получим описание формы 2
+func SendMessage(Action string, d GetData ) {
+	var buff bytes.Buffer
+	enc := gob.NewEncoder(&buff)
+	mes := MessageGob{
+		Action: Action,
+		Data:   d,
+	}
+	enc.Encode(mes)
+	k := buff.Bytes()
+	println(Action)
+	Cl.Reci <- k
+}
+
+
+
