@@ -34,7 +34,7 @@ const (
 func GetDataContainer(idform string, idcontainer string) {
 	var buff bytes.Buffer
 	enc := gob.NewEncoder(&buff)
-	d := GetData{Table: "md_forms", ID: idform, Type: idcontainer}
+	d := GetData{ ID: idform, Container: idcontainer}
 	mes := MessageGob{
 		Action: "GetDataContainer",
 		Data:   d,
@@ -57,7 +57,7 @@ func GetListTable(fd *FormData, p *ButtonData) {
 func GetToolBarPodsystem2(fd *FormData, p *ButtonData) {
 	for i := range fd.form {
 		if fd.form[i][Fun] == p.Fun {
-			d := GetData{ID: "idform:"+fd.ID+";idcontainer:"+fd.form[i][ID]}
+			d := GetData{ID: fd.ID, Container:fd.form[i][ID]}
 			SendMessage("GetDataContainer", d)
 		}
 	}
@@ -76,7 +76,7 @@ func ListTable(c *MessageGob) {
 		d.OnTapped = func() {
 			_, param := findButton(d)
 			mp := strings.Split(param.Parameters, ";")
-			w:=InitForm("TableList", mp[0], "")
+			w:=InitForm("TableList", mp[0])
 			w.Show()
 		}
 		p := "idform:" + b[ID]
@@ -196,14 +196,13 @@ func getid(id string) map[string]string {
 
 func ToolBar(c *MessageGob) {
 	app := c.Data.Data
-	attr := getid(c.Data.ID)
 
-	form := app_values[attr["idform"]]
-	fd := app_values[attr["idform"]].form
+	form := app_values[c.Data.ID]
+	fd := app_values[c.Data.ID].form
 
-	tb := ToolBarCreate(attr["idform"], app, color.Gray{230})
-	app_values[attr["idform"]].Container[attr["idcontainer"]] = tb
-	parent := fd[attr["idcontainer"]][ParentID]
+	tb := ToolBarCreate(c.Data.ID, c.Data.Container, app, color.Gray{230})
+	app_values[c.Data.ID].Container[c.Data.Container] = tb
+	parent := fd[c.Data.Container][ParentID]
 	// update form top fegin
 	mp := strings.Split(fd[parent][ChildrensID], ";")
 	top := container.New(layout.NewGridLayoutWithRows(2))
@@ -216,7 +215,7 @@ func ToolBar(c *MessageGob) {
 		}
 	}
 	form.Container[parent] = top
-	SetContent(attr["idform"])
+	SetContent(c.Data.ID)
 }
 
 
@@ -225,8 +224,7 @@ func ToolBar(c *MessageGob) {
 
 func InitFormLocal(c *MessageGob) {
 	app := c.Data.Data
-	attr := getid(c.Data.ID)
-	fd := app_values[attr["idform"]]
+	fd := app_values[c.Data.ID]
 	for i := range app {
 		fd.form[app[i][ID]] = app[i]
 		if app[i][ParentID] != "0" {
@@ -252,7 +250,7 @@ func InitFormView(c *MessageGob) {
 
 
 // InitForm - инициализация формы 1
-func InitForm(idform,idtable,idelem string) fyne.Window {
+func InitForm(idform, parameters string) fyne.Window {
 	myWindow := myApp.NewWindow("Телефоны")
 	myWindow.Resize(fyne.NewSize(1200, 400))
 	app_values[idform] = &FormData{}
@@ -264,8 +262,8 @@ func InitForm(idform,idtable,idelem string) fyne.Window {
 	app_values[idform].Table = make(map[string]*TableOtoko)
 	app_values[idform].Tree = make(map[string]*TreeOtoko)
 	app_values[idform].form = make(map[string][]string)
-	d := GetData{ID: "idform:"+idform}
-	SendMessage("GetDescription", d)
+	d := GetData{ID: idform, Container: "1"}
+	SendMessage("GetDataContainer", d)
 	return myWindow
 }
 

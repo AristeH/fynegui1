@@ -7,11 +7,7 @@ import (
 	"encoding/json"
 	"log"
 	"os"
-
-//	"github.com/gorilla/websocket"
-
 )
-
 
 
 func GetFile(c *MessageGob){

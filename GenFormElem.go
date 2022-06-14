@@ -1,9 +1,6 @@
 package main
 
 import (
-	"bytes"
-	"encoding/gob"
-	"encoding/json"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/widget"
 )
@@ -11,24 +8,6 @@ import (
 type Message struct {
 	Action     []byte // имя  функции
 	Parameters []byte // параметры
-}
-
-func GenData(elemname string, id string) {
-	var buff bytes.Buffer
-	enc := gob.NewEncoder(&buff)
-	jsonMessage, _ := json.Marshal([]string{"ID: " + id})
-	d := GetData{Table: elemname, ID: id}
-	mes := MessageGob{
-		Action:     elemname + "GetData",
-		Parameters: jsonMessage,
-		Data:       d,
-	}
-	enc.Encode(mes)
-	k := buff.Bytes()
-	println(k)
-
-	Cl.Reci <- k
-
 }
 
 

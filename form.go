@@ -12,7 +12,8 @@ import (
 
 type ButtonData struct {
 	Parameters string         // параметры кнопки формат Имяпараметра:Значение;... ИмяпараметраN:ЗначениеN;
-	Fun        string         // функция выполняемая при нажатии на кнопку
+	Fun        string 
+	Container string        // функция выполняемая при нажатии на кнопку
 	Widget     *widget.Button // отображение кнопки на экране
 }
 
@@ -45,7 +46,8 @@ func findButton(d *widget.Button) (*FormData, *ButtonData) {
 
 // ToolBarCreate - создание командной панели
 // 
-func ToolBarCreate(idform string, but [][]string, color color.Color) *fyne.Container {
+func ToolBarCreate(idform string,c string, but [][]string, color color.Color) *fyne.Container {
+	var br [][]string
 	// Получим форму с данными
 	fd := app_values[idform] 
 	// создадим кнопки формы
@@ -53,11 +55,21 @@ func ToolBarCreate(idform string, but [][]string, color color.Color) *fyne.Conta
 	for _, value := range but {
 		d := widget.NewButtonWithIcon(value[Synonym], GetIcon(value[Name]), nil)
 		d.OnTapped = func() {
-			RunprocLocal(findButton(d))
+			f,b :=findButton(d)
+			output := make([]string, 12)
+
+		output[ID] = f.ID                 // гуид подсистмы/кнопки
+		output[Name] = b.Parameters       //параметрыфункции
+		output[Fun] = b.Fun // функция для кнопки
+
+		br = append(br, output)
+
+			d := GetData{ID: idform, Container: "9", Data:br}
+			SendMessage("GetDataContainer", d)
 		}
 		//ff := strings.Split(value[Name],":")
 		// сохраним кнопку в FormData
-		fd.Button[value[ID]] = ButtonData{Fun: value[Fun], Parameters: value[ID], Widget: d}
+		fd.Button[value[ID]] = ButtonData{Fun: value[Fun],Container:c, Parameters: value[ID], Widget: d}
 		con.Add(d)
 	}
 	return container.New(layout.NewMaxLayout(),	canvas.NewRectangle(color),	con,)

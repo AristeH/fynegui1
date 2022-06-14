@@ -35,9 +35,8 @@ type MessageGob struct{
 }
 
 type GetData struct {
-	Table string
-	ID    string
-	Type  string
+	ID   string
+	Container  string
 	Data  [][]string
 }
 

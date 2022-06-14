@@ -17,7 +17,7 @@ func main() {
 	RegFunc("ListTable", ListTable)
 	RegFunc("GetFile", GetFile)
 
-	myWindow := InitForm("main", "", "")
+	myWindow := InitForm("main", "")
 	myWindow.ShowAndRun()
 
 }
