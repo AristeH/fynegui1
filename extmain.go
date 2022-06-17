@@ -10,6 +10,7 @@ import (
 
 	"github.com/gorilla/websocket"
 )
+
 var sLogName = "aristeh.log"
 var mfu map[string]func(*MessageGob)
 var mfulocal map[string]func(*FormData, *ButtonData)
@@ -27,24 +28,24 @@ var Cl Client
 var CH chan string
 var VCH chan string
 
-type MessageGob struct{
-	Action string  // Имя функуции
-	Parameters []byte //параметры??
-	Data GetData   // Сведенеия о данных
-	File FileUP    // сведения о передаваемом файле
+type MessageGob struct {
+	Action     string  // Имя функуции
+	Parameters []byte  //параметры??
+	Data       GetData // Сведенеия о данных
+	File       FileUP  // сведения о передаваемом файле
 }
 
 type GetData struct {
-	ID   string
-	Container  string
-	Data  [][]string
+	ID        string
+	Container string
+	Data      [][]string
 }
 
-type FileUP struct{
-	Name string
-	Dir string
+type FileUP struct {
+	Name    string
+	Dir     string
 	Content []byte
-} 
+}
 
 func Init(sOpt string, constr string, quit chan string) int {
 	VCH = make(chan string)
@@ -78,7 +79,7 @@ func readC() {
 			}
 			break
 		}
- 		z:=bytes.NewBuffer(message)
+		z := bytes.NewBuffer(message)
 		out := MessageGob{}
 		dec := gob.NewDecoder(z)
 		dec.Decode(&out)
@@ -86,8 +87,6 @@ func readC() {
 
 	}
 }
-
-
 
 // RegFunc adds the fu func to a map of functions,
 func RegFunc(sName string, fu func(*MessageGob)) {
@@ -111,7 +110,8 @@ func WriteLog(sText string) {
 		return
 	}
 	defer f.Close()
-	f.WriteString(sText)
+	f.WriteString(sText + "\n")
+	println(sText)
 }
 
 func write() {
@@ -120,31 +120,30 @@ func write() {
 	}()
 
 	for {
-		 message, ok := <-Cl.Reci
-			println("пишем в сокет")
-			if !ok {
-				err := Cl.socket.WriteMessage(websocket.CloseMessage, []byte{})
-				if err != nil {
-					WriteLog(fmt.Sprintf("WebSocket Close Error: (%s)", err))
-				}
-				return
-			}
-			err := Cl.socket.WriteMessage(websocket.TextMessage, message)
+		message, ok := <-Cl.Reci
+		if !ok {
+			err := Cl.socket.WriteMessage(websocket.CloseMessage, []byte{})
 			if err != nil {
-				fmt.Println("ошибка write:", err)
-				break
+				WriteLog(fmt.Sprintf("WebSocket Close Error: (%s)", err))
 			}
-			if err := Cl.socket.WriteMessage(websocket.PingMessage, []byte{}); err != nil {
-				fmt.Println("ошибка ping:", err)
-				return
-			}
+			return
+		}
+		err := Cl.socket.WriteMessage(websocket.TextMessage, message)
+		if err != nil {
+			fmt.Println("ошибка write:", err)
+			break
+		}
+		if err := Cl.socket.WriteMessage(websocket.PingMessage, []byte{}); err != nil {
+			fmt.Println("ошибка ping:", err)
+			return
+		}
 	}
 }
 
 // RegFunc adds the fu func to a map of functions,
-func RegFuncLocal(sName string, fu func(*FormData,  *ButtonData) ) {
+func RegFuncLocal(sName string, fu func(*FormData, *ButtonData)) {
 	if mfulocal == nil {
-		mfulocal = make(map[string]func(*FormData,  *ButtonData))
+		mfulocal = make(map[string]func(*FormData, *ButtonData))
 	}
 	mfulocal[sName] = fu
 }
@@ -152,8 +151,6 @@ func RegFuncLocal(sName string, fu func(*FormData,  *ButtonData) ) {
 // Runproc выполним процедуру
 func RunprocLocal(fd *FormData, sName *ButtonData) {
 	if fnc, bExist := mfulocal[sName.Fun]; bExist {
-		fnc(fd,sName)
+		fnc(fd, sName)
 	}
 }
-
-

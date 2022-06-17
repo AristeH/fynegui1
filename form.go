@@ -1,31 +1,31 @@
 package main
 
 import (
-	"image/color"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
+	"image/color"
 )
 
 type ButtonData struct {
-	Parameters string         // параметры кнопки формат Имяпараметра:Значение;... ИмяпараметраN:ЗначениеN;
-	Fun        string 
-	Container string        // функция выполняемая при нажатии на кнопку
+	Parameters string // параметры кнопки формат Имяпараметра:Значение;... ИмяпараметраN:ЗначениеN;
+	Fun        string
+	Container  string         // функция выполняемая при нажатии на кнопку
 	Widget     *widget.Button // отображение кнопки на экране
 }
 
 //FormData - данные формы
 type FormData struct {
-	ID        string                     // ID - ГУИД формы
-	Entry     map[string]entryForm       // Entry  - список полей ввода формы
-	Table     map[string]*TableOtoko     // Table  - список таблиц формы
-	Tree      map[string]*TreeOtoko      // Table  - список таблиц формы
-	Button    map[string]ButtonData      // Button - список кнопок формы
+	ID        string                       // ID - ГУИД формы
+	Entry     map[string]entryForm         // Entry  - список полей ввода формы
+	Table     map[string]*TableOtoko       // Table  - список таблиц формы
+	Tree      map[string]*TreeOtoko        // Table  - список таблиц формы
+	Button    map[string]ButtonData        // Button - список кнопок формы
 	Container map[string]fyne.CanvasObject // Container - список контейнеров формы
-	form      map[string][]string        // form иерархия контейнеров формы
+	form      map[string][]string          // form иерархия контейнеров формы
 	W         fyne.Window
 }
 
@@ -42,37 +42,36 @@ func findButton(d *widget.Button) (*FormData, *ButtonData) {
 	return &FormData{}, &ButtonData{}
 }
 
-
-
 // ToolBarCreate - создание командной панели
-// 
-func ToolBarCreate(idform string,c string, but [][]string, color color.Color) *fyne.Container {
-	var br [][]string
+//
+func ToolBarCreate(idform string, c string, but [][]string, color color.Color) *fyne.Container {
+
 	// Получим форму с данными
-	fd := app_values[idform] 
+	fd := app_values[idform]
 	// создадим кнопки формы
 	con := container.NewHBox()
 	for _, value := range but {
-		d := widget.NewButtonWithIcon(value[Synonym], GetIcon(value[Name]), nil)
+		d := widget.NewButtonWithIcon(value[Name], GetIcon(value[Icon]), nil)
 		d.OnTapped = func() {
-			f,b :=findButton(d)
+			var br [][]string
+			f, b := findButton(d)
 			output := make([]string, 12)
 
-		output[ID] = f.ID                 // гуид подсистмы/кнопки
-		output[Name] = b.Parameters       //параметрыфункции
-		output[Fun] = b.Fun // функция для кнопки
+			output[ID] = f.ID                 // гуид подсистмы/кнопки
+			output[Parameters] = b.Parameters //параметрыфункции
+			output[Fun] = b.Fun               // функция для кнопки
 
-		br = append(br, output)
+			br = append(br, output)
 
-			d := GetData{ID: idform, Container: "9", Data:br}
+			d := GetData{ID: idform, Data: br}
 			SendMessage("GetDataContainer", d)
 		}
 		//ff := strings.Split(value[Name],":")
 		// сохраним кнопку в FormData
-		fd.Button[value[ID]] = ButtonData{Fun: value[Fun],Container:c, Parameters: value[ID], Widget: d}
+		fd.Button[value[ID]] = ButtonData{Fun: value[Fun], Container: c, Parameters: value[Parameters], Widget: d}
 		con.Add(d)
 	}
-	return container.New(layout.NewMaxLayout(),	canvas.NewRectangle(color),	con,)
+	return container.New(layout.NewMaxLayout(), canvas.NewRectangle(color), con)
 }
 
 func GetIcon(n string) fyne.Resource {
@@ -84,5 +83,3 @@ func GetIcon(n string) fyne.Resource {
 	}
 	return nil
 }
-
-

@@ -21,12 +21,12 @@ const (
 	Synonym       int = 2  //синоним
 	ParentID      int = 3  //гуид родителя или владельца метаданного
 	OrderOutput   int = 4  //порядок вывода элементов интерфейса
-	MestoOutput   int = 5  //область вывода{top,bottom,left,right,middle,""}
+	Icon          int = 5  //область вывода{top,bottom,left,right,middle,""}
 	TypeContainer int = 6  //имя контейнера, виджета
 	NameContainer int = 7  //имя заголовка контейнера
-	width         int = 8  //ширина
+	Style         int = 8  //ширина
 	ChildrensID   int = 9  //иерархия дети( подсистемы, табличные части, реквизиты)
-	TypeMetaData  int = 10 // тип метаданного
+	Parameters    int = 10 // тип метаданного
 	Fun           int = 11 // тип метаданного
 )
 
@@ -34,7 +34,7 @@ const (
 func GetDataContainer(idform string, idcontainer string) {
 	var buff bytes.Buffer
 	enc := gob.NewEncoder(&buff)
-	d := GetData{ ID: idform, Container: idcontainer}
+	d := GetData{ID: idform, Container: idcontainer}
 	mes := MessageGob{
 		Action: "GetDataContainer",
 		Data:   d,
@@ -45,28 +45,15 @@ func GetDataContainer(idform string, idcontainer string) {
 	Cl.Reci <- k
 }
 
-
 func GetListTable(fd *FormData, p *ButtonData) {
 	for i := range fd.form {
 		if fd.form[i][Fun] == "ListTable" {
-			GetDataContainer("idform:"+fd.ID+";idcontainer:"+fd.form[i][ID], p.Parameters)
-		}
-	}
-}
-
-func GetToolBarPodsystem2(fd *FormData, p *ButtonData) {
-	for i := range fd.form {
-		if fd.form[i][Fun] == p.Fun {
-			d := GetData{ID: fd.ID, Container:fd.form[i][ID]}
-			SendMessage("GetDataContainer", d)
+			GetDataContainer(fd.ID, fd.form[i][ID])
 		}
 	}
 }
 
 func ListTable(c *MessageGob) {
-
-   attr:= getid(c.Data.ID) 
-	
 	tbl := c.Data.Data
 	contCatalog := container.NewVBox()
 	contDocument := container.NewVBox()
@@ -76,12 +63,12 @@ func ListTable(c *MessageGob) {
 		d.OnTapped = func() {
 			_, param := findButton(d)
 			mp := strings.Split(param.Parameters, ";")
-			w:=InitForm("TableList", mp[0])
+			w := InitForm("TableList", mp[0])
 			w.Show()
 		}
-		p := "idform:" + b[ID]
-		app_values["main"].Button[b[Synonym]] = ButtonData{Fun: b[Name] + "GenForm", Parameters: p, Widget: d}
-		switch b[TypeMetaData] {
+
+		app_values[c.Data.ID].Button[b[ID]] = ButtonData{Fun: b[Name] + "GenForm", Parameters: b[ID], Widget: d}
+		switch b[TypeContainer] {
 		case "Справочник":
 			contCatalog.Add(d)
 		case "Документ":
@@ -92,8 +79,10 @@ func ListTable(c *MessageGob) {
 	acc.Append(&widget.AccordionItem{Title: "Справочники", Detail: contCatalog})
 	d := container.NewVBox(container.NewVScroll(acc))
 	d.Layout = layout.NewMaxLayout()
-	app_values[attr["idform"]].Container[app_values[attr["idform"]].form[attr["idcontainer"]][ParentID]] = d
-	SetContent(attr["idform"])
+	fd := app_values[c.Data.ID].form
+	parent := fd[c.Data.Container][ParentID]
+	app_values[c.Data.ID].Container[parent] = d
+	SetContent(c.Data.ID)
 }
 
 func SetContent(idform string) {
@@ -164,11 +153,9 @@ func SetContent(idform string) {
 
 	// 	content := container.New(lb,top)
 	win.SetContent(content)
+	win.Show()
 }
 
-func ToolBarPodsystem2(c *MessageGob) {
-	//ToolBarPodsystem1(c)
-}
 func getid(id string) map[string]string {
 	rm := make(map[string]string)
 	mp := strings.Split(id, ";")
@@ -200,7 +187,7 @@ func ToolBar(c *MessageGob) {
 	form := app_values[c.Data.ID]
 	fd := app_values[c.Data.ID].form
 
-	tb := ToolBarCreate(c.Data.ID, c.Data.Container, app, color.Gray{230})
+	tb := ToolBarCreate(c.Data.ID, c.Data.Container, app, color.Gray{Y: 230})
 	app_values[c.Data.ID].Container[c.Data.Container] = tb
 	parent := fd[c.Data.Container][ParentID]
 	// update form top fegin
@@ -218,10 +205,6 @@ func ToolBar(c *MessageGob) {
 	SetContent(c.Data.ID)
 }
 
-
-
-
-
 func InitFormLocal(c *MessageGob) {
 	app := c.Data.Data
 	fd := app_values[c.Data.ID]
@@ -238,19 +221,21 @@ func InitFormView(c *MessageGob) {
 	//attr := getid(c.Data.ID)
 	fd := app_values[app[0][ID]]
 	fd.W.SetTitle(app[0][Synonym])
-	w:=strings.Split(app[0][width], ";")
+	w := strings.Split(app[0][Style], ";")
 	if len(w) == 2 {
-		wf,_ := strconv.Atoi(w[0])
-		hf,_ := strconv.Atoi(w[1])
+		wf, _ := strconv.Atoi(w[0])
+		hf, _ := strconv.Atoi(w[1])
 		fd.W.Resize(fyne.NewSize(float32(wf), float32(hf)))
-	}else{
+	} else {
 		fd.W.Resize(fyne.NewSize(1000, 100))
 	}
 }
 
-
 // InitForm - инициализация формы 1
 func InitForm(idform, parameters string) fyne.Window {
+	var br [][]string
+
+	WriteLog("Инициализация формы:" + idform + " параметры:" + parameters)
 	myWindow := myApp.NewWindow("Телефоны")
 	myWindow.Resize(fyne.NewSize(1200, 400))
 	app_values[idform] = &FormData{}
@@ -262,13 +247,20 @@ func InitForm(idform, parameters string) fyne.Window {
 	app_values[idform].Table = make(map[string]*TableOtoko)
 	app_values[idform].Tree = make(map[string]*TreeOtoko)
 	app_values[idform].form = make(map[string][]string)
-	d := GetData{ID: idform, Container: "1"}
+
+	output := make([]string, 12)
+	output[ID] = idform       // гуид подсистмы/кнопки
+	output[Name] = parameters //параметрыфункции
+	output[Fun] = ""          // функция для кнопки
+
+	br = append(br, output)
+	d := GetData{ID: idform, Data: br}
 	SendMessage("GetDataContainer", d)
 	return myWindow
 }
 
-//GetDescription - получим описание формы 2
-func SendMessage(Action string, d GetData ) {
+//SendMessage -  отправить сообщение серверу
+func SendMessage(Action string, d GetData) {
 	var buff bytes.Buffer
 	enc := gob.NewEncoder(&buff)
 	mes := MessageGob{
@@ -277,9 +269,6 @@ func SendMessage(Action string, d GetData ) {
 	}
 	enc.Encode(mes)
 	k := buff.Bytes()
-	println(Action)
+	WriteLog("На сервер:" + Action + " Форма:" + d.ID + " функция:" + d.Data[0][Fun] + " параметры:" + d.Data[0][Parameters])
 	Cl.Reci <- k
 }
-
-
-
