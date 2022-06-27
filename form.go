@@ -32,7 +32,7 @@ type FormData struct {
 //findButton - найдем кнопку в списке виджетов формы
 // возвращает ссылку на форму FormData, и на кнопку ButtonData
 func findButton(d *widget.Button) (*FormData, *ButtonData) {
-	for _, f := range app_values {
+	for _, f := range appValues {
 		for _, b := range f.Button {
 			if b.Widget == d {
 				return f, &b
@@ -47,7 +47,7 @@ func findButton(d *widget.Button) (*FormData, *ButtonData) {
 func ToolBarCreate(idform string, c string, but [][]string, color color.Color) *fyne.Container {
 
 	// Получим форму с данными
-	fd := app_values[idform]
+	fd := appValues[idform]
 	// создадим кнопки формы
 	con := container.NewHBox()
 	for _, value := range but {

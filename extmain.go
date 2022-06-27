@@ -6,14 +6,12 @@ import (
 
 	"fmt"
 
-	"os"
-
 	"github.com/gorilla/websocket"
 )
 
 var sLogName = "aristeh.log"
 var mfu map[string]func(*MessageGob)
-var mfulocal map[string]func(*FormData, *ButtonData)
+var mfuLocal map[string]func(*FormData, *ButtonData)
 
 // Client  - структура
 type Client struct {
@@ -57,7 +55,7 @@ func Init(sOpt string, constr string, quit chan string) int {
 func connectServer() string {
 	conn, _, err := websocket.DefaultDialer.Dial("ws://127.0.0.1:8080/telephon", nil)
 	if err != nil {
-		WriteLog(fmt.Sprintf("Dial error:  (%s)", err))
+		logger.Infof(fmt.Sprintf("Dial error:  (%s)", err))
 		return "Error connection"
 	}
 	Cl = Client{id: "", socket: conn, Send: make(chan []byte), Reci: make(chan []byte)}
@@ -75,7 +73,7 @@ func readC() {
 		if err != nil {
 			fmt.Println("read mt:", mt)
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
-				WriteLog(fmt.Sprintf("error: %v", err))
+				logger.Infof(fmt.Sprintf("error: %v", err))
 			}
 			break
 		}
@@ -102,17 +100,6 @@ func Runproc(c *MessageGob) {
 	}
 }
 
-// WriteLog writes the sText to a log file aristeh.log.
-func WriteLog(sText string) {
-	f, err := os.OpenFile(sLogName, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0600)
-	if err != nil {
-		return
-	}
-	defer f.Close()
-	f.WriteString(sText + "\n")
-	println(sText)
-}
-
 func write() {
 	defer func() {
 		Cl.socket.Close()
@@ -123,7 +110,7 @@ func write() {
 		if !ok {
 			err := Cl.socket.WriteMessage(websocket.CloseMessage, []byte{})
 			if err != nil {
-				WriteLog(fmt.Sprintf("WebSocket Close Error: (%s)", err))
+				logger.Infof(fmt.Sprintf("WebSocket Close Error: (%s)", err))
 			}
 			return
 		}
@@ -141,15 +128,15 @@ func write() {
 
 // RegFuncLocal adds the fu func to a map of functions,
 func RegFuncLocal(sName string, fu func(*FormData, *ButtonData)) {
-	if mfulocal == nil {
-		mfulocal = make(map[string]func(*FormData, *ButtonData))
+	if mfuLocal == nil {
+		mfuLocal = make(map[string]func(*FormData, *ButtonData))
 	}
-	mfulocal[sName] = fu
+	mfuLocal[sName] = fu
 }
 
 // RunprocLocal выполним процедуру
 func RunprocLocal(fd *FormData, sName *ButtonData) {
-	if fnc, bExist := mfulocal[sName.Fun]; bExist {
+	if fnc, bExist := mfuLocal[sName.Fun]; bExist {
 		fnc(fd, sName)
 	}
 }

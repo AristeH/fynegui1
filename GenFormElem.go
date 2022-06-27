@@ -10,12 +10,10 @@ type Message struct {
 	Parameters []byte // параметры
 }
 
-
-
 func GenFormTree(NameTree, IDForm string) *widget.Tree {
 
 	childUIDs := func(uid string) (c []string) {
-		return app_values[NameTree].Tree[NameTree].TreeUIDMapping[uid]
+		return appValues[NameTree].Tree[NameTree].TreeUIDMapping[uid]
 	}
 
 	createNode := func(branch bool) (o fyne.CanvasObject) {
@@ -24,8 +22,8 @@ func GenFormTree(NameTree, IDForm string) *widget.Tree {
 
 	// It's a branch if uid exists, and has sub-values
 	isBranch := func(uid string) (ok bool) {
-		if _, ok := app_values[NameTree].Tree[NameTree].TreeUIDMapping[uid]; ok {
-			if len(app_values[NameTree].Tree[NameTree].TreeUIDMapping[uid]) > 0 {
+		if _, ok := appValues[NameTree].Tree[NameTree].TreeUIDMapping[uid]; ok {
+			if len(appValues[NameTree].Tree[NameTree].TreeUIDMapping[uid]) > 0 {
 				return true
 			}
 		}
@@ -33,9 +31,8 @@ func GenFormTree(NameTree, IDForm string) *widget.Tree {
 	}
 
 	updateNode := func(uid string, branch bool, node fyne.CanvasObject) {
-		node.(*widget.Label).SetText(app_values[NameTree].Tree[NameTree].TextForTreeUID[uid])
+		node.(*widget.Label).SetText(appValues[NameTree].Tree[NameTree].TextForTreeUID[uid])
 	}
 
 	return widget.NewTree(childUIDs, isBranch, createNode, updateNode)
 }
-

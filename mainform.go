@@ -67,7 +67,7 @@ func AccordionTable(c *MessageGob) {
 			w.Show()
 		}
 
-		app_values[c.Data.ID].Button[b[ID]] = ButtonData{Fun: b[Name] + "GenForm", Parameters: b[ID], Widget: d}
+		appValues[c.Data.ID].Button[b[ID]] = ButtonData{Fun: b[Name] + "GenForm", Parameters: b[ID], Widget: d}
 		switch b[TypeContainer] {
 		case "Справочник":
 			contCatalog.Add(d)
@@ -79,9 +79,9 @@ func AccordionTable(c *MessageGob) {
 	acc.Append(&widget.AccordionItem{Title: "Справочники", Detail: contCatalog})
 	d := container.NewVBox(container.NewVScroll(acc))
 	d.Layout = layout.NewMaxLayout()
-	fd := app_values[c.Data.ID].form
+	fd := appValues[c.Data.ID].form
 	parent := fd[c.Data.Container][ParentID]
-	app_values[c.Data.ID].Container[parent] = d
+	appValues[c.Data.ID].Container[parent] = d
 	SetContent(c.Data.ID)
 }
 
@@ -96,8 +96,8 @@ func SetContent(idform string) {
 	bottom = nil
 	left = nil
 	right = nil
-	win := app_values[idform].W
-	f := app_values[idform].form
+	win := appValues[idform].W
+	f := appValues[idform].form
 	for i := range f {
 		if f[i][ParentID] == "0" {
 			root = f[i][ID]
@@ -114,11 +114,11 @@ func SetContent(idform string) {
 
 					if f[recb][TypeContainer] == "top" {
 
-						top = app_values[idform].Container[recb]
+						top = appValues[idform].Container[recb]
 
 					}
 					if f[recb][TypeContainer] == "left" {
-						left = app_values[idform].Container[recb]
+						left = appValues[idform].Container[recb]
 
 					}
 				}
@@ -184,11 +184,11 @@ func getid(id string) map[string]string {
 func ToolBar(c *MessageGob) {
 	app := c.Data.Data
 
-	form := app_values[c.Data.ID]
-	fd := app_values[c.Data.ID].form
+	form := appValues[c.Data.ID]
+	fd := appValues[c.Data.ID].form
 
 	tb := ToolBarCreate(c.Data.ID, c.Data.Container, app, color.Gray{Y: 230})
-	app_values[c.Data.ID].Container[c.Data.Container] = tb
+	appValues[c.Data.ID].Container[c.Data.Container] = tb
 	parent := fd[c.Data.Container][ParentID]
 	// update form top fegin
 	mp := strings.Split(fd[parent][ChildrensID], ";")
@@ -207,7 +207,7 @@ func ToolBar(c *MessageGob) {
 
 func InitFormLocal(c *MessageGob) {
 	app := c.Data.Data
-	fd := app_values[c.Data.ID]
+	fd := appValues[c.Data.ID]
 	for i := range app {
 		fd.form[app[i][ID]] = app[i]
 		if app[i][ParentID] != "0" {
@@ -219,7 +219,7 @@ func InitFormLocal(c *MessageGob) {
 func InitFormView(c *MessageGob) {
 	app := c.Data.Data
 	//attr := getid(c.Data.ID)
-	fd := app_values[app[0][ID]]
+	fd := appValues[app[0][ID]]
 	fd.W.SetTitle(app[0][Synonym])
 	w := strings.Split(app[0][Style], ";")
 	if len(w) == 2 {
@@ -235,18 +235,18 @@ func InitFormView(c *MessageGob) {
 func InitForm(idform, parameters string) fyne.Window {
 	var br [][]string
 
-	WriteLog("Инициализация формы:" + idform + " параметры:" + parameters)
+	logger.Infof("Инициализация формы:" + idform + " параметры:" + parameters)
 	myWindow := myApp.NewWindow("Телефоны")
 	myWindow.Resize(fyne.NewSize(1200, 400))
-	app_values[idform] = &FormData{}
-	app_values[idform].ID = idform
-	app_values[idform].W = myWindow
-	app_values[idform].Button = make(map[string]ButtonData)
-	app_values[idform].Container = make(map[string]fyne.CanvasObject)
-	app_values[idform].Entry = make(map[string]entryForm)
-	app_values[idform].Table = make(map[string]*TableOtoko)
-	app_values[idform].Tree = make(map[string]*TreeOtoko)
-	app_values[idform].form = make(map[string][]string)
+	appValues[idform] = &FormData{}
+	appValues[idform].ID = idform
+	appValues[idform].W = myWindow
+	appValues[idform].Button = make(map[string]ButtonData)
+	appValues[idform].Container = make(map[string]fyne.CanvasObject)
+	appValues[idform].Entry = make(map[string]entryForm)
+	appValues[idform].Table = make(map[string]*TableOtoko)
+	appValues[idform].Tree = make(map[string]*TreeOtoko)
+	appValues[idform].form = make(map[string][]string)
 
 	output := make([]string, 12)
 	output[ID] = idform       // гуид подсистмы/кнопки
@@ -269,6 +269,6 @@ func SendMessage(Action string, d GetData) {
 	}
 	enc.Encode(mes)
 	k := buff.Bytes()
-	WriteLog("На сервер:" + Action + " Форма:" + d.ID + " функция:" + d.Data[0][Fun] + " параметры:" + d.Data[0][Parameters])
+	logger.Infof("На сервер:" + Action + " Форма:" + d.ID + " функция:" + d.Data[0][Fun] + " параметры:" + d.Data[0][Parameters])
 	Cl.Reci <- k
 }

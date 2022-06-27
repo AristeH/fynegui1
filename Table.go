@@ -39,7 +39,7 @@ func sortS(x [][]string, k int) {
 	n := len(x)
 	for i := 1; i < n; i++ {
 		for j := i; j < n; j++ {
-			if strings.ToUpper( x[i][k]) > strings.ToUpper(x[j][k]) {
+			if strings.ToUpper(x[i][k]) > strings.ToUpper(x[j][k]) {
 				temp = x[i]
 				x[i] = x[j]
 				x[j] = temp
@@ -62,7 +62,7 @@ func sortDown(x [][]string, k int) {
 	}
 }
 
-func  newTableOtoko(IDForm, IDTable string) (*fyne.Container,*TableOtoko) {
+func newTableOtoko(IDForm, IDTable string) (*fyne.Container, *TableOtoko) {
 	var t1 = make([][]string, 3)
 
 	t := &TableOtoko{}
@@ -94,7 +94,7 @@ func  newTableOtoko(IDForm, IDTable string) (*fyne.Container,*TableOtoko) {
 			check := newenterCheck()
 			// обработка нажатия на чек бокс
 			check.OnChanged = func(b bool) {
-				t := app_values[t.IDForm].Table[t.ID]
+				t := appValues[t.IDForm].Table[t.ID]
 				n := len(t.Data)
 				row := 0
 				for i := 1; i < n; i++ {
@@ -167,10 +167,10 @@ func  newTableOtoko(IDForm, IDTable string) (*fyne.Container,*TableOtoko) {
 					ic.col = i.Col
 					ic.Refresh()
 					ic.Hidden = false
-					app_values[t.IDForm].Table[t.ID].wc[i] = ic
+					appValues[t.IDForm].Table[t.ID].wc[i] = ic
 				default:
 					entry.SetText(t.Data[i.Row][i.Col])
-					app_values[t.IDForm].Table[t.ID].we[i] = entry
+					appValues[t.IDForm].Table[t.ID].we[i] = entry
 					entry.col = i.Col
 					entry.ID = t.Data[i.Row][0]
 					entry.Hidden = false
@@ -202,7 +202,7 @@ func  newTableOtoko(IDForm, IDTable string) (*fyne.Container,*TableOtoko) {
 
 		t.Table,
 	)
-	return content,t
+	return content, t
 
 }
 
@@ -216,7 +216,7 @@ type enterEntry struct {
 }
 
 func (e *enterEntry) Tapped(ev *fyne.PointEvent) {
-	t := app_values[e.IDForm].Table[e.IDTable]
+	t := appValues[e.IDForm].Table[e.IDTable]
 	n := len(t.Data)
 	row := 0
 	for i := 1; i < n; i++ {
@@ -235,7 +235,7 @@ func (e *enterEntry) Tapped(ev *fyne.PointEvent) {
 	}
 }
 func (e *enterEntry) DoubleTapped(ev *fyne.PointEvent) {
-	t := app_values[e.IDForm].Table[e.IDTable]
+	t := appValues[e.IDForm].Table[e.IDTable]
 	n := len(t.Data)
 	row := 0
 	for i := 1; i < n; i++ {
@@ -277,20 +277,20 @@ func scrolltable(row int, col int, t *TableOtoko) {
 		newTableCellID := widget.TableCellID{Col: col, Row: row}
 		t.Table.ScrollTo(newTableCellID)
 		key := t.wc[newTableCellID]
-		app_values[t.IDForm].W.Canvas().Focus(key)
+		appValues[t.IDForm].W.Canvas().Focus(key)
 
 	default:
 		newTableCellID := widget.TableCellID{Col: col, Row: row}
 		t.Table.ScrollTo(newTableCellID)
 		key := t.we[newTableCellID]
-		app_values[t.IDForm].W.Canvas().Focus(key)
+		appValues[t.IDForm].W.Canvas().Focus(key)
 
 	}
 
 }
 
 func (e *enterEntry) KeyDown(key *fyne.KeyEvent) {
-	t := app_values[e.IDForm].Table[e.IDTable]
+	t := appValues[e.IDForm].Table[e.IDTable]
 	n := len(t.Data)
 	row := 0
 	for i := 1; i < n; i++ {
@@ -361,7 +361,7 @@ func newenterCheck() *enterCheck {
 }
 
 func (e *enterCheck) KeyDown(key *fyne.KeyEvent) {
-	t := app_values[e.IDForm].Table[e.IDTable]
+	t := appValues[e.IDForm].Table[e.IDTable]
 	n := len(t.Data)
 	row := 0
 	for i := 1; i < n; i++ {
@@ -375,7 +375,7 @@ func (e *enterCheck) KeyDown(key *fyne.KeyEvent) {
 		e.onEnter()
 	case "KP_Enter":
 		e.onEnter()
-case "Down":
+	case "Down":
 		if n == row+1 {
 			scrolltable(row, e.col, t)
 		} else {
