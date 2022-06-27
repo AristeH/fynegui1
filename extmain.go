@@ -84,7 +84,6 @@ func readC() {
 		dec := gob.NewDecoder(z)
 		dec.Decode(&out)
 		go Runproc(&out)
-
 	}
 }
 
@@ -140,7 +139,7 @@ func write() {
 	}
 }
 
-// RegFunc adds the fu func to a map of functions,
+// RegFuncLocal adds the fu func to a map of functions,
 func RegFuncLocal(sName string, fu func(*FormData, *ButtonData)) {
 	if mfulocal == nil {
 		mfulocal = make(map[string]func(*FormData, *ButtonData))
@@ -148,7 +147,7 @@ func RegFuncLocal(sName string, fu func(*FormData, *ButtonData)) {
 	mfulocal[sName] = fu
 }
 
-// Runproc выполним процедуру
+// RunprocLocal выполним процедуру
 func RunprocLocal(fd *FormData, sName *ButtonData) {
 	if fnc, bExist := mfulocal[sName.Fun]; bExist {
 		fnc(fd, sName)

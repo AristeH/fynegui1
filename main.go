@@ -14,10 +14,15 @@ func main() {
 	RegFunc("InitFormLocal", InitFormLocal) //Получим структуру создаваемой формы
 	RegFunc("InitFormView", InitFormView)   //Получим описание формы
 	RegFunc("ToolBar", ToolBar)
-	RegFunc("ListTable", ListTable)
+	RegFunc("AccordionTable", AccordionTable)
+	RegFunc("TableList", TableList)
 	RegFunc("GetFile", GetFile)
 
 	myWindow := InitForm("main", "")
 	myWindow.ShowAndRun()
 
+}
+
+func TableList(gob *MessageGob) {
+	println(gob)
 }

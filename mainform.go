@@ -30,7 +30,7 @@ const (
 	Fun           int = 11 // тип метаданного
 )
 
-//GetDescription - получим описание формы 2
+//GetDataContainer - получим описание формы 2
 func GetDataContainer(idform string, idcontainer string) {
 	var buff bytes.Buffer
 	enc := gob.NewEncoder(&buff)
@@ -47,13 +47,13 @@ func GetDataContainer(idform string, idcontainer string) {
 
 func GetListTable(fd *FormData, p *ButtonData) {
 	for i := range fd.form {
-		if fd.form[i][Fun] == "ListTable" {
+		if fd.form[i][Fun] == "AccordionTable" {
 			GetDataContainer(fd.ID, fd.form[i][ID])
 		}
 	}
 }
 
-func ListTable(c *MessageGob) {
+func AccordionTable(c *MessageGob) {
 	tbl := c.Data.Data
 	contCatalog := container.NewVBox()
 	contDocument := container.NewVBox()
