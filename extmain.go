@@ -9,7 +9,6 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-var sLogName = "aristeh.log"
 var mfu map[string]func(*MessageGob)
 var mfuLocal map[string]func(*FormData, *ButtonData)
 
@@ -81,6 +80,7 @@ func readC() {
 		out := MessageGob{}
 		dec := gob.NewDecoder(z)
 		dec.Decode(&out)
+		logger.Infof("Получил сообщение :" + out.Action + " Форма:" + out.Data.ID)
 		go Runproc(&out)
 	}
 }

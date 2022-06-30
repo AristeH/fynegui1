@@ -20,7 +20,10 @@ func (hook *writerHook) Fire(entry *logrus.Entry) error {
 		return err
 	}
 	for _, w := range hook.Writer {
-		w.Write([]byte(line))
+		_, err := w.Write([]byte(line))
+		if err != nil {
+			return err
+		}
 	}
 	return err
 }
@@ -49,7 +52,7 @@ func init() {
 	l.Formatter = &logrus.TextFormatter{
 		CallerPrettyfier: func(frame *runtime.Frame) (function string, file string) {
 			filename := path.Base(frame.File)
-			return fmt.Sprintf("%s()", frame.Function), fmt.Sprintf("%s%d", filename, frame.Line)
+			return fmt.Sprintf("%s()", frame.Function), fmt.Sprintf("%s:%d", filename, frame.Line)
 		},
 		DisableColors: false,
 		FullTimestamp: true,

@@ -3,12 +3,11 @@ package main
 import (
 	"bytes"
 	"encoding/gob"
+	"fyne.io/fyne/v2"
 	"image/color"
 	"strconv"
 	"strings"
 
-	//"fyne.io/fyne/v2/canvas"
-	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/widget"
@@ -45,14 +44,6 @@ func GetDataContainer(idform string, idcontainer string) {
 	Cl.Reci <- k
 }
 
-func GetListTable(fd *FormData, p *ButtonData) {
-	for i := range fd.form {
-		if fd.form[i][Fun] == "AccordionTable" {
-			GetDataContainer(fd.ID, fd.form[i][ID])
-		}
-	}
-}
-
 func AccordionTable(c *MessageGob) {
 	tbl := c.Data.Data
 	contCatalog := container.NewVBox()
@@ -63,7 +54,7 @@ func AccordionTable(c *MessageGob) {
 		d.OnTapped = func() {
 			_, param := findButton(d)
 			mp := strings.Split(param.Parameters, ";")
-			w := InitForm("TableList", mp[0])
+			w := InitForm(param.Parameters, mp[0])
 			w.Show()
 		}
 
@@ -85,6 +76,22 @@ func AccordionTable(c *MessageGob) {
 	SetContent(c.Data.ID)
 }
 
+func ToolBarParent(f, c string) fyne.CanvasObject {
+	form := appValues[f]
+	fd := appValues[f].form
+
+	mp := strings.Split(fd[c][ChildrensID], ";")
+	top := container.New(layout.NewGridLayoutWithRows(2))
+	for _, rec := range mp {
+		if rec != "" {
+			if form.Container[rec] != nil {
+				top.Add(form.Container[rec])
+			}
+		}
+	}
+	return top
+}
+
 func SetContent(idform string) {
 	var root string
 
@@ -92,18 +99,18 @@ func SetContent(idform string) {
 	var left fyne.CanvasObject
 	var right fyne.CanvasObject
 	var bottom fyne.CanvasObject
-	top = nil
-	bottom = nil
-	left = nil
-	right = nil
+	var middle fyne.CanvasObject
+
 	win := appValues[idform].W
 	f := appValues[idform].form
+
 	for i := range f {
 		if f[i][ParentID] == "0" {
 			root = f[i][ID]
 			break
 		}
 	}
+
 	mproot := strings.Split(f[root][ChildrensID], ";")
 
 	for _, recroot := range mproot {
@@ -111,15 +118,14 @@ func SetContent(idform string) {
 			mpborder := strings.Split(f[recroot][ChildrensID], ";")
 			for _, recb := range mpborder {
 				if recb != "" {
-
 					if f[recb][TypeContainer] == "top" {
-
 						top = appValues[idform].Container[recb]
-
 					}
 					if f[recb][TypeContainer] == "left" {
 						left = appValues[idform].Container[recb]
-
+					}
+					if f[recb][TypeContainer] == "middle" {
+						middle = appValues[idform].Container[recb]
 					}
 				}
 
@@ -134,74 +140,72 @@ func SetContent(idform string) {
 	if top != nil {
 		content.Add(top)
 	}
-	//middle := canvas.NewText("content", color.Black)
-	// container := container.NewBorderLayout(top, left, nil, nil)
-
-	// 	container.Objects = append(container.Objects, top)
-
-	// 	container.Objects = append(container.Objects, canvas.NewText("content", color.Black))
-
-	// 	container.Objects = append(container.Objects, canvas.NewText("fgdfgdfg", color.Black))
-
-	// 	container.Objects = append(container.Objects, canvas.NewText("eretreg", color.Black))
-
-	//	if top != left {
-	//		container.Objects = append(container.Objects, left)
-	//	}
-
-	//container.AddObject(topc.)
+	if middle != nil {
+		content.Add(middle)
+	}
 
 	// 	content := container.New(lb,top)
 	win.SetContent(content)
 	win.Show()
 }
 
-func getid(id string) map[string]string {
-	rm := make(map[string]string)
-	mp := strings.Split(id, ";")
-	for _, rec := range mp {
-		if rec != "" {
-			mp1 := strings.Split(rec, ":")
-			if len(mp1) == 2 {
-				switch mp1[0] {
-
-				case "idform":
-					rm["idform"] = mp1[1]
-				case "idtable":
-					rm["idtable"] = mp1[1]
-				case "idelem":
-					rm["idelem"] = mp1[1]
-				case "idcontainer":
-					rm["idcontainer"] = mp1[1]
-				}
-			}
-
+func createParent(f, c string) {
+	form := appValues[f].form
+	if form[form[c][ParentID]][OrderOutput] == "0" {
+		switch form[c][TypeContainer] {
+		case "Toolbar":
+			appValues[f].Container[form[c][ParentID]] = ToolBarParent(f, form[c][ParentID])
 		}
+	} else {
+		if form[form[c][ParentID]][TypeContainer] == "TableList" {
+			var top fyne.CanvasObject
+			var left fyne.CanvasObject
+			var right fyne.CanvasObject
+			var bottom fyne.CanvasObject
+			var middle fyne.CanvasObject
+			switch form[c][TypeContainer] {
+			case "Toolbar":
+				top = ToolBarParent(f, form[c][ParentID])
+			case "Table":
+				middle = appValues[f].Container[c]
+			}
+			mpborder := strings.Split(form[form[c][ParentID]][ChildrensID], ";")
+			for _, recb := range mpborder {
+				if recb != "" {
+					if form[recb][TypeContainer] == "top" {
+						top = appValues[f].Container[recb]
+					}
+					if form[recb][TypeContainer] == "left" {
+						left = appValues[f].Container[recb]
+					}
+					if form[recb][TypeContainer] == "middle" {
+						middle = appValues[f].Container[recb]
+					}
+				}
+
+			}
+			content := container.New(layout.NewBorderLayout(top, bottom, left, right))
+			if top != nil {
+				content.Add(top)
+			}
+			if middle != nil {
+				content.Add(middle)
+			}
+			appValues[f].Container[form[c][ParentID]] = content
+			p := form[c][ParentID]
+			appValues[f].Container[form[p][ParentID]] = content
+		}
+
 	}
-	return rm
+
 }
 
 func ToolBar(c *MessageGob) {
 	app := c.Data.Data
 
-	form := appValues[c.Data.ID]
-	fd := appValues[c.Data.ID].form
-
 	tb := ToolBarCreate(c.Data.ID, c.Data.Container, app, color.Gray{Y: 230})
 	appValues[c.Data.ID].Container[c.Data.Container] = tb
-	parent := fd[c.Data.Container][ParentID]
-	// update form top fegin
-	mp := strings.Split(fd[parent][ChildrensID], ";")
-	top := container.New(layout.NewGridLayoutWithRows(2))
-	//top.Layout=layout.NewMaxLayout()
-	for _, rec := range mp {
-		if rec != "" {
-			if form.Container[rec] != nil {
-				top.Add(form.Container[rec])
-			}
-		}
-	}
-	form.Container[parent] = top
+	createParent(c.Data.ID, c.Data.Container)
 	SetContent(c.Data.ID)
 }
 
@@ -232,29 +236,28 @@ func InitFormView(c *MessageGob) {
 }
 
 // InitForm - инициализация формы 1
-func InitForm(idform, parameters string) fyne.Window {
+func InitForm(form, parameters string) fyne.Window {
 	var br [][]string
-
-	logger.Infof("Инициализация формы:" + idform + " параметры:" + parameters)
+	logger.Tracef("Инициализация формы:" + form + " параметры:" + parameters)
 	myWindow := myApp.NewWindow("Телефоны")
 	myWindow.Resize(fyne.NewSize(1200, 400))
-	appValues[idform] = &FormData{}
-	appValues[idform].ID = idform
-	appValues[idform].W = myWindow
-	appValues[idform].Button = make(map[string]ButtonData)
-	appValues[idform].Container = make(map[string]fyne.CanvasObject)
-	appValues[idform].Entry = make(map[string]entryForm)
-	appValues[idform].Table = make(map[string]*TableOtoko)
-	appValues[idform].Tree = make(map[string]*TreeOtoko)
-	appValues[idform].form = make(map[string][]string)
+	appValues[form] = &FormData{
+		ID:        form,
+		W:         myWindow,
+		Button:    make(map[string]ButtonData),
+		Container: make(map[string]fyne.CanvasObject),
+		Entry:     make(map[string]entryForm),
+		Table:     make(map[string]*TableOtoko),
+		Tree:      make(map[string]*TreeOtoko),
+		form:      make(map[string][]string),
+	}
 
 	output := make([]string, 12)
-	output[ID] = idform       // гуид подсистмы/кнопки
+	output[ID] = form         // гуид подсистмы/кнопки
 	output[Name] = parameters //параметрыфункции
-	output[Fun] = ""          // функция для кнопки
 
 	br = append(br, output)
-	d := GetData{ID: idform, Data: br}
+	d := GetData{ID: form, Data: br}
 	SendMessage("GetDataContainer", d)
 	return myWindow
 }
@@ -269,6 +272,6 @@ func SendMessage(Action string, d GetData) {
 	}
 	enc.Encode(mes)
 	k := buff.Bytes()
-	logger.Infof("На сервер:" + Action + " Форма:" + d.ID + " функция:" + d.Data[0][Fun] + " параметры:" + d.Data[0][Parameters])
+	logger.Infof("ОТПР- Форма:" + d.ID + "Контейнер:" + d.Container + "Функция:" + Action + " параметры:" + d.Data[0][Parameters])
 	Cl.Reci <- k
 }

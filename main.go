@@ -1,15 +1,18 @@
 package main
 
-//import "github.com/ilyakaznacheev/cleanenv"
 import (
+	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
+	"fyne.io/fyne/v2/widget"
 	"fynegui/pkg/logging"
 )
 
-// список форм
-var appValues = make(map[string]*FormData)
-var myApp = app.New()
-var logger logging.Logger
+var (
+	// список форм
+	appValues = make(map[string]*FormData)
+	myApp     = app.New()
+	logger    logging.Logger
+)
 
 func main() {
 	logger = logging.GetLogger()
@@ -20,7 +23,7 @@ func main() {
 	RegFunc("InitFormView", InitFormView)   //Получим описание формы
 	RegFunc("ToolBar", ToolBar)
 	RegFunc("AccordionTable", AccordionTable)
-	RegFunc("TableList", TableList)
+	RegFunc("Table", Table)
 	RegFunc("GetFile", GetFile)
 
 	myWindow := InitForm("main", "")
@@ -28,6 +31,19 @@ func main() {
 
 }
 
-func TableList(gob *MessageGob) {
-	println(gob)
+func Table(c *MessageGob) {
+	println(c)
+	list := widget.NewTable(
+		func() (int, int) {
+			return len(c.Data.Data), len(c.Data.Data[0])
+		},
+		func() fyne.CanvasObject {
+			return widget.NewLabel("wide content")
+		},
+		func(i widget.TableCellID, o fyne.CanvasObject) {
+			o.(*widget.Label).SetText(c.Data.Data[i.Row][i.Col])
+		})
+	appValues[c.Data.ID].Container[c.Data.Container] = list
+	createParent(c.Data.ID, c.Data.Container)
+	SetContent(c.Data.ID)
 }
