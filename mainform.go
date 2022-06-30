@@ -172,13 +172,13 @@ func createParent(f, c string) {
 			mpborder := strings.Split(form[form[c][ParentID]][ChildrensID], ";")
 			for _, recb := range mpborder {
 				if recb != "" {
-					if form[recb][TypeContainer] == "top" {
+					if form[recb][TypeContainer] == "Toolbar" {
 						top = appValues[f].Container[recb]
 					}
 					if form[recb][TypeContainer] == "left" {
 						left = appValues[f].Container[recb]
 					}
-					if form[recb][TypeContainer] == "middle" {
+					if form[recb][TypeContainer] == "Table" {
 						middle = appValues[f].Container[recb]
 					}
 				}
