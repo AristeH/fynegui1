@@ -64,7 +64,8 @@ func ToolBarCreate(idform string, c string, but [][]string, color color.Color) *
 			br = append(br, output)
 
 			d := GetData{ID: idform, Data: br}
-			SendMessage("GetDataContainer", d)
+			UpdateContainer(d)
+			//SendMessage("GetDataContainer", d)
 		}
 		//ff := strings.Split(value[Name],":")
 		// сохраним кнопку в FormData

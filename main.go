@@ -1,9 +1,7 @@
 package main
 
 import (
-	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
-	"fyne.io/fyne/v2/widget"
 	"fynegui/pkg/logging"
 )
 
@@ -18,32 +16,17 @@ func main() {
 	logger = logging.GetLogger()
 	logger.Infof("InitFormLocal")
 	go connectServer()
+	myApp.Settings().Theme()
+	RegFunc("uc", UpdateForm) // обновим форму
 
-	RegFunc("InitFormLocal", InitFormLocal) //Получим структуру создаваемой формы
-	RegFunc("InitFormView", InitFormView)   //Получим описание формы
-	RegFunc("ToolBar", ToolBar)
-	RegFunc("AccordionTable", AccordionTable)
+	//RegFunc("InitFormLocal", GetDataContainer) //Получим структуру создаваемой формы
+	RegFunc("init", initform) //Получим описание формы
+	RegFunc("Toolbar", ToolBar)
+	RegFunc("Accordion", Accordion)
 	RegFunc("Table", Table)
-	RegFunc("GetFile", GetFile)
+	//RegFunc("GetFile", GetFile)
 
 	myWindow := InitForm("main", "")
 	myWindow.ShowAndRun()
 
-}
-
-func Table(c *MessageGob) {
-	println(c)
-	list := widget.NewTable(
-		func() (int, int) {
-			return len(c.Data.Data), len(c.Data.Data[0])
-		},
-		func() fyne.CanvasObject {
-			return widget.NewLabel("wide content")
-		},
-		func(i widget.TableCellID, o fyne.CanvasObject) {
-			o.(*widget.Label).SetText(c.Data.Data[i.Row][i.Col])
-		})
-	appValues[c.Data.ID].Container[c.Data.Container] = list
-	createParent(c.Data.ID, c.Data.Container)
-	SetContent(c.Data.ID)
 }

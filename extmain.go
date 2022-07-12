@@ -80,7 +80,9 @@ func readC() {
 		out := MessageGob{}
 		dec := gob.NewDecoder(z)
 		dec.Decode(&out)
-		logger.Infof("Получил сообщение :" + out.Action + " Форма:" + out.Data.ID)
+		if out.Action == "" {
+			logger.Errorf("Получил сообщение :" + out.Action + " Форма:" + out.Data.ID)
+		}
 		go Runproc(&out)
 	}
 }

@@ -4,13 +4,12 @@ import (
 	"bytes"
 	"encoding/gob"
 	"fyne.io/fyne/v2"
-	"image/color"
-	"strconv"
-	"strings"
-
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/widget"
+	"image/color"
+	"strconv"
+	"strings"
 )
 
 // константы метаданные для вывода интерфейса пользователя, номера столбца для вывода
@@ -29,189 +28,31 @@ const (
 	Fun           int = 11 // тип метаданного
 )
 
-//GetDataContainer - получим описание формы 2
-func GetDataContainer(idform string, idcontainer string) {
-	var buff bytes.Buffer
-	enc := gob.NewEncoder(&buff)
-	d := GetData{ID: idform, Container: idcontainer}
-	mes := MessageGob{
-		Action: "GetDataContainer",
-		Data:   d,
+func UpdateForm(mes *MessageGob) {
+	f := mes.Data.ID
+	c := mes.Data.Container
+	if c == "form" {
+		InitFormLocal(mes)
+		return
 	}
-	enc.Encode(mes)
-	k := buff.Bytes()
-	println(k)
-	Cl.Reci <- k
-}
-
-func AccordionTable(c *MessageGob) {
-	tbl := c.Data.Data
-	contCatalog := container.NewVBox()
-	contDocument := container.NewVBox()
-	acc := widget.NewAccordion()
-	for _, b := range tbl {
-		d := widget.NewButton(b[Synonym], nil)
-		d.OnTapped = func() {
-			_, param := findButton(d)
-			mp := strings.Split(param.Parameters, ";")
-			w := InitForm(param.Parameters, mp[0])
-			w.Show()
-		}
-
-		appValues[c.Data.ID].Button[b[ID]] = ButtonData{Fun: b[Name] + "GenForm", Parameters: b[ID], Widget: d}
-		switch b[TypeContainer] {
-		case "Справочник":
-			contCatalog.Add(d)
-		case "Документ":
-			contDocument.Add(d)
-		}
-	}
-	acc.Append(&widget.AccordionItem{Title: "Документы", Detail: contDocument})
-	acc.Append(&widget.AccordionItem{Title: "Справочники", Detail: contCatalog})
-	d := container.NewVBox(container.NewVScroll(acc))
-	d.Layout = layout.NewMaxLayout()
-	fd := appValues[c.Data.ID].form
-	parent := fd[c.Data.Container][ParentID]
-	appValues[c.Data.ID].Container[parent] = d
-	SetContent(c.Data.ID)
-}
-
-func ToolBarParent(f, c string) fyne.CanvasObject {
-	form := appValues[f]
-	fd := appValues[f].form
-
-	mp := strings.Split(fd[c][ChildrensID], ";")
-	top := container.New(layout.NewGridLayoutWithRows(2))
-	for _, rec := range mp {
-		if rec != "" {
-			if form.Container[rec] != nil {
-				top.Add(form.Container[rec])
+	form := appValues[f].form // map[string][]string
+	for i := range form {
+		if c == form[i][ID] {
+			if fnc, bExist := mfu[form[i][TypeContainer]]; bExist {
+				fnc(mes)
+			} else {
+				logger.Errorf("Не удалось найти функцию: " + form[i][TypeContainer])
 			}
+			return
 		}
-	}
-	return top
-}
-
-func SetContent(idform string) {
-	var root string
-
-	var top fyne.CanvasObject
-	var left fyne.CanvasObject
-	var right fyne.CanvasObject
-	var bottom fyne.CanvasObject
-	var middle fyne.CanvasObject
-
-	win := appValues[idform].W
-	f := appValues[idform].form
-
-	for i := range f {
-		if f[i][ParentID] == "0" {
-			root = f[i][ID]
-			break
-		}
-	}
-
-	mproot := strings.Split(f[root][ChildrensID], ";")
-
-	for _, recroot := range mproot {
-		if recroot != "" {
-			mpborder := strings.Split(f[recroot][ChildrensID], ";")
-			for _, recb := range mpborder {
-				if recb != "" {
-					if f[recb][TypeContainer] == "top" {
-						top = appValues[idform].Container[recb]
-					}
-					if f[recb][TypeContainer] == "left" {
-						left = appValues[idform].Container[recb]
-					}
-					if f[recb][TypeContainer] == "middle" {
-						middle = appValues[idform].Container[recb]
-					}
-				}
-
-			}
-		}
-	}
-
-	content := container.New(layout.NewBorderLayout(top, bottom, left, right))
-	if left != nil {
-		content.Add(left)
-	}
-	if top != nil {
-		content.Add(top)
-	}
-	if middle != nil {
-		content.Add(middle)
-	}
-
-	// 	content := container.New(lb,top)
-	win.SetContent(content)
-	win.Show()
-}
-
-func createParent(f, c string) {
-	form := appValues[f].form
-	if form[form[c][ParentID]][OrderOutput] == "0" {
-		switch form[c][TypeContainer] {
-		case "Toolbar":
-			appValues[f].Container[form[c][ParentID]] = ToolBarParent(f, form[c][ParentID])
-		}
-	} else {
-		if form[form[c][ParentID]][TypeContainer] == "TableList" {
-			var top fyne.CanvasObject
-			var left fyne.CanvasObject
-			var right fyne.CanvasObject
-			var bottom fyne.CanvasObject
-			var middle fyne.CanvasObject
-			switch form[c][TypeContainer] {
-			case "Toolbar":
-				top = ToolBarParent(f, form[c][ParentID])
-			case "Table":
-				middle = appValues[f].Container[c]
-			}
-			mpborder := strings.Split(form[form[c][ParentID]][ChildrensID], ";")
-			for _, recb := range mpborder {
-				if recb != "" {
-					if form[recb][TypeContainer] == "Toolbar" {
-						top = appValues[f].Container[recb]
-					}
-					if form[recb][TypeContainer] == "left" {
-						left = appValues[f].Container[recb]
-					}
-					if form[recb][TypeContainer] == "Table" {
-						middle = appValues[f].Container[recb]
-					}
-				}
-
-			}
-			content := container.New(layout.NewBorderLayout(top, bottom, left, right))
-			if top != nil {
-				content.Add(top)
-			}
-			if middle != nil {
-				content.Add(middle)
-			}
-			appValues[f].Container[form[c][ParentID]] = content
-			p := form[c][ParentID]
-			appValues[f].Container[form[p][ParentID]] = content
-		}
-
 	}
 
 }
 
-func ToolBar(c *MessageGob) {
-	app := c.Data.Data
-
-	tb := ToolBarCreate(c.Data.ID, c.Data.Container, app, color.Gray{Y: 230})
-	appValues[c.Data.ID].Container[c.Data.Container] = tb
-	createParent(c.Data.ID, c.Data.Container)
-	SetContent(c.Data.ID)
-}
-
-func InitFormLocal(c *MessageGob) {
-	app := c.Data.Data
-	fd := appValues[c.Data.ID]
+//InitFormLocal - инициализация структуры формы.
+func InitFormLocal(mes *MessageGob) {
+	app := mes.Data.Data
+	fd := appValues[mes.Data.ID]
 	for i := range app {
 		fd.form[app[i][ID]] = app[i]
 		if app[i][ParentID] != "0" {
@@ -220,8 +61,12 @@ func InitFormLocal(c *MessageGob) {
 	}
 }
 
-func InitFormView(c *MessageGob) {
-	app := c.Data.Data
+// initform - заголовок, стиль формы
+func initform(mes *MessageGob) {
+	//f := mes.Data.ID
+	//c := mes.Data.Container
+	app := mes.Data.Data
+
 	//attr := getid(c.Data.ID)
 	fd := appValues[app[0][ID]]
 	fd.W.SetTitle(app[0][Synonym])
@@ -233,13 +78,169 @@ func InitFormView(c *MessageGob) {
 	} else {
 		fd.W.Resize(fyne.NewSize(1000, 100))
 	}
+
+	fd.W.SetCloseIntercept(func() {
+		fd.W.Hide()
+	})
+
+}
+
+func ToolBar(mes *MessageGob) {
+	f := mes.Data.ID
+	c := mes.Data.Container
+	app := mes.Data.Data
+
+	tb := ToolBarCreate(f, c, app, color.Gray{Y: 230})
+	appValues[f].Container[c] = tb
+	createParent(f, appValues[f].form[c][ParentID])
+	SetContent(f)
+}
+
+func Accordion(mes *MessageGob) {
+	f := mes.Data.ID
+	c := mes.Data.Container
+	tbl := mes.Data.Data
+	contCatalog := container.NewVBox()
+	contDocument := container.NewVBox()
+	acc := widget.NewAccordion()
+	for _, b := range tbl {
+		d := widget.NewButton(b[Synonym], nil)
+		d.OnTapped = func() {
+			_, param := findButton(d)
+			//mp := strings.Split(param.Parameters, ";")
+			w := InitForm(param.Parameters, "")
+			w.Show()
+		}
+
+		appValues[f].Button[b[ID]] = ButtonData{Fun: b[Name] + "GenForm", Parameters: b[ID], Widget: d}
+		switch b[TypeContainer] {
+		case "Справочник":
+			contCatalog.Add(d)
+		case "Документ":
+			contDocument.Add(d)
+		}
+	}
+	acc.Append(&widget.AccordionItem{Title: "Документы", Detail: contDocument})
+	acc.Append(&widget.AccordionItem{Title: "Справочники", Detail: contCatalog})
+	d := container.NewVBox(container.NewVScroll(acc))
+	d.Layout = layout.NewMaxLayout()
+	appValues[f].Container[c] = d
+	createParent(f, appValues[f].form[c][ParentID])
+	SetContent(f)
+}
+
+func top(f, c string) {
+	form := appValues[f]
+	fd := appValues[f].form
+
+	mp := strings.Split(fd[c][ChildrensID], ";")
+	top := container.New(layout.NewGridLayoutWithRows(len(mp) - 1))
+	for _, rec := range mp {
+		if rec != "" {
+			if form.Container[rec] != nil {
+				top.Add(form.Container[rec])
+			}
+		}
+	}
+
+	appValues[f].Container[c] = top
+	createParent(f, fd[c][ParentID])
+}
+
+func border(f, c string) {
+	var top fyne.CanvasObject
+	var left fyne.CanvasObject
+	var right fyne.CanvasObject
+	var bottom fyne.CanvasObject
+	var middle fyne.CanvasObject
+
+	form := appValues[f]
+	fd := appValues[f].form
+
+	mp := strings.Split(fd[c][ChildrensID], ";")
+
+	for _, rec := range mp {
+		if rec != "" {
+			if form.Container[rec] != nil {
+				switch fd[rec][TypeContainer] {
+				case "top":
+					top = form.Container[rec]
+
+				case "bottom":
+					bottom = form.Container[rec]
+
+				case "left":
+					left = form.Container[rec]
+
+				case "right":
+					right = form.Container[rec]
+
+				case "middle":
+					middle = form.Container[rec]
+
+				}
+			}
+		}
+	}
+	content := container.New(layout.NewBorderLayout(top, bottom, left, right))
+	if left != nil {
+		content.Add(left)
+	}
+	if top != nil {
+		content.Add(top)
+	}
+	if middle != nil {
+		content.Add(middle)
+	}
+	form.Container[c] = content
+
+	//appValues[f].Container[c] = top
+	//createParent(f, fd[c][ParentID])
+}
+
+func SetContent(f string) {
+	var content fyne.CanvasObject
+	form := appValues[f].form // map[string][]string
+	for i := range form {
+		if "init" == form[i][TypeContainer] {
+			root := strings.Split(form[i][ChildrensID], ";")
+			for _, rec := range root {
+				if rec != "" {
+					content = appValues[f].Container[rec]
+				}
+			}
+			break
+		}
+	}
+	appValues[f].W.SetContent(content)
+	appValues[f].W.Show()
+}
+
+func createParent(f, c string) {
+	form := appValues[f].form
+
+	switch form[c][TypeContainer] {
+	case "top":
+		top(f, c)
+
+	case "Border":
+		border(f, c)
+
+	case "left":
+		top(f, c)
+	case "middle":
+		top(f, c)
+	}
 }
 
 // InitForm - инициализация формы 1
 func InitForm(form, parameters string) fyne.Window {
 	var br [][]string
 	logger.Tracef("Инициализация формы:" + form + " параметры:" + parameters)
-	myWindow := myApp.NewWindow("Телефоны")
+	if val, ok := appValues[form]; ok {
+		return val.W
+	}
+	myWindow := myApp.NewWindow("")
 	myWindow.Resize(fyne.NewSize(1200, 400))
 	appValues[form] = &FormData{
 		ID:        form,
@@ -253,12 +254,13 @@ func InitForm(form, parameters string) fyne.Window {
 	}
 
 	output := make([]string, 12)
-	output[ID] = form         // гуид подсистмы/кнопки
-	output[Name] = parameters //параметрыфункции
+	output[ID] = form               // гуид подсистмы/кнопки
+	output[Parameters] = parameters //параметрыфункции
 
 	br = append(br, output)
-	d := GetData{ID: form, Data: br}
-	SendMessage("GetDataContainer", d)
+	d := GetData{ID: form, Container: "", Data: br}
+	logger.Tracef("Получим данные формы с параметрами:" + form + " параметры:" + parameters)
+	UpdateContainer(d)
 	return myWindow
 }
 
@@ -274,4 +276,14 @@ func SendMessage(Action string, d GetData) {
 	k := buff.Bytes()
 	logger.Infof("ОТПР- Форма:" + d.ID + "Контейнер:" + d.Container + "Функция:" + Action + " параметры:" + d.Data[0][Parameters])
 	Cl.Reci <- k
+}
+
+func UpdateContainer(param GetData) {
+	var buff bytes.Buffer
+	enc := gob.NewEncoder(&buff)
+	enc.Encode(MessageGob{
+		Action: "GetDataContainer", //update container
+		Data:   param,              // данные контейнера, формы
+	})
+	Cl.Reci <- buff.Bytes()
 }
