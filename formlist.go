@@ -7,20 +7,24 @@ import (
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/widget"
 	"image/color"
+	"strconv"
 )
 
-func NewTableList1(IDForm, IDTable string, data [][]string) *widget.Table {
+func NewTableList1(mess *MessageGob) *widget.Table {
+	data := mess.Data.Data
 	t := &TableOtoko{}
-	t.ColumnsName = data[2]
-	t.ColumnsType = data[1]
+
+	t.ColumnsName = mess.Data.DataDescription[2]
+	t.ColumnsType = mess.Data.DataDescription[1]
 	t.ColumnsWidth = []float32{40}
 	t.AlterRowColor = color.Gray{Y: 250}
 	t.HeaderColor = color.Gray{Y: 80}
 	t.RowColor = color.Gray{Y: 200}
 	t.Data = data
 	t.Edit = true
-	t.ID = IDTable
-	t.IDForm = IDForm
+	t.ID = mess.Data.Container
+	t.IDForm = mess.Data.ID
+
 	//TO.wb = make(map[*widget.Button]int)
 	t.wc = make(map[widget.TableCellID]*enterCheck)
 	t.we = make(map[widget.TableCellID]*enterEntry)
@@ -40,48 +44,38 @@ func NewTableList1(IDForm, IDTable string, data [][]string) *widget.Table {
 		func(i widget.TableCellID, o fyne.CanvasObject) {
 
 			box := o.(*fyne.Container)
+
 			rect := box.Objects[0].(*canvas.Rectangle)
 			if i.Row == 0 {
+				box.Objects[1].(*widget.Label).SetText(t.ColumnsName[i.Col])
 				rect.FillColor = t.HeaderColor
 			} else if i.Row%2 == 0 {
+				box.Objects[1].(*widget.Label).SetText(data[i.Row-1][i.Col])
 				rect.FillColor = t.AlterRowColor
 			} else {
+				box.Objects[1].(*widget.Label).SetText(data[i.Row-1][i.Col])
 				rect.FillColor = t.RowColor
 			}
-			cont := box.Objects[1].(*widget.Label)
-			if i.Row == 0 {
-				cont.SetText(t.ColumnsName[i.Col])
-			} else {
-				cont.SetText(data[i.Row][i.Col])
-			}
-
 		})
-
-	//table
-	t.ColumnsWidth = make([]float32, len(t.ColumnsName))
-	for j := 0; j < len(t.ColumnsName); j++ {
-		t.ColumnsWidth[j] = float32(len(data[2][j])) * 9
+	for i := 0; i < len(mess.Data.DataDescription[1]); i++ {
+		s, _ := strconv.ParseFloat(mess.Data.DataDescription[3][i], 32)
+		t.Table.SetColumnWidth(i, float32(s)*32)
 	}
 
-	// 		fd.Table[app.Table].ColumnsType = ColumnsType
-	// 		fd.Table[app.Table].ColumnsWidth = ColumnsWidth
-	// 		fd.Table[app.Table].ColumnsName = ColumnsName
-
-	for ic, v := range t.ColumnsWidth {
-		t.Table.SetColumnWidth(ic, v)
-	}
-	t.ColumnsWidth[0] = 0
-	appValues[IDForm].Table[IDTable] = t
 	return t.Table
-
 }
 
 func Table(mess *MessageGob) {
 	f := mess.Data.ID
 	c := mess.Data.Container
-	list := NewTableList1(f, f, mess.Data.Data)
-	appValues[f].Container[c] = list
+	t := NewTableList1(mess)
+
+	appValues[f].Container[c] = t
 
 	createParent(f, appValues[f].form[c][ParentID])
-	SetContent(f)
+	nextContainer(mess)
+	//if mess.Data.UpdateForm {
+	//UpdateFormContent(GetData{ID: f})
+	//}
+
 }

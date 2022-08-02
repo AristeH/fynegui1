@@ -27,15 +27,17 @@ var VCH chan string
 
 type MessageGob struct {
 	Action     string  // Имя функуции
-	Parameters []byte  //параметры??
+	Parameters string  //параметры??
 	Data       GetData // Сведенеия о данных
 	File       FileUP  // сведения о передаваемом файле
 }
 
 type GetData struct {
-	ID        string
-	Container string
-	Data      [][]string
+	ID              string
+	Container       string
+	Data            [][]string
+	UpdateForm      bool
+	DataDescription [][]string
 }
 
 type FileUP struct {
@@ -80,10 +82,12 @@ func readC() {
 		out := MessageGob{}
 		dec := gob.NewDecoder(z)
 		dec.Decode(&out)
-		if out.Action == "" {
-			logger.Errorf("Получил сообщение :" + out.Action + " Форма:" + out.Data.ID)
+		//if out.Action == "" {
+		logger.Infof("Получил сообщение :" + out.Action + " Форма:" + out.Data.ID + " контейнер:" + out.Data.Container)
+		//}
+		if out.Data.ID != "" {
+			go Runproc(&out)
 		}
-		go Runproc(&out)
 	}
 }
 

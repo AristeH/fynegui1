@@ -33,6 +33,7 @@ func UpdateForm(mes *MessageGob) {
 	c := mes.Data.Container
 	if c == "form" {
 		InitFormLocal(mes)
+
 		return
 	}
 	form := appValues[f].form // map[string][]string
@@ -49,16 +50,57 @@ func UpdateForm(mes *MessageGob) {
 
 }
 
+func nextContainer(mes *MessageGob) {
+
+	fd := appValues[mes.Data.ID]
+	fun := true
+
+	for i := range fd.form {
+		if fun && fd.form[i][ID] > mes.Data.Container && fd.form[i][Parameters] == "true" {
+			var br [][]string
+			output := make([]string, 12)
+
+			output[ID] = fd.form[i][ID] // гуид подсистмы/кнопки
+			//
+			output[Fun] = fd.form[i][Fun] // функция для кнопки
+
+			br = append(br, output)
+			fun = false
+			d := GetData{ID: mes.Data.ID, Data: br, Container: output[ID]}
+			UpdateContainer(d)
+		}
+	}
+	if fun {
+		SetContent(mes.Data.ID)
+	}
+
+}
+
 //InitFormLocal - инициализация структуры формы.
 func InitFormLocal(mes *MessageGob) {
 	app := mes.Data.Data
 	fd := appValues[mes.Data.ID]
+	fun := true
 	for i := range app {
 		fd.form[app[i][ID]] = app[i]
+		if fun && app[i][Parameters] == "true" {
+			var br [][]string
+			output := make([]string, 12)
+
+			output[ID] = app[i][ID] // гуид подсистмы/кнопки
+
+			output[Fun] = app[i][Fun] // функция для кнопки
+			fun = false
+			br = append(br, output)
+
+			d := GetData{ID: mes.Data.ID, Data: br, Container: output[ID]}
+			UpdateContainer(d)
+		}
 		if app[i][ParentID] != "0" {
 			fd.Container[strconv.Itoa(i)] = nil
 		}
 	}
+
 }
 
 // initform - заголовок, стиль формы
@@ -89,11 +131,11 @@ func ToolBar(mes *MessageGob) {
 	f := mes.Data.ID
 	c := mes.Data.Container
 	app := mes.Data.Data
-
 	tb := ToolBarCreate(f, c, app, color.Gray{Y: 230})
 	appValues[f].Container[c] = tb
 	createParent(f, appValues[f].form[c][ParentID])
 	SetContent(f)
+	nextContainer(mes)
 }
 
 func Accordion(mes *MessageGob) {
@@ -127,6 +169,7 @@ func Accordion(mes *MessageGob) {
 	appValues[f].Container[c] = d
 	createParent(f, appValues[f].form[c][ParentID])
 	SetContent(f)
+
 }
 
 func top(f, c string) {
@@ -261,6 +304,7 @@ func InitForm(form, parameters string) fyne.Window {
 	d := GetData{ID: form, Container: "", Data: br}
 	logger.Tracef("Получим данные формы с параметрами:" + form + " параметры:" + parameters)
 	UpdateContainer(d)
+	//UpdateFormContent(GetData{ID: form})
 	return myWindow
 }
 
@@ -284,6 +328,16 @@ func UpdateContainer(param GetData) {
 	enc.Encode(MessageGob{
 		Action: "GetDataContainer", //update container
 		Data:   param,              // данные контейнера, формы
+	})
+	Cl.Reci <- buff.Bytes()
+}
+
+func UpdateFormContent(param GetData) {
+	var buff bytes.Buffer
+	enc := gob.NewEncoder(&buff)
+	enc.Encode(MessageGob{
+		Action: "UpdateFormContent", //update container
+		Data:   param,               // данные контейнера, формы
 	})
 	Cl.Reci <- buff.Bytes()
 }
