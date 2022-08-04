@@ -125,10 +125,10 @@ func write() {
 			fmt.Println("ошибка write:", err)
 			break
 		}
-		if err := Cl.socket.WriteMessage(websocket.PingMessage, []byte{}); err != nil {
-			fmt.Println("ошибка ping:", err)
-			return
-		}
+		//if err := Cl.socket.WriteMessage(websocket.PingMessage, []byte{}); err != nil {
+		//	logger.Infof(fmt.Sprintf(шибка ping: (%s)", err))
+		//	return
+		//}
 	}
 }
 

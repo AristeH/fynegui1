@@ -63,7 +63,7 @@ func ToolBarCreate(idform string, c string, but [][]string, color color.Color) *
 
 			br = append(br, output)
 
-			d := GetData{ID: idform, Data: br}
+			d := GetData{ID: idform, Data: br, Container: c}
 			UpdateContainer(d)
 			//SendMessage("GetDataContainer", d)
 		}

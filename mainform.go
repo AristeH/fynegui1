@@ -68,6 +68,7 @@ func nextContainer(mes *MessageGob) {
 			fun = false
 			d := GetData{ID: mes.Data.ID, Data: br, Container: output[ID]}
 			UpdateContainer(d)
+			break
 		}
 	}
 	if fun {
@@ -134,7 +135,6 @@ func ToolBar(mes *MessageGob) {
 	tb := ToolBarCreate(f, c, app, color.Gray{Y: 230})
 	appValues[f].Container[c] = tb
 	createParent(f, appValues[f].form[c][ParentID])
-	SetContent(f)
 	nextContainer(mes)
 }
 
@@ -168,7 +168,7 @@ func Accordion(mes *MessageGob) {
 	d.Layout = layout.NewMaxLayout()
 	appValues[f].Container[c] = d
 	createParent(f, appValues[f].form[c][ParentID])
-	SetContent(f)
+	nextContainer(mes)
 
 }
 
@@ -299,12 +299,15 @@ func InitForm(form, parameters string) fyne.Window {
 	output := make([]string, 12)
 	output[ID] = form               // гуид подсистмы/кнопки
 	output[Parameters] = parameters //параметрыфункции
-
+	appValues[form].W = myWindow
 	br = append(br, output)
 	d := GetData{ID: form, Container: "", Data: br}
 	logger.Tracef("Получим данные формы с параметрами:" + form + " параметры:" + parameters)
 	UpdateContainer(d)
 	//UpdateFormContent(GetData{ID: form})
+	myWindow.SetCloseIntercept(func() {
+		myWindow.Hide()
+	})
 	return myWindow
 }
 
@@ -329,6 +332,7 @@ func UpdateContainer(param GetData) {
 		Action: "GetDataContainer", //update container
 		Data:   param,              // данные контейнера, формы
 	})
+	logger.Tracef("Отправка сообщения форма:" + param.ID + " контейнер:" + param.Container)
 	Cl.Reci <- buff.Bytes()
 }
 

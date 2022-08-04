@@ -74,8 +74,4 @@ func Table(mess *MessageGob) {
 
 	createParent(f, appValues[f].form[c][ParentID])
 	nextContainer(mess)
-	//if mess.Data.UpdateForm {
-	//UpdateFormContent(GetData{ID: f})
-	//}
-
 }
