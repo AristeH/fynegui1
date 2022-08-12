@@ -42,21 +42,22 @@ func NewTableList1(mess *MessageGob) *widget.Table {
 
 		},
 		func(i widget.TableCellID, o fyne.CanvasObject) {
-
 			box := o.(*fyne.Container)
-
 			rect := box.Objects[0].(*canvas.Rectangle)
 			if i.Row == 0 {
 				box.Objects[1].(*canvas.Text).Text = t.ColumnStyle[i.Col].Name
 				rect.FillColor = MapColor[t.TabStyle.HeaderColor]
 			} else if i.Row%2 == 0 {
-				box.Objects[1].(*canvas.Text).Text = data[i.Row-1][i.Col]
-				box.Objects[1].(*canvas.Text).Color = &color.NRGBA{R: 128, G: 0, B: 128, A: 255}
-				//box.Objects[1].(*widget.Label).SetText(data[i.Row-1][i.Col])
+				//	box.Objects[1].(*canvas.Text).Text = data[i.Row-1][i.Col]
+				//	box.Objects[1].(*canvas.Text).Color = &color.NRGBA{R: 128, G: 0, B: 128, A: 255}
+				box.Objects[1].(*widget.Label).SetText(data[i.Row-1][i.Col])
 				rect.FillColor = MapColor[t.TabStyle.RowAlterColor]
 			} else {
 				box.Objects[1].(*canvas.Text).Text = data[i.Row-1][i.Col]
 				rect.FillColor = MapColor[t.TabStyle.RowColor]
+			}
+			if val, ok := MapColor[t.ColumnStyle[i.Col].BGColor]; ok {
+				rect.FillColor = mix(val, rect.FillColor)
 			}
 		})
 	for i := 0; i < len(mess.Data.DataDescription[1]); i++ {
