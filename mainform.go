@@ -77,7 +77,7 @@ func nextContainer(mes *MessageGob) {
 
 }
 
-//InitFormLocal - инициализация структуры формы.
+// InitFormLocal - инициализация структуры формы.
 func InitFormLocal(mes *MessageGob) {
 	app := mes.Data.Data
 	fd := appValues[mes.Data.ID]
@@ -311,7 +311,7 @@ func InitForm(form, parameters string) fyne.Window {
 	return myWindow
 }
 
-//SendMessage -  отправить сообщение серверу
+// SendMessage -  отправить сообщение серверу
 func SendMessage(Action string, d GetData) {
 	var buff bytes.Buffer
 	enc := gob.NewEncoder(&buff)
@@ -344,4 +344,52 @@ func UpdateFormContent(param GetData) {
 		Data:   param,               // данные контейнера, формы
 	})
 	Cl.Reci <- buff.Bytes()
+}
+
+func FieldsCreate(mes *MessageGob) {
+
+	var vb []*fyne.Container
+	f := mes.Data.ID
+	c := mes.Data.Container
+	fd := mes.Data.Data
+	fEntry := make(map[string]entryForm)
+	v := container.New(layout.NewHBoxLayout())
+
+	for i := 0; i < len(fd); i++ {
+		for k := len(vb); k < len(fd[i])*2; k++ {
+			vb = append(vb, container.New(layout.NewVBoxLayout()))
+			vb = append(vb, container.New(layout.NewVBoxLayout()))
+		}
+		for j := 0; j < len(fd[i]); j++ {
+			vb[j*2].Add(widget.NewLabel(fd[i][j])) //.Name
+			entry := widget.NewEntry()
+			if fd[i][j] == "" {
+				entry.PlaceHolder = fd[i][j] //.Title
+			} else {
+				entry.Text = fd[i][j] //.Value
+			}
+			entry.Wrapping = fyne.TextWrapOff
+			vb[j*2+1].Add(entry)
+			fEntry[fd[i][j]] = entryForm{Value: fd[i][j], Widget: entry} //.Value
+		}
+	}
+
+	for i := 0; i < len(vb); i++ {
+		v.Add(vb[i])
+	}
+	beans := appValues[f]
+	beans.Entry = fEntry
+	appValues[f] = beans
+	for j := 0; j < len(fd[0]); j++ {
+		h := container.New(layout.NewVBoxLayout())
+		for i := 0; i < len(fd); i++ {
+			h.Add(widget.NewLabel(fd[i][j]))
+			// entry := widget.NewEntry()
+			// entry.PlaceHolder = f[i][j].Title
+			// h.Add(entry)
+		}
+		v.Add(h)
+	}
+	createParent(f, appValues[f].form[c][ParentID])
+	nextContainer(mes)
 }

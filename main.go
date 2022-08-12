@@ -2,6 +2,7 @@ package main
 
 import (
 	"fyne.io/fyne/v2/app"
+	"fyne.io/fyne/v2/theme"
 	"fynegui/pkg/logging"
 )
 
@@ -16,7 +17,7 @@ func main() {
 	logger = logging.GetLogger()
 	logger.Infof("InitFormLocal")
 	go connectServer()
-	myApp.Settings().Theme()
+	myApp.Settings().SetTheme(theme.DefaultTheme())
 	RegFunc("uc", UpdateForm) // обновим форму
 
 	//RegFunc("InitFormLocal", GetDataContainer) //Получим структуру создаваемой формы

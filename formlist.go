@@ -13,21 +13,21 @@ import (
 func NewTableList1(mess *MessageGob) *widget.Table {
 	data := mess.Data.Data
 	t := &TableOtoko{}
+	for i := 0; i < len(mess.Data.DataDescription[2]); i++ {
+		t.ColumnStyle[i].Name = mess.Data.DataDescription[2][i]
+		t.ColumnStyle[i].Type = mess.Data.DataDescription[1][i]
+	}
 
-	t.ColumnsName = mess.Data.DataDescription[2]
-	t.ColumnsType = mess.Data.DataDescription[1]
-	t.ColumnsWidth = []float32{40}
-	t.AlterRowColor = color.Gray{Y: 250}
-	t.HeaderColor = color.Gray{Y: 80}
-	t.RowColor = color.Gray{Y: 200}
+	t.TabStyle.RowAlterColor = "lightslategrey"
+	t.TabStyle.HeaderColor = "darkslategrey"
+	t.TabStyle.RowColor = "lightgrey"
 	t.Data = data
-	t.Edit = true
 	t.ID = mess.Data.Container
 	t.IDForm = mess.Data.ID
 
 	//TO.wb = make(map[*widget.Button]int)
-	t.wc = make(map[widget.TableCellID]*enterCheck)
-	t.we = make(map[widget.TableCellID]*enterEntry)
+	//t.wc = make(map[widget.TableCellID]*enterCheck)
+	//	t.we = make(map[widget.TableCellID]*enterEntry)
 
 	t.Table = widget.NewTable(
 		func() (int, int) {
@@ -37,7 +37,7 @@ func NewTableList1(mess *MessageGob) *widget.Table {
 
 			return container.New(layout.NewMaxLayout(),
 				canvas.NewRectangle(color.Gray{Y: 250}),
-				widget.NewLabel("wide content"),
+				canvas.NewText("Hello world", color.Opaque), //widget.NewLabel("wide content")
 			)
 
 		},
@@ -47,14 +47,16 @@ func NewTableList1(mess *MessageGob) *widget.Table {
 
 			rect := box.Objects[0].(*canvas.Rectangle)
 			if i.Row == 0 {
-				box.Objects[1].(*widget.Label).SetText(t.ColumnsName[i.Col])
-				rect.FillColor = t.HeaderColor
+				box.Objects[1].(*canvas.Text).Text = t.ColumnStyle[i.Col].Name
+				rect.FillColor = MapColor[t.TabStyle.HeaderColor]
 			} else if i.Row%2 == 0 {
-				box.Objects[1].(*widget.Label).SetText(data[i.Row-1][i.Col])
-				rect.FillColor = t.AlterRowColor
+				box.Objects[1].(*canvas.Text).Text = data[i.Row-1][i.Col]
+				box.Objects[1].(*canvas.Text).Color = &color.NRGBA{R: 128, G: 0, B: 128, A: 255}
+				//box.Objects[1].(*widget.Label).SetText(data[i.Row-1][i.Col])
+				rect.FillColor = MapColor[t.TabStyle.RowAlterColor]
 			} else {
-				box.Objects[1].(*widget.Label).SetText(data[i.Row-1][i.Col])
-				rect.FillColor = t.RowColor
+				box.Objects[1].(*canvas.Text).Text = data[i.Row-1][i.Col]
+				rect.FillColor = MapColor[t.TabStyle.RowColor]
 			}
 		})
 	for i := 0; i < len(mess.Data.DataDescription[1]); i++ {
