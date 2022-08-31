@@ -3,8 +3,10 @@ package main
 import (
 	"bytes"
 	"encoding/gob"
+	"fmt"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/widget"
 	"image/color"
@@ -152,6 +154,44 @@ func Accordion(mes *MessageGob) {
 			//mp := strings.Split(param.Parameters, ";")
 			w := InitForm(param.Parameters, "")
 			w.Show()
+			w.Canvas().SetOnTypedKey(func(k *fyne.KeyEvent) {
+
+				i := activeContainer.Selected
+				switch k.Name {
+				case "Down":
+					if len(activeContainer.Data)-1 > activeContainer.Selected.Row {
+						activeContainer.Selected = widget.TableCellID{Col: i.Col, Row: i.Row + 1}
+					}
+				case "Up":
+					if i.Row > 1 {
+						activeContainer.Selected = widget.TableCellID{Col: i.Col, Row: i.Row - 1}
+					}
+				case "Left":
+					if i.Col >= 1 {
+						activeContainer.Selected = widget.TableCellID{Col: i.Col - 1, Row: i.Row}
+					}
+				case "Right":
+					if len(activeContainer.Data[0])-1 > i.Col {
+						activeContainer.Selected = widget.TableCellID{Col: i.Col + 1, Row: i.Row}
+					}
+				case "KP_Enter", "Return":
+					Entry := widget.NewEntry()
+					Entry.Validator = getValidator(activeContainer.ColumnStyle[i.Row].Type)
+					items := []*widget.FormItem{
+						widget.NewFormItem("Username", Entry),
+					}
+					dialog.ShowForm("введите", "", "cancel", items, func(b bool) {
+						if !b {
+							return
+						}
+						fmt.Println("KP_Enter", Entry.Text)
+						activeContainer.Data[i.Row][i.Col] = Entry.Text
+					}, w)
+
+				}
+				activeContainer.Table.ScrollTo(activeContainer.Selected)
+				activeContainer.Table.Refresh()
+			})
 		}
 
 		appValues[f].Button[b[ID]] = ButtonData{Fun: b[Name] + "GenForm", Parameters: b[ID], Widget: d}
@@ -187,6 +227,32 @@ func top(f, c string) {
 	}
 
 	appValues[f].Container[c] = top
+	createParent(f, fd[c][ParentID])
+}
+
+func TableList(f, c string) {
+	var t fyne.CanvasObject
+	var m fyne.CanvasObject
+	form := appValues[f]
+	fd := appValues[f].form
+
+	mp := strings.Split(fd[c][ChildrensID], ";")
+
+	if val, ok := form.Container[mp[0]]; ok {
+		t = val
+	}
+	if val, ok := form.Container[mp[1]]; ok {
+		m = val
+		content := container.NewBorder(
+			t,
+			nil,
+			nil,
+			nil,
+			m,
+		)
+		appValues[f].Container[c] = content
+	}
+
 	createParent(f, fd[c][ParentID])
 }
 
@@ -268,7 +334,8 @@ func createParent(f, c string) {
 
 	case "Border":
 		border(f, c)
-
+	case "TableList":
+		TableList(f, c)
 	case "left":
 		top(f, c)
 	case "middle":
@@ -279,7 +346,7 @@ func createParent(f, c string) {
 // InitForm - инициализация формы 1
 func InitForm(form, parameters string) fyne.Window {
 	var br [][]string
-	logger.Tracef("Инициализация формы:" + form + " параметры:" + parameters)
+	logger.Tracef("Инициализация формы f:" + form + " c:" + parameters)
 	if val, ok := appValues[form]; ok {
 		return val.W
 	}

@@ -6,7 +6,7 @@ import (
 	"fyne.io/fyne/v2/widget"
 )
 
-func choiceFromList(l []string, w *TableOtoko, e *enterEntry) {
+func choiceFromList(l []string, w *TableOtoko, e *oLabel) {
 
 	myWindow := myApp.NewWindow("List Widget")
 
@@ -21,7 +21,7 @@ func choiceFromList(l []string, w *TableOtoko, e *enterEntry) {
 			o.(*widget.Label).SetText(Names[i])
 		})
 	list.OnSelected = func(id widget.ListItemID) {
-		g := w.we[e]
+		g := w.wol[e]
 		w.Properties.Data[g.Row][g.Col] = l[id]
 		w.ColumnStyle[g.Row].BGColor = l[id]
 		e.SetText(l[id])

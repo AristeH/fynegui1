@@ -8,9 +8,10 @@ import (
 
 var (
 	// список форм
-	appValues = make(map[string]*FormData)
-	myApp     = app.New()
-	logger    logging.Logger
+	appValues       = make(map[string]*FormData)
+	myApp           = app.New()
+	logger          logging.Logger
+	activeContainer *TableOtoko
 )
 
 func main() {
