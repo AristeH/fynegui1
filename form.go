@@ -11,13 +11,13 @@ import (
 )
 
 type ButtonData struct {
-	Parameters string // параметры кнопки формат Имяпараметра:Значение;... ИмяпараметраN:ЗначениеN;
-	Fun        string
-	Container  string         // функция выполняемая при нажатии на кнопку
+	Parameters map[string]string // параметры кнопки формат Имяпараметра:Значение;... ИмяпараметраN:ЗначениеN;
+	Fun        string            // функция выполняемая при нажатии на кнопку
+	Container  string
 	Widget     *widget.Button // отображение кнопки на экране
 }
 
-//FormData - данные формы
+// FormData - данные формы
 type FormData struct {
 	ID        string                       // ID - ГУИД формы
 	Entry     map[string]entryForm         // Entry  - список полей ввода формы
@@ -29,7 +29,7 @@ type FormData struct {
 	W         fyne.Window
 }
 
-//findButton - найдем кнопку в списке виджетов формы
+// findButton - найдем кнопку в списке виджетов формы
 // возвращает ссылку на форму FormData, и на кнопку ButtonData
 func findButton(d *widget.Button) (*FormData, *ButtonData) {
 	for _, f := range appValues {
@@ -43,7 +43,6 @@ func findButton(d *widget.Button) (*FormData, *ButtonData) {
 }
 
 // ToolBarCreate - создание командной панели
-//
 func ToolBarCreate(idform string, c string, but [][]string, color color.Color) *fyne.Container {
 
 	// Получим форму с данными
@@ -57,19 +56,21 @@ func ToolBarCreate(idform string, c string, but [][]string, color color.Color) *
 			f, b := findButton(d)
 			output := make([]string, 12)
 
-			output[ID] = f.ID                 // гуид подсистмы/кнопки
-			output[Parameters] = b.Parameters //параметрыфункции
-			output[Fun] = b.Fun               // функция для кнопки
+			output[ID] = f.ID                       // гуид подсистмы/кнопки
+			output[Parameters] = b.Parameters["ID"] //параметрыфункции
+			output[Fun] = b.Fun                     // функция для кнопки
 
 			br = append(br, output)
 
-			d := GetData{ID: idform, Data: br, Container: c}
+			d := GetData{Form: idform, Data: br, Action: b.Fun, Container: c}
 			UpdateContainer(d)
 			//SendMessage("GetDataContainer", d)
 		}
 		//ff := strings.Split(value[Name],":")
 		// сохраним кнопку в FormData
-		fd.Button[value[ID]] = ButtonData{Fun: value[Fun], Container: c, Parameters: value[Parameters], Widget: d}
+		mp := make(map[string]string)
+		mp["ID"] = value[ID]
+		fd.Button[value[ID]] = ButtonData{Fun: value[Fun], Container: c, Parameters: mp, Widget: d}
 		con.Add(d)
 	}
 	return container.New(layout.NewMaxLayout(), canvas.NewRectangle(color), con)

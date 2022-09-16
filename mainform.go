@@ -30,14 +30,91 @@ const (
 	Fun           int = 11 // тип метаданного
 )
 
-func UpdateForm(mes *MessageGob) {
-	f := mes.Data.ID
-	c := mes.Data.Container
-	if c == "form" {
-		InitFormLocal(mes)
-
-		return
+// InitForm - инициализация формы шаблон и объект
+func InitForm(form string) fyne.Window {
+	//var br [][]string
+	logger.Tracef("Инициализация формы f:" + form)
+	if val, ok := appValues[form]; ok {
+		return val.W
 	}
+	myWindow := myApp.NewWindow("")
+	myWindow.Resize(fyne.NewSize(1200, 400))
+	appValues[form] = &FormData{
+		ID:        form,
+		W:         myWindow,
+		Button:    make(map[string]ButtonData),
+		Container: make(map[string]fyne.CanvasObject),
+		Entry:     make(map[string]entryForm),
+		Table:     make(map[string]*TableOtoko),
+		Tree:      make(map[string]*TreeOtoko),
+		form:      make(map[string][]string),
+	}
+	//myWindow.CenterOnScreen()
+	if form != "main" {
+		myWindow.SetCloseIntercept(func() {
+			myWindow.Hide()
+		})
+	}
+	appValues[form].W = myWindow
+	myWindow.Show()
+	return myWindow
+}
+
+// FormDescription - инициализация структуры формы.
+func FormDescription(mes *GetData) {
+	app := mes.Data
+	fd := appValues[mes.Form]
+
+	for i := range app {
+		fd.form[app[i][ID]] = app[i]
+
+		if app[i][ParentID] != "0" {
+			fd.Container[strconv.Itoa(i)] = nil
+		}
+	}
+	var br [][]string
+	output := make([]string, 12)
+	output[ID] = fd.ID // гуид подсистмы/кнопки
+	appValues[fd.ID].W = fd.W
+	br = append(br, output)
+	d := GetData{Form: fd.ID, Action: "FormStyle", Data: br}
+	UpdateContainer(d)
+
+}
+
+// FormStyle - заголовок, стиль формы
+func FormStyle(mes *GetData) {
+	app := mes.Data
+	fd := appValues[mes.Form]
+	fd.W.SetTitle(app[0][Synonym])
+	w := strings.Split(app[0][Style], ";")
+	if len(w) == 2 {
+		wf, _ := strconv.Atoi(w[0])
+		hf, _ := strconv.Atoi(w[1])
+		fd.W.Resize(fyne.NewSize(float32(wf), float32(hf)))
+	} else {
+		fd.W.Resize(fyne.NewSize(1000, 1000))
+	}
+	fd.W.SetCloseIntercept(func() {
+		fd.W.Hide()
+	})
+	fun := true
+	for i, j := range fd.form {
+		print(i)
+		print(j)
+		tc, _ := strconv.Atoi(j[ID])
+		mc, _ := strconv.Atoi(mes.Container)
+		if fun && j[Parameters] == "true" && tc > mc {
+			d := GetData{Form: mes.Form, Action: j[Fun], Container: j[ID]}
+			UpdateContainer(d)
+			break
+		}
+	}
+}
+
+func UpdateForm(mes *GetData) {
+	f := mes.Form
+	c := mes.Container
 	form := appValues[f].form // map[string][]string
 	for i := range form {
 		if c == form[i][ID] {
@@ -52,110 +129,70 @@ func UpdateForm(mes *MessageGob) {
 
 }
 
-func nextContainer(mes *MessageGob) {
+func nextContainer(mes *GetData) {
 
-	fd := appValues[mes.Data.ID]
+	fd := appValues[mes.Form]
 	fun := true
 
 	for i := range fd.form {
-		if fun && fd.form[i][ID] > mes.Data.Container && fd.form[i][Parameters] == "true" {
+		tc, _ := strconv.Atoi(fd.form[i][ID])
+		mc, _ := strconv.Atoi(mes.Container)
+		if fun && tc > mc && fd.form[i][Parameters] == "true" {
 			var br [][]string
 			output := make([]string, 12)
 
-			output[ID] = fd.form[i][ID] // гуид подсистмы/кнопки
+			output[ID] = fd.form[i][ID] // гуид подсистемы/кнопки
 			//
 			output[Fun] = fd.form[i][Fun] // функция для кнопки
 
 			br = append(br, output)
 			fun = false
-			d := GetData{ID: mes.Data.ID, Data: br, Container: output[ID]}
+			d := GetData{Form: mes.Form, Action: fd.form[i][Fun], Data: br, Container: output[ID]}
 			UpdateContainer(d)
 			break
 		}
 	}
 	if fun {
-		SetContent(mes.Data.ID)
+		SetContent(mes.Form)
 	}
 
 }
 
-// InitFormLocal - инициализация структуры формы.
-func InitFormLocal(mes *MessageGob) {
-	app := mes.Data.Data
-	fd := appValues[mes.Data.ID]
-	fun := true
-	for i := range app {
-		fd.form[app[i][ID]] = app[i]
-		if fun && app[i][Parameters] == "true" {
-			var br [][]string
-			output := make([]string, 12)
-
-			output[ID] = app[i][ID] // гуид подсистмы/кнопки
-
-			output[Fun] = app[i][Fun] // функция для кнопки
-			fun = false
-			br = append(br, output)
-
-			d := GetData{ID: mes.Data.ID, Data: br, Container: output[ID]}
-			UpdateContainer(d)
-		}
-		if app[i][ParentID] != "0" {
-			fd.Container[strconv.Itoa(i)] = nil
-		}
-	}
-
-}
-
-// initform - заголовок, стиль формы
-func initform(mes *MessageGob) {
-	//f := mes.Data.ID
-	//c := mes.Data.Container
-	app := mes.Data.Data
-
-	//attr := getid(c.Data.ID)
-	fd := appValues[app[0][ID]]
-	fd.W.SetTitle(app[0][Synonym])
-	w := strings.Split(app[0][Style], ";")
-	if len(w) == 2 {
-		wf, _ := strconv.Atoi(w[0])
-		hf, _ := strconv.Atoi(w[1])
-		fd.W.Resize(fyne.NewSize(float32(wf), float32(hf)))
-	} else {
-		fd.W.Resize(fyne.NewSize(1000, 100))
-	}
-
-	fd.W.SetCloseIntercept(func() {
-		fd.W.Hide()
-	})
-
-}
-
-func ToolBar(mes *MessageGob) {
-	f := mes.Data.ID
-	c := mes.Data.Container
-	app := mes.Data.Data
-	tb := ToolBarCreate(f, c, app, color.Gray{Y: 230})
+func ToolBar(mes *GetData) {
+	f := mes.Form
+	c := mes.Container
+	tb := ToolBarCreate(f, c, mes.Data, color.Gray{Y: 230})
 	appValues[f].Container[c] = tb
 	createParent(f, appValues[f].form[c][ParentID])
 	nextContainer(mes)
 }
 
-func Accordion(mes *MessageGob) {
-	f := mes.Data.ID
-	c := mes.Data.Container
-	tbl := mes.Data.Data
+func Accordion(mes *GetData) {
+	f := mes.Form
+	c := mes.Container
+	tbl := mes.Data
+	fd := appValues[f]
 	contCatalog := container.NewVBox()
 	contDocument := container.NewVBox()
 	acc := widget.NewAccordion()
 	for _, b := range tbl {
 		d := widget.NewButton(b[Synonym], nil)
+		mp := make(map[string]string)
+		mp["form"] = b[ID]
+		mp["type"] = b[NameContainer]
+		fd.Button[b[ID]] = ButtonData{Fun: b[Fun], Container: c, Parameters: mp, Widget: d}
 		d.OnTapped = func() {
 			_, param := findButton(d)
+
 			//mp := strings.Split(param.Parameters, ";")
-			w := InitForm(param.Parameters, "")
+			w := InitForm(param.Parameters["form"])
+			d := GetData{Form: param.Parameters["form"], Action: "FormDescription"}
+			UpdateContainer(d)
 			w.Show()
 			w.Canvas().SetOnTypedKey(func(k *fyne.KeyEvent) {
-
+				if activeContainer == nil {
+					return
+				}
 				i := activeContainer.Selected
 				switch k.Name {
 				case "Down":
@@ -167,12 +204,23 @@ func Accordion(mes *MessageGob) {
 						activeContainer.Selected = widget.TableCellID{Col: i.Col, Row: i.Row - 1}
 					}
 				case "Left":
-					if i.Col >= 1 {
-						activeContainer.Selected = widget.TableCellID{Col: i.Col - 1, Row: i.Row}
+					r := activeContainer.Selected.Col
+					for r >= 1 && activeContainer.ColumnStyle[r-1].Width == 0 && 0 < r {
+						r--
+					}
+					if r >= 1 {
+						activeContainer.Selected = widget.TableCellID{Col: r - 1, Row: i.Row}
 					}
 				case "Right":
-					if len(activeContainer.Data[0])-1 > i.Col {
-						activeContainer.Selected = widget.TableCellID{Col: i.Col + 1, Row: i.Row}
+
+					r := activeContainer.Selected.Col
+					if len(activeContainer.Data[0])-1 > r {
+						r++
+						for activeContainer.ColumnStyle[r].Width == 0 && len(activeContainer.Data[0])-1 > r {
+							r++
+						}
+
+						activeContainer.Selected = widget.TableCellID{Col: r, Row: i.Row}
 					}
 				case "KP_Enter", "Return":
 					Entry := widget.NewEntry()
@@ -194,7 +242,7 @@ func Accordion(mes *MessageGob) {
 			})
 		}
 
-		appValues[f].Button[b[ID]] = ButtonData{Fun: b[Name] + "GenForm", Parameters: b[ID], Widget: d}
+		appValues[f].Button[b[ID]] = ButtonData{Fun: b[Name] + "GenForm", Parameters: mp, Widget: d}
 		switch b[TypeContainer] {
 		case "Справочник":
 			contCatalog.Add(d)
@@ -321,6 +369,7 @@ func SetContent(f string) {
 			break
 		}
 	}
+
 	appValues[f].W.SetContent(content)
 	appValues[f].W.Show()
 }
@@ -343,82 +392,38 @@ func createParent(f, c string) {
 	}
 }
 
-// InitForm - инициализация формы 1
-func InitForm(form, parameters string) fyne.Window {
-	var br [][]string
-	logger.Tracef("Инициализация формы f:" + form + " c:" + parameters)
-	if val, ok := appValues[form]; ok {
-		return val.W
-	}
-	myWindow := myApp.NewWindow("")
-	myWindow.Resize(fyne.NewSize(1200, 400))
-	appValues[form] = &FormData{
-		ID:        form,
-		W:         myWindow,
-		Button:    make(map[string]ButtonData),
-		Container: make(map[string]fyne.CanvasObject),
-		Entry:     make(map[string]entryForm),
-		Table:     make(map[string]*TableOtoko),
-		Tree:      make(map[string]*TreeOtoko),
-		form:      make(map[string][]string),
-	}
-
-	output := make([]string, 12)
-	output[ID] = form               // гуид подсистмы/кнопки
-	output[Parameters] = parameters //параметрыфункции
-	appValues[form].W = myWindow
-	br = append(br, output)
-	d := GetData{ID: form, Container: "", Data: br}
-	logger.Tracef("Получим данные формы с параметрами:" + form + " параметры:" + parameters)
-	UpdateContainer(d)
-	//UpdateFormContent(GetData{ID: form})
-	myWindow.SetCloseIntercept(func() {
-		myWindow.Hide()
-	})
-	return myWindow
-}
-
 // SendMessage -  отправить сообщение серверу
-func SendMessage(Action string, d GetData) {
+func SendMessage(d GetData) {
 	var buff bytes.Buffer
 	enc := gob.NewEncoder(&buff)
-	mes := MessageGob{
-		Action: Action,
-		Data:   d,
-	}
-	enc.Encode(mes)
+	enc.Encode(d)
 	k := buff.Bytes()
-	logger.Infof("ОТПР- Форма:" + d.ID + "Контейнер:" + d.Container + "Функция:" + Action + " параметры:" + d.Data[0][Parameters])
+	logger.Infof("ОТПР- Форма:" + d.Form + "Контейнер:" + d.Container + "Функция:" + d.Action + " параметры:" + d.Data[0][Parameters])
 	Cl.Reci <- k
 }
 
 func UpdateContainer(param GetData) {
 	var buff bytes.Buffer
 	enc := gob.NewEncoder(&buff)
-	enc.Encode(MessageGob{
-		Action: "GetDataContainer", //update container
-		Data:   param,              // данные контейнера, формы
-	})
-	logger.Tracef("Отправка сообщения форма:" + param.ID + " контейнер:" + param.Container)
-	Cl.Reci <- buff.Bytes()
+	enc.Encode(param)
+	logger.Tracef("Отправка ->f:" + param.Form + " c:" + param.Container)
+	k := buff.Bytes()
+	Cl.Reci <- k
 }
 
 func UpdateFormContent(param GetData) {
 	var buff bytes.Buffer
 	enc := gob.NewEncoder(&buff)
-	enc.Encode(MessageGob{
-		Action: "UpdateFormContent", //update container
-		Data:   param,               // данные контейнера, формы
-	})
+	enc.Encode(param)
 	Cl.Reci <- buff.Bytes()
 }
 
-func FieldsCreate(mes *MessageGob) {
+func FieldsCreate(mes *GetData) {
 
 	var vb []*fyne.Container
-	f := mes.Data.ID
-	c := mes.Data.Container
-	fd := mes.Data.Data
+	f := mes.Form
+	c := mes.Container
+	fd := mes.Data
 	fEntry := make(map[string]entryForm)
 	v := container.New(layout.NewHBoxLayout())
 

@@ -9,7 +9,7 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-var mfu map[string]func(*MessageGob)
+var mfu map[string]func(*GetData)
 var mfuLocal map[string]func(*FormData, *ButtonData)
 
 // Client  - структура
@@ -25,18 +25,11 @@ var Cl Client
 var CH chan string
 var VCH chan string
 
-type MessageGob struct {
-	Action     string  // Имя функуции
-	Parameters string  //параметры??
-	Data       GetData // Сведенеия о данных
-	File       FileUP  // сведения о передаваемом файле
-}
-
 type GetData struct {
-	ID              string
+	Form            string
 	Container       string
+	Action          string
 	Data            [][]string
-	UpdateForm      bool
 	DataDescription [][]string
 }
 
@@ -79,28 +72,29 @@ func readC() {
 			break
 		}
 		z := bytes.NewBuffer(message)
-		out := MessageGob{}
+		out := GetData{}
 		dec := gob.NewDecoder(z)
 		dec.Decode(&out)
 		//if out.Action == "" {
-		logger.Infof("Получил сообщение :" + out.Action + " Форма:" + out.Data.ID + " контейнер:" + out.Data.Container)
+		logger.Infof("<-:" + out.Action + " f:" + out.Form + " c:" + out.Container)
 		//}
-		if out.Data.ID != "" {
+		if out.Form != "" {
+			logger.Infof("прочитано:" + out.Action + " f:" + out.Form + " c:" + out.Container)
 			go Runproc(&out)
 		}
 	}
 }
 
 // RegFunc adds the fu func to a map of functions,
-func RegFunc(sName string, fu func(*MessageGob)) {
+func RegFunc(sName string, fu func(*GetData)) {
 	if mfu == nil {
-		mfu = make(map[string]func(*MessageGob))
+		mfu = make(map[string]func(*GetData))
 	}
 	mfu[sName] = fu
 }
 
 // Runproc выполним процедуру
-func Runproc(c *MessageGob) {
+func Runproc(c *GetData) {
 	if fnc, bExist := mfu[c.Action]; bExist {
 		fnc(c)
 	}
@@ -116,10 +110,11 @@ func write() {
 		if !ok {
 			err := Cl.socket.WriteMessage(websocket.CloseMessage, []byte{})
 			if err != nil {
-				logger.Infof(fmt.Sprintf("WebSocket Close Error: (%s)", err))
+
 			}
 			return
 		}
+		logger.Infof(fmt.Sprintf("write"))
 		err := Cl.socket.WriteMessage(websocket.TextMessage, message)
 		if err != nil {
 			fmt.Println("ошибка write:", err)
@@ -129,20 +124,5 @@ func write() {
 		//	logger.Infof(fmt.Sprintf(шибка ping: (%s)", err))
 		//	return
 		//}
-	}
-}
-
-// RegFuncLocal adds the fu func to a map of functions,
-func RegFuncLocal(sName string, fu func(*FormData, *ButtonData)) {
-	if mfuLocal == nil {
-		mfuLocal = make(map[string]func(*FormData, *ButtonData))
-	}
-	mfuLocal[sName] = fu
-}
-
-// RunprocLocal выполним процедуру
-func RunprocLocal(fd *FormData, sName *ButtonData) {
-	if fnc, bExist := mfuLocal[sName.Fun]; bExist {
-		fnc(fd, sName)
 	}
 }

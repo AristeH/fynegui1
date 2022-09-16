@@ -16,19 +16,21 @@ var (
 
 func main() {
 	logger = logging.GetLogger()
-	logger.Infof("InitFormLocal")
 	go connectServer()
 	myApp.Settings().SetTheme(theme.DefaultTheme())
 	RegFunc("uc", UpdateForm) // обновим форму
 
 	//RegFunc("InitFormLocal", GetDataContainer) //Получим структуру создаваемой формы
-	RegFunc("init", initform) //Получим описание формы
-	RegFunc("Toolbar", ToolBar)
+	RegFunc("FormStyle", FormStyle) //Получим описание формы
+	RegFunc("ToolBar", ToolBar)
 	RegFunc("Accordion", Accordion)
 	RegFunc("Table", Table)
-	//RegFunc("GetFile", GetFile)
+	RegFunc("FormDescription", FormDescription)
+	// создадим форму
 
-	myWindow := InitForm("main", "")
+	myWindow := InitForm("main")
+	d := GetData{Form: "main", Action: "FormDescription"}
+	UpdateContainer(d)
 	myWindow.ShowAndRun()
 
 }

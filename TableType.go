@@ -7,10 +7,8 @@ import (
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/data/validation"
 	"fyne.io/fyne/v2/layout"
-	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 	"image/color"
-	"log"
 	"strconv"
 )
 
@@ -72,6 +70,7 @@ func (t *TableOtoko) MakeTableLabel() {
 			entry.IDForm = t.IDForm
 			entry.IDTable = t.ID
 			entry.parent = t
+
 			return container.New(layout.NewMaxLayout(),
 				canvas.NewRectangle(color.Gray{Y: 250}),
 				entry,
@@ -86,12 +85,12 @@ func (t *TableOtoko) MakeTableLabel() {
 			entry = box.Objects[1].(*oLabel)
 			entry.Ind = &i
 			entry.SetText(t.Data[i.Row][i.Col])
-			entry.Alignment = fyne.TextAlignTrailing
-			entry.TextStyle = fyne.TextStyle{
-				Bold:      false,
-				Italic:    false,
-				Monospace: false,
-				TabWidth:  0,
+			t.Table.SetColumnWidth(i.Col, t.ColumnStyle[i.Col].Width)
+			//	si := fyne.MeasureText(entry.Text, 24, entry.TextStyle)
+			if t.ColumnStyle[i.Col].Type == "float" {
+				entry.Label.Alignment = fyne.TextAlignLeading
+			} else {
+				entry.Label.Alignment = fyne.TextAlignTrailing
 			}
 			if i.Row == 0 {
 				rect.FillColor = MapColor[t.TabStyle.HeaderColor]
@@ -101,6 +100,7 @@ func (t *TableOtoko) MakeTableLabel() {
 				}
 			} else if i.Row%2 == 0 {
 				rect.FillColor = MapColor[t.TabStyle.RowAlterColor]
+
 			} else {
 				rect.FillColor = MapColor[t.TabStyle.RowColor]
 			}
@@ -108,7 +108,7 @@ func (t *TableOtoko) MakeTableLabel() {
 				rect.FillColor = mix(val, rect.FillColor)
 			}
 			if i == t.Selected {
-				rect.FillColor = MapColor["tomato"]
+				rect.FillColor = MapColor["Selected"]
 			}
 		})
 	for ic, v := range t.ColumnStyle {
@@ -118,16 +118,16 @@ func (t *TableOtoko) MakeTableLabel() {
 		t.Selected = id
 		fmt.Printf("i.Col: %v\n", id.Col)
 	}
-
-	t.Tool = widget.NewToolbar(
-		widget.NewToolbarAction(theme.DocumentCreateIcon(), func() {
-			log.Println("New document")
-		}),
-		widget.NewToolbarSeparator(),
-		widget.NewToolbarAction(theme.ContentAddIcon(), func() {}),
-		widget.NewToolbarAction(theme.ContentRemoveIcon(), func() {}),
-		widget.NewToolbarSpacer(),
-		widget.NewToolbarAction(theme.SettingsIcon(), func() {}))
+	t.Table.Refresh()
+	//t.Tool = widget.NewToolbar(
+	//	widget.NewToolbarAction(theme.DocumentCreateIcon(), func() {
+	//		log.Println("New document")
+	//	}),
+	//	widget.NewToolbarSeparator(),
+	//	widget.NewToolbarAction(theme.ContentAddIcon(), func() {}),
+	//	widget.NewToolbarAction(theme.ContentRemoveIcon(), func() {}),
+	//	widget.NewToolbarSpacer(),
+	//	widget.NewToolbarAction(theme.SettingsIcon(), func() {}))
 }
 
 func getValidator(t string) fyne.StringValidator {

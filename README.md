@@ -26,4 +26,14 @@
 имя файла данные
 id таблица данных(id_рек_гуи значение )
 
+Обмен данными с сервером
+type GetData struct {
+    Form            string      //имя формы 
+    Container       string      // контейнер
+    Action          string      // функция на сервере
+    Data            [][]string  //данные
+    DataDescription [][]string  // описание данных
+}
+
+
 

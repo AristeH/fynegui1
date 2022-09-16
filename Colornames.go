@@ -35,7 +35,7 @@ func mix(src, dest color.Color) color.RGBA {
 	}
 }
 
-// Map contains named colors defined in the SVG 1.1 spec.
+// MapColor contains named colors defined in the SVG 1.1 spec.
 var MapColor = map[string]color.RGBA{
 	"aliceblue":            {0xf0, 0xf8, 0xff, 0xff}, // rgb(240, 248, 255)
 	"antiquewhite":         {0xfa, 0xeb, 0xd7, 0xff}, // rgb(250, 235, 215)
@@ -184,6 +184,10 @@ var MapColor = map[string]color.RGBA{
 	"whitesmoke":           {0xf5, 0xf5, 0xf5, 0xff}, // rgb(245, 245, 245)
 	"yellow":               {0xff, 0xff, 0x00, 0xff}, // rgb(255, 255, 0)
 	"yellowgreen":          {0x9a, 0xcd, 0x32, 0xff}, // rgb(154, 205, 50)
+	"RowAlterColor":        {0xd5, 0xd5, 0xd5, 0xff}, // rgb(192, 192, 192)
+	"HeaderColor":          {0xc0, 0xc0, 0xc0, 0xff}, // rgb(192, 192, 192)
+	"RowColor":             {0xf4, 0xf4, 0xf4, 0xff}, // rgb(192, 192, 192)
+	"Selected":             {0x9d, 0x9d, 0x9d, 0xff}, // rgb(192, 192, 192)
 }
 
 // Names contains the color names defined in the SVG 1.1 spec.
@@ -335,4 +339,7 @@ var Names = []string{
 	"whitesmoke",
 	"yellow",
 	"yellowgreen",
+	"HeaderColor",
+	"RowColor",
+	"Selected",
 }
