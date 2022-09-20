@@ -80,6 +80,9 @@ func readC() {
 		//}
 		if out.Form != "" {
 			logger.Infof("прочитано:" + out.Action + " f:" + out.Form + " c:" + out.Container)
+			if out.Action == "" {
+				out.Action = appValues[out.Form].form[out.Container][TypeContainer]
+			}
 			go Runproc(&out)
 		}
 	}
@@ -95,6 +98,7 @@ func RegFunc(sName string, fu func(*GetData)) {
 
 // Runproc выполним процедуру
 func Runproc(c *GetData) {
+
 	if fnc, bExist := mfu[c.Action]; bExist {
 		fnc(c)
 	}
@@ -125,4 +129,12 @@ func write() {
 		//	return
 		//}
 	}
+}
+
+func UpdateContainer(param GetData) {
+	var buff bytes.Buffer
+	enc := gob.NewEncoder(&buff)
+	enc.Encode(param)
+	k := buff.Bytes()
+	Cl.Reci <- k
 }

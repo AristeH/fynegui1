@@ -22,10 +22,11 @@ func main() {
 
 	//RegFunc("InitFormLocal", GetDataContainer) //Получим структуру создаваемой формы
 	RegFunc("FormStyle", FormStyle) //Получим описание формы
-	RegFunc("ToolBar", ToolBar)
+	RegFunc("Toolbar", ToolBar)
 	RegFunc("Accordion", Accordion)
 	RegFunc("Table", Table)
 	RegFunc("FormDescription", FormDescription)
+
 	// создадим форму
 
 	myWindow := InitForm("main")

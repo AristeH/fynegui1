@@ -21,9 +21,9 @@ func choiceFromList(l []string, w *TableOtoko, e *oLabel) {
 			o.(*widget.Label).SetText(Names[i])
 		})
 	list.OnSelected = func(id widget.ListItemID) {
-		g := w.wol[e]
-		w.Properties.Data[g.Row][g.Col] = l[id]
-		w.ColumnStyle[g.Row].BGColor = l[id]
+		//g := w.wol[e]
+		//w.Properties.Data[g.Row][g.Col] = l[id]
+		//w.ColumnStyle[g.Row].BGColor = l[id]
 		e.SetText(l[id])
 		fmt.Println(l[id])
 		myWindow.Close()

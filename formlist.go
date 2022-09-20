@@ -23,7 +23,7 @@ func NewTableList1(mess *GetData) *widget.Table {
 		cs.Name = mess.DataDescription[2][i]
 		cs.Type = mess.DataDescription[1][i]
 
-		b := mess.DataDescription[2][i] == "Ссылка" || strings.HasPrefix(mess.DataDescription[2][i], "id_")
+		b := mess.DataDescription[0][i] == "id" || strings.HasPrefix(mess.DataDescription[0][i], "id_")
 		if b {
 			cs.Width = 0
 		} else {
@@ -46,7 +46,7 @@ func NewTableList1(mess *GetData) *widget.Table {
 	t.Data = data
 	t.ID = mess.Container
 	t.IDForm = mess.Form
-	t.wol = make(map[*oLabel]widget.TableCellID)
+	//t.wol = make(map[*oLabel]widget.TableCellID)
 	t.MakeTableLabel()
 	activeContainer = t
 	return t.Table
@@ -61,4 +61,5 @@ func Table(mess *GetData) {
 
 	createParent(f, appValues[f].form[c][ParentID])
 	nextContainer(mess)
+	t.Refresh()
 }

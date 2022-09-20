@@ -54,8 +54,8 @@ type TableOtoko struct {
 	Properties  *TableOtoko
 	W           fyne.Window
 	Selected    widget.TableCellID
-	wol         map[*oLabel]widget.TableCellID
-	wb          map[*widget.Button]int
+	//	wol         map[*oLabel]widget.TableCellID
+	wb map[*widget.Button]int
 }
 
 func (t *TableOtoko) MakeTableLabel() {
@@ -85,12 +85,19 @@ func (t *TableOtoko) MakeTableLabel() {
 			entry = box.Objects[1].(*oLabel)
 			entry.Ind = &i
 			entry.SetText(t.Data[i.Row][i.Col])
-			t.Table.SetColumnWidth(i.Col, t.ColumnStyle[i.Col].Width)
-			//	si := fyne.MeasureText(entry.Text, 24, entry.TextStyle)
-			if t.ColumnStyle[i.Col].Type == "float" {
-				entry.Label.Alignment = fyne.TextAlignLeading
+			if t.ColumnStyle[i.Col].Width == 0 {
+				entry.Hidden = true
 			} else {
+				entry.Hidden = false
+			}
+
+			if t.ColumnStyle[i.Col].Type == "float" {
 				entry.Label.Alignment = fyne.TextAlignTrailing
+			} else {
+				entry.Label.Alignment = fyne.TextAlignLeading
+			}
+			entry.TextStyle = fyne.TextStyle{
+				Bold: false,
 			}
 			if i.Row == 0 {
 				rect.FillColor = MapColor[t.TabStyle.HeaderColor]
@@ -118,7 +125,7 @@ func (t *TableOtoko) MakeTableLabel() {
 		t.Selected = id
 		fmt.Printf("i.Col: %v\n", id.Col)
 	}
-	t.Table.Refresh()
+	//	t.Table.Refresh()
 	//t.Tool = widget.NewToolbar(
 	//	widget.NewToolbarAction(theme.DocumentCreateIcon(), func() {
 	//		log.Println("New document")

@@ -72,22 +72,16 @@ func FormDescription(mes *GetData) {
 			fd.Container[strconv.Itoa(i)] = nil
 		}
 	}
-	var br [][]string
-	output := make([]string, 12)
-	output[ID] = fd.ID // гуид подсистмы/кнопки
-	appValues[fd.ID].W = fd.W
-	br = append(br, output)
-	d := GetData{Form: fd.ID, Action: "FormStyle", Data: br}
-	UpdateContainer(d)
+	FormStyle(mes)
 
 }
 
 // FormStyle - заголовок, стиль формы
 func FormStyle(mes *GetData) {
-	app := mes.Data
+	app := mes.DataDescription
 	fd := appValues[mes.Form]
 	fd.W.SetTitle(app[0][Synonym])
-	w := strings.Split(app[0][Style], ";")
+	w := strings.Split(app[0][Style], "x")
 	if len(w) == 2 {
 		wf, _ := strconv.Atoi(w[0])
 		hf, _ := strconv.Atoi(w[1])
@@ -98,13 +92,11 @@ func FormStyle(mes *GetData) {
 	fd.W.SetCloseIntercept(func() {
 		fd.W.Hide()
 	})
-	fun := true
-	for i, j := range fd.form {
-		print(i)
-		print(j)
+
+	for _, j := range fd.form {
 		tc, _ := strconv.Atoi(j[ID])
 		mc, _ := strconv.Atoi(mes.Container)
-		if fun && j[Parameters] == "true" && tc > mc {
+		if j[Parameters] == "true" && tc > mc {
 			d := GetData{Form: mes.Form, Action: j[Fun], Container: j[ID]}
 			UpdateContainer(d)
 			break
@@ -238,11 +230,9 @@ func Accordion(mes *GetData) {
 
 				}
 				activeContainer.Table.ScrollTo(activeContainer.Selected)
-				activeContainer.Table.Refresh()
+				//activeContainer.Table.Refresh()
 			})
 		}
-
-		appValues[f].Button[b[ID]] = ButtonData{Fun: b[Name] + "GenForm", Parameters: mp, Widget: d}
 		switch b[TypeContainer] {
 		case "Справочник":
 			contCatalog.Add(d)
@@ -399,15 +389,6 @@ func SendMessage(d GetData) {
 	enc.Encode(d)
 	k := buff.Bytes()
 	logger.Infof("ОТПР- Форма:" + d.Form + "Контейнер:" + d.Container + "Функция:" + d.Action + " параметры:" + d.Data[0][Parameters])
-	Cl.Reci <- k
-}
-
-func UpdateContainer(param GetData) {
-	var buff bytes.Buffer
-	enc := gob.NewEncoder(&buff)
-	enc.Encode(param)
-	logger.Tracef("Отправка ->f:" + param.Form + " c:" + param.Container)
-	k := buff.Bytes()
 	Cl.Reci <- k
 }
 
