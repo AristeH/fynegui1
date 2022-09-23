@@ -7,6 +7,7 @@ import (
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/data/validation"
 	"fyne.io/fyne/v2/layout"
+	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 	"image/color"
 	"strconv"
@@ -54,8 +55,8 @@ type TableOtoko struct {
 	Properties  *TableOtoko
 	W           fyne.Window
 	Selected    widget.TableCellID
-	//	wol         map[*oLabel]widget.TableCellID
-	wb map[*widget.Button]int
+	wol         map[*oLabel]widget.TableCellID
+	wb          map[*widget.Button]int
 }
 
 func (t *TableOtoko) MakeTableLabel() {
@@ -70,30 +71,40 @@ func (t *TableOtoko) MakeTableLabel() {
 			entry.IDForm = t.IDForm
 			entry.IDTable = t.ID
 			entry.parent = t
-
+			toolbar := widget.NewToolbar()
+			content := container.New(layout.NewBorderLayout(nil, nil, entry, toolbar),
+				entry, toolbar)
 			return container.New(layout.NewMaxLayout(),
 				canvas.NewRectangle(color.Gray{Y: 250}),
-				entry,
+				content,
 			)
 
 		},
 		func(i widget.TableCellID, o fyne.CanvasObject) {
-			var entry *oLabel
 
+			toolbar := widget.NewToolbar()
+			open := widget.NewToolbarAction(theme.DocumentIcon(), func() {
+				fmt.Println("profile settings clicked in toolbar")
+			})
 			box := o.(*fyne.Container)
 			rect := box.Objects[0].(*canvas.Rectangle)
-			entry = box.Objects[1].(*oLabel)
+			entry := newOLabel()
 			entry.Ind = &i
+			entry.parent = t
 			entry.SetText(t.Data[i.Row][i.Col])
 			if t.ColumnStyle[i.Col].Width == 0 {
 				entry.Hidden = true
 			} else {
 				entry.Hidden = false
 			}
+			switch t.ColumnStyle[i.Col].Type {
 
-			if t.ColumnStyle[i.Col].Type == "float" {
+			case "float":
 				entry.Label.Alignment = fyne.TextAlignTrailing
-			} else {
+			case "String":
+				entry.Label.Alignment = fyne.TextAlignLeading
+			default:
+				toolbar.Append(open)
 				entry.Label.Alignment = fyne.TextAlignLeading
 			}
 			entry.TextStyle = fyne.TextStyle{
@@ -114,8 +125,16 @@ func (t *TableOtoko) MakeTableLabel() {
 			if val, ok := MapColor[t.ColumnStyle[i.Col].BGColor]; ok {
 				rect.FillColor = mix(val, rect.FillColor)
 			}
+			content := container.New(layout.NewBorderLayout(nil, nil, entry, nil), entry)
+			box.Objects[1] = content
 			if i == t.Selected {
 				rect.FillColor = MapColor["Selected"]
+				input := newoEntry()
+				input.Ind = &i
+				input.SetText(t.Data[i.Row][i.Col])
+				content := container.New(layout.NewBorderLayout(nil, nil, nil, toolbar),
+					toolbar, input)
+				box.Objects[1] = content
 			}
 		})
 	for ic, v := range t.ColumnStyle {
@@ -123,7 +142,10 @@ func (t *TableOtoko) MakeTableLabel() {
 	}
 	t.Table.OnSelected = func(id widget.TableCellID) {
 		t.Selected = id
+		activeContainer = t
 		fmt.Printf("i.Col: %v\n", id.Col)
+		t.Table.Refresh()
+
 	}
 	//	t.Table.Refresh()
 	//t.Tool = widget.NewToolbar(

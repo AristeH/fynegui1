@@ -20,7 +20,7 @@ func NewTableList1(mess *GetData) *widget.Table {
 
 	for i := 0; i < len(mess.DataDescription[2]); i++ {
 		cs := ColumnStyle{}
-		cs.Name = mess.DataDescription[2][i]
+		cs.Name = mess.DataDescription[0][i]
 		cs.Type = mess.DataDescription[1][i]
 
 		b := mess.DataDescription[0][i] == "id" || strings.HasPrefix(mess.DataDescription[0][i], "id_")

@@ -3,10 +3,8 @@ package main
 import (
 	"bytes"
 	"encoding/gob"
-	"fmt"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/widget"
 	"image/color"
@@ -44,10 +42,10 @@ func InitForm(form string) fyne.Window {
 		W:         myWindow,
 		Button:    make(map[string]ButtonData),
 		Container: make(map[string]fyne.CanvasObject),
-		Entry:     make(map[string]entryForm),
-		Table:     make(map[string]*TableOtoko),
-		Tree:      make(map[string]*TreeOtoko),
-		form:      make(map[string][]string),
+		//Entry:     make(map[string]entryForm),
+		Table: make(map[string]*TableOtoko),
+		Tree:  make(map[string]*TreeOtoko),
+		form:  make(map[string][]string),
 	}
 	//myWindow.CenterOnScreen()
 	if form != "main" {
@@ -192,6 +190,7 @@ func Accordion(mes *GetData) {
 						activeContainer.Selected = widget.TableCellID{Col: i.Col, Row: i.Row + 1}
 					}
 				case "Up":
+
 					if i.Row > 1 {
 						activeContainer.Selected = widget.TableCellID{Col: i.Col, Row: i.Row - 1}
 					}
@@ -215,18 +214,18 @@ func Accordion(mes *GetData) {
 						activeContainer.Selected = widget.TableCellID{Col: r, Row: i.Row}
 					}
 				case "KP_Enter", "Return":
-					Entry := widget.NewEntry()
-					Entry.Validator = getValidator(activeContainer.ColumnStyle[i.Row].Type)
-					items := []*widget.FormItem{
-						widget.NewFormItem("Username", Entry),
-					}
-					dialog.ShowForm("введите", "", "cancel", items, func(b bool) {
-						if !b {
-							return
-						}
-						fmt.Println("KP_Enter", Entry.Text)
-						activeContainer.Data[i.Row][i.Col] = Entry.Text
-					}, w)
+					//Entry := widget.NewEntry()
+					//Entry.Validator = getValidator(activeContainer.ColumnStyle[i.Row].Type)
+					//items := []*widget.FormItem{
+					//	widget.NewFormItem("Username", Entry),
+					//}
+					//dialog.ShowForm("введите", "", "cancel", items, func(b bool) {
+					//	if !b {
+					//		return
+					//	}
+					//	fmt.Println("KP_Enter", Entry.Text)
+					//	activeContainer.Data[i.Row][i.Col] = Entry.Text
+					//}, w)
 
 				}
 				activeContainer.Table.ScrollTo(activeContainer.Selected)
@@ -405,7 +404,7 @@ func FieldsCreate(mes *GetData) {
 	f := mes.Form
 	c := mes.Container
 	fd := mes.Data
-	fEntry := make(map[string]entryForm)
+	//fEntry := make(map[string]entryForm)
 	v := container.New(layout.NewHBoxLayout())
 
 	for i := 0; i < len(fd); i++ {
@@ -423,7 +422,7 @@ func FieldsCreate(mes *GetData) {
 			}
 			entry.Wrapping = fyne.TextWrapOff
 			vb[j*2+1].Add(entry)
-			fEntry[fd[i][j]] = entryForm{Value: fd[i][j], Widget: entry} //.Value
+			//fEntry[fd[i][j]] = entryForm{Value: fd[i][j], Widget: entry} //.Value
 		}
 	}
 
@@ -431,7 +430,7 @@ func FieldsCreate(mes *GetData) {
 		v.Add(vb[i])
 	}
 	beans := appValues[f]
-	beans.Entry = fEntry
+	//beans.Entry = fEntry
 	appValues[f] = beans
 	for j := 0; j < len(fd[0]); j++ {
 		h := container.New(layout.NewVBoxLayout())

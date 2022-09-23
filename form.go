@@ -19,8 +19,8 @@ type ButtonData struct {
 
 // FormData - данные формы
 type FormData struct {
-	ID        string                       // ID - ГУИД формы
-	Entry     map[string]entryForm         // Entry  - список полей ввода формы
+	ID string // ID - ГУИД формы
+	//Entry     map[string]entryForm         // Entry  - список полей ввода формы
 	Table     map[string]*TableOtoko       // Table  - список таблиц формы
 	Tree      map[string]*TreeOtoko        // Table  - список таблиц формы
 	Button    map[string]ButtonData        // Button - список кнопок формы
